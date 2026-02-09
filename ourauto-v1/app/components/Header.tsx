@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useTheme } from 'next-themes'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -10,6 +11,7 @@ export default function Header() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     const getUser = async () => {
@@ -56,18 +58,26 @@ export default function Header() {
             <>
               {!user ? (
                 <div className="flex gap-4 items-center">
-                  <Link
-                    href="/login"
-                    className="text-zinc-400 hover:text-white transition text-sm"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-5 py-2 rounded-lg transition text-sm"
-                  >
-                    Become Dealer
-                  </Link>
+                  <div className="flex gap-3 items-center">
+                    <button
+                      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                      className="px-3 py-1 border rounded"
+                    >
+                      {theme === 'dark' ? 'Light' : 'Dark'}
+                    </button>
+                    <Link
+                      href="/login"
+                      className="text-zinc-400 hover:text-white transition text-sm"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-5 py-2 rounded-lg transition text-sm"
+                    >
+                      Become Dealer
+                    </Link>
+                  </div>
                 </div>
               ) : (
                 <div className="flex gap-4 items-center">
