@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface Car {
   id: string
@@ -20,31 +21,39 @@ export default function DealerDashboard() {
   const [cars, setCars] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchCars = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+  const router = useRouter()
 
-      if (!user) return
+  const fetchCars = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-      const { data, error } = await supabase
-        .from('cars')
-        .select('*')
-        .eq('dealer_id', user.id)
-        .order('created_at', { ascending: false })
+    if (!user) return
 
-      if (error) {
-        console.error('Error fetching cars:', error)
-      } else {
-        setCars(data || [])
+    const { data, error } = await supabase
+      .from('cars')
+      .select('*')
+      .eq('dealer_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching cars:', error)
+    } else {
+      setCars(data || [])
+
+      // Enforce 6-car lock: redirect to onboarding if less than 6
+      if ((data || []).length < 6) {
+        router.push('/dealer/onboarding')
       }
-
-      setLoading(false)
     }
 
+    setLoading(false)
+  }
+
+  useEffect(() => {
     fetchCars()
-  }, [supabase])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const totalCars = cars.length
   const activeCars = cars.filter((c) => c.status === 'active').length
@@ -186,6 +195,21 @@ export default function DealerDashboard() {
                       >
                         View
                       </Link>
+                    </div>
+                    <div>
+                      <button
+                        onClick={async () => {
+                          await supabase
+                            .from('cars')
+                            .update({ status: car.status === 'active' ? 'draft' : 'active' })
+                            .eq('id', car.id)
+
+                          fetchCars()
+                        }}
+                        className="mt-2 text-sm px-3 py-1 border rounded"
+                      >
+                        {car.status === 'active' ? 'Set Draft' : 'Activate'}
+                      </button>
                     </div>
                   </div>
                 </div>

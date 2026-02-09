@@ -6,20 +6,22 @@ import Link from 'next/link'
 
 interface Car {
   id: string
-  name: string
-  brand: string
-  model: string
-  year: number
-  price: number
-  mileage: number
-  fuel_type: string
-  transmission: string
-  status: string
+  name?: string
+  title?: string
+  brand?: string
+  model?: string
+  year?: number
+  price?: number
+  mileage?: number
+  fuel_type?: string
+  transmission?: string
+  status?: string
+  car_images?: Array<{ image_url?: string }>
 }
 
 export default function MarketplacePage() {
   const supabase = createClient()
-  const [cars, setCars] = useState<Car[]>([])
+  const [cars, setCars] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState({
     brand: '',
@@ -29,7 +31,13 @@ export default function MarketplacePage() {
 
   useEffect(() => {
     const fetchCars = async () => {
-      let query = supabase.from('cars').select('*').eq('status', 'active')
+      let query = supabase
+        .from('cars')
+        .select(`
+          *,
+          car_images(image_url)
+        `)
+        .eq('is_active', true)
 
       if (filters.brand) {
         query = query.ilike('brand', `%${filters.brand}%`)
@@ -114,48 +122,38 @@ export default function MarketplacePage() {
         ) : (
           <>
             <p className="text-sm text-zinc-400 mb-6">{cars.length} cars found</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cars.map((car) => (
-                <Link
-                  key={car.id}
-                  href={`/car/${car.id}`}
-                  className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-yellow-500 transition group"
-                >
-                  {/* Image Placeholder */}
-                  <div className="bg-zinc-800 h-48 flex items-center justify-center group-hover:bg-zinc-700 transition">
-                    <span className="text-zinc-500">🚗 Car Image</span>
-                  </div>
+            <div className="p-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {cars?.map((car: any) => {
+                const image = car.car_images?.[0]?.image_url
 
-                  {/* Details */}
-                  <div className="p-5 space-y-3">
-                    <div>
-                      <h3 className="font-bold text-lg group-hover:text-yellow-500 transition">{car.name}</h3>
-                      <p className="text-sm text-zinc-400">
-                        {car.year} • {car.brand} {car.model}
+                return (
+                  <Link
+                    key={car.id}
+                    href={`/car/${car.id}`}
+                    className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow hover:scale-[1.02] transition-all duration-300"
+                  >
+                    {image && (
+                      <img
+                        src={image}
+                        alt={car.title ?? car.name}
+                        className="w-full h-48 object-cover"
+                      />
+                    )}
+
+                    <div className="p-4">
+                      <h2 className="font-semibold text-lg">{car.title ?? car.name}</h2>
+
+                      <p className="text-sm opacity-70">
+                        {car.brand} • {car.year}
+                      </p>
+
+                      <p className="mt-2 text-yellow-500 font-bold text-xl">
+                        {car.price ? `₹ ${car.price}` : ''}
                       </p>
                     </div>
-
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-zinc-500">Price:</span>
-                        <span className="font-bold text-yellow-500">{formatPrice(car.price)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-zinc-500">Mileage:</span>
-                        <span>{(car.mileage / 1000).toFixed(0)}K km</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-zinc-500">Fuel:</span>
-                        <span>{car.fuel_type}</span>
-                      </div>
-                    </div>
-
-                    <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 rounded-lg transition mt-4">
-                      View Details
-                    </button>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                )
+              })}
             </div>
           </>
         )}
