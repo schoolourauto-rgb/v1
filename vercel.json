@@ -1,6 +1,1 @@
-{
-  "buildCommand": "cd ourauto-v1 && npm run build",
-  "installCommand": "cd ourauto-v1 && npm install",
-  "devCommand": "cd ourauto-v1 && npm run dev",
-  "outputDirectory": "ourauto-v1/.next"
-}
+{}
