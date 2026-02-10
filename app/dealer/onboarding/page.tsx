@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export default function OnboardingPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted text-white">
       <div className="max-w-3xl mx-auto px-6 py-20">
         <div className="text-center space-y-8">
           <div>
@@ -12,14 +12,14 @@ export default function OnboardingPage() {
             <p className="text-zinc-400 text-lg">Get your dealership up and running in minutes</p>
           </div>
 
-          <div className="bg-yellow-900/20 border border-yellow-800 p-8 rounded-2xl space-y-4">
+          <div className="bg-yellow-900/20 border border-yellow-800 p-8 rounded-2xl shadow-lg backdrop-blur-sm space-y-4">
             <h2 className="text-2xl font-semibold text-yellow-400">Next Step: Add Your First Car</h2>
             <p className="text-zinc-300">
               To unlock the marketplace and start selling, you need to list a minimum of <strong>6 cars</strong> on your
               profile.
             </p>
 
-            <div className="bg-black/50 p-6 rounded-xl space-y-3 text-left">
+            <div className="bg-black/50 p-6 rounded-2xl space-y-3 text-left border border-zinc-800">
               <div className="flex gap-3">
                 <span className="text-2xl">📋</span>
                 <div>
@@ -47,19 +47,19 @@ export default function OnboardingPage() {
           <div className="space-y-4">
             <Link
               href="/dealer/add-car"
-              className="block bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-4 rounded-lg transition text-lg"
+              className="block bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-4 rounded-2xl shadow-lg backdrop-blur-sm border border-border transition text-lg hover:scale-[1.02] active:scale-95 duration-200"
             >
               Add Your First Car
             </Link>
             <Link
               href="/dealer/dashboard"
-              className="block bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-8 py-4 rounded-lg transition"
+              className="block bg-zinc-800 hover:bg-zinc-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-lg backdrop-blur-sm border border-border transition hover:scale-[1.02] active:scale-95 duration-200"
             >
               View Dashboard
             </Link>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl text-left space-y-2">
+          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-left space-y-2">
             <p className="text-sm text-zinc-400">
               <strong>💡 Pro Tip:</strong> Professional photos, detailed descriptions, and competitive pricing help you
               get more inquiries.

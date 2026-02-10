@@ -93,9 +93,9 @@ export default function Header() {
 
   return (
     <header className="border-b border-zinc-800 bg-background sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-foreground hover:text-yellow-500 transition">
+        <Link href="/" className="text-xl md:text-2xl font-bold text-foreground hover:text-yellow-500 transition">
           OurAuto
         </Link>
 
@@ -116,13 +116,7 @@ export default function Header() {
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             )}
           </button>
-          {/* Location button (for manual trigger) */}
-          <button
-            className="rounded p-2 hover:bg-accent"
-            onClick={handleGetLocation}
-          >
-            📍 Enable Location
-          </button>
+            {/* Location button removed as per new UX */}
           {/* PWA Install button */}
           {showInstall && (
             <button
@@ -145,7 +139,7 @@ export default function Header() {
                     </Link>
                     <Link
                       href="/signup"
-                      className="bg-yellow-500 hover:bg-yellow-600 text-foreground font-semibold px-5 py-2 rounded-lg transition text-sm"
+                      className="bg-yellow-500 hover:bg-yellow-600 text-foreground font-semibold px-5 py-2 rounded-2xl shadow-lg backdrop-blur-sm border border-border transition text-sm hover:scale-[1.02] active:scale-95 duration-200"
                     >
                       Become Dealer
                     </Link>

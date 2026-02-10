@@ -1,6 +1,8 @@
 
 import Header from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/theme-provider";
+import LocationPopup from "@/components/LocationPopup";
+import InstallAppPopup from "@/components/InstallAppPopup";
 import "./globals.css";
 
 export default function RootLayout({
@@ -19,6 +21,8 @@ export default function RootLayout({
           <Header />
           <main className="flex-1 flex flex-col">
             {children}
+            <LocationPopup />
+            <InstallAppPopup />
           </main>
         </ThemeProvider>
       </body>
