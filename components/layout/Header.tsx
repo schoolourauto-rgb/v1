@@ -15,14 +15,12 @@ export default function Header() {
 
         {/* LEFT SIDE - LOGO */}
         <Link href="/" className="flex items-center">
-          <Image
-            src="/logo.png"
-            alt="OurAuto"
-            width={140}
-            height={40}
-            priority
-            className="object-contain"
-          />
+          <Link
+            href="/"
+            className="text-2xl font-bold tracking-tight text-black dark:text-white"
+          >
+            OurAuto
+          </Link>
         </Link>
 
         {/* DESKTOP MENU */}
