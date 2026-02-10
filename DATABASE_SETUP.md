@@ -1,3 +1,4 @@
+// Moved to /docs/DATABASE_SETUP.md
 # 🚀 Supabase Database & Storage Setup Guide
 
 ## ✅ Step 1: Create `cars` Table

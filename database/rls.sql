@@ -1,0 +1,2 @@
+-- Paste your RLS policy export here.
+-- Example: CREATE POLICY, ALTER POLICY, etc.

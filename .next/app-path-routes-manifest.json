@@ -1,0 +1,14 @@
+{
+  "/favicon.ico/route": "/favicon.ico",
+  "/_not-found/page": "/_not-found",
+  "/(auth)/signup/page": "/signup",
+  "/car/[id]/page": "/car/[id]",
+  "/dealer/add-car/page": "/dealer/add-car",
+  "/dealer/dashboard/page": "/dealer/dashboard",
+  "/dealer/edit-car/[id]/page": "/dealer/edit-car/[id]",
+  "/dealer/onboarding/page": "/dealer/onboarding",
+  "/marketplace/page": "/marketplace",
+  "/page": "/",
+  "/(auth)/login/page": "/login",
+  "/_global-error/page": "/_global-error"
+}

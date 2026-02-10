@@ -40,11 +40,7 @@ export default function DealerDashboard() {
       console.error('Error fetching cars:', error)
     } else {
       setCars(data || [])
-
-      // Enforce 6-car lock: redirect to onboarding if less than 6
-      if ((data || []).length < 6) {
-        router.push('/dealer/onboarding')
-      }
+      // Onboarding flow frozen for V1. No redirect.
     }
 
     setLoading(false)

@@ -55,7 +55,8 @@ export default function SignupPage() {
         return
       }
 
-      router.push('/dealer/onboarding')
+      // Onboarding flow frozen for V1. Go to dashboard after signup.
+      router.push('/dealer/dashboard')
     } catch (err) {
       setError('Something went wrong')
       setLoading(false)

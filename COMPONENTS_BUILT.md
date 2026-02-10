@@ -1,3 +1,4 @@
+// Moved to /docs/COMPONENTS_BUILT.md
 # 🔥 OurAuto Platform - Built Components
 
 ## 🏗️ Current Architecture
