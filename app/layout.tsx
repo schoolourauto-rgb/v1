@@ -1,5 +1,6 @@
-import Header from "@/components/layout/Header";
 
+import Header from "@/components/layout/Header";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export default function RootLayout({
@@ -8,12 +9,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#000000" />
+      </head>
       <body className="min-h-screen bg-background text-foreground antialiased">
-        <Header />
-        <main className="flex-1 flex flex-col">
-        {children}
-        </main>
+        <ThemeProvider>
+          <Header />
+          <main className="flex-1 flex flex-col">
+            {children}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -64,11 +64,11 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white px-4">
-      <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl w-full max-w-md space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
+      <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm w-full max-w-md space-y-4">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">Dealer Signup</h1>
-          <p className="text-zinc-400 text-sm">Join OurAuto Marketplace</p>
+          <p className="text-muted-foreground text-sm">Join OurAuto Marketplace</p>
         </div>
 
         {error && (
@@ -80,7 +80,7 @@ export default function SignupPage() {
         <div className="space-y-3">
           <input
             placeholder="Business Name"
-            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
             value={form.business_name}
             onChange={(e) => setForm({ ...form, business_name: e.target.value })}
             disabled={loading}
@@ -88,7 +88,7 @@ export default function SignupPage() {
 
           <input
             placeholder="Owner Name"
-            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
             value={form.owner_name}
             onChange={(e) => setForm({ ...form, owner_name: e.target.value })}
             disabled={loading}
@@ -96,7 +96,7 @@ export default function SignupPage() {
 
           <input
             placeholder="Mobile"
-            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
             value={form.mobile}
             onChange={(e) => setForm({ ...form, mobile: e.target.value })}
             disabled={loading}
@@ -105,7 +105,7 @@ export default function SignupPage() {
           <input
             placeholder="Email"
             type="email"
-            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             disabled={loading}
@@ -114,7 +114,7 @@ export default function SignupPage() {
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             disabled={loading}
@@ -124,12 +124,12 @@ export default function SignupPage() {
         <button
           onClick={handleSignup}
           disabled={loading}
-          className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold p-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-primary hover:opacity-90 text-primary-foreground font-semibold p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Creating Account...' : 'Create Account'}
         </button>
 
-        <p className="text-center text-zinc-400 text-sm">
+        <p className="text-center text-muted-foreground text-sm">
           Already have an account?{' '}
           <a href="/login" className="text-yellow-500 hover:underline">
             Login

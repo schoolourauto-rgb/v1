@@ -42,11 +42,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white px-4">
-      <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl w-full max-w-md space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
+      <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm w-full max-w-md space-y-4">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">Dealer Login</h1>
-          <p className="text-zinc-400 text-sm">Access Your OurAuto Dashboard</p>
+          <p className="text-muted-foreground text-sm">Access Your OurAuto Dashboard</p>
         </div>
 
         {error && (
@@ -59,7 +59,7 @@ export default function LoginPage() {
           <input
             placeholder="Email"
             type="email"
-            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             disabled={loading}
@@ -68,7 +68,7 @@ export default function LoginPage() {
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             disabled={loading}
@@ -78,12 +78,12 @@ export default function LoginPage() {
         <button
           onClick={handleLogin}
           disabled={loading}
-          className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold p-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-primary hover:opacity-90 text-primary-foreground font-semibold p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
 
-        <div className="space-y-2 text-center text-sm text-zinc-400">
+        <div className="space-y-2 text-center text-sm text-muted-foreground">
           <p>
             Don't have an account?{' '}
             <Link href="/signup" className="text-yellow-500 hover:underline">

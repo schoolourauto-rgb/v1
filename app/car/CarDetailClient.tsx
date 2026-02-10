@@ -9,14 +9,14 @@ export default function CarDetail({ car, user }: any) {
   const dealerMobile = car.profiles?.mobile
 
   return (
-    <div className="p-10 max-w-5xl mx-auto">
+    <div className="min-h-screen bg-background text-foreground p-10 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">{car.title || car.name}</h1>
 
       {/* Main Image */}
       {selected && (
         <img
           src={selected}
-          className="w-full h-96 object-cover rounded-xl"
+          className="w-full h-96 object-cover rounded-xl bg-muted"
         />
       )}
 
@@ -27,7 +27,7 @@ export default function CarDetail({ car, user }: any) {
             key={index}
             src={img.image_url}
             onClick={() => setSelected(img.image_url)}
-            className="w-24 h-24 object-cover rounded cursor-pointer border"
+            className="w-24 h-24 object-cover rounded cursor-pointer border border-border bg-muted"
           />
         ))}
       </div>
@@ -37,7 +37,7 @@ export default function CarDetail({ car, user }: any) {
       </p>
 
       {!user && (
-        <p className="text-yellow-500 mt-4">Login to view full details</p>
+        <p className="text-primary mt-4">Login to view full details</p>
       )}
 
       {dealerMobile && (
@@ -47,7 +47,7 @@ export default function CarDetail({ car, user }: any) {
           )}`}
           target="_blank"
           rel="noreferrer"
-          className="inline-block mt-6 bg-green-500 text-white px-6 py-3 rounded-lg"
+          className="inline-block mt-6 bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:opacity-90 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40"
         >
           Contact Dealer on WhatsApp
         </a>

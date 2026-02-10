@@ -169,17 +169,17 @@ export default function EditCarPage() {
   }
 
   return (
-    <div className="bg-black min-h-screen">
+    <div className="bg-background text-foreground min-h-screen">
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="mb-8">
           <Link href="/dealer/dashboard" className="text-yellow-500 hover:underline mb-4 inline-block text-sm">
             ← Back to Dashboard
           </Link>
           <h1 className="text-4xl font-bold mb-2">Edit Car</h1>
-          <p className="text-zinc-400">Update your car listing</p>
+          <p className="text-muted-foreground">Update your car listing</p>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl space-y-6">
+        <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm space-y-6">
           {error && (
             <div className="bg-red-900/20 border border-red-800 text-red-300 p-4 rounded-lg text-sm">
               ⚠️ {error}
@@ -192,7 +192,7 @@ export default function EditCarPage() {
 
             <input
               placeholder="Car Title"
-              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+              className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               disabled={saving}
@@ -201,14 +201,14 @@ export default function EditCarPage() {
             <div className="grid grid-cols-2 gap-4">
               <input
                 placeholder="Brand"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.brand}
                 onChange={(e) => setForm({ ...form, brand: e.target.value })}
                 disabled={saving}
               />
               <input
                 placeholder="Model"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.model}
                 onChange={(e) => setForm({ ...form, model: e.target.value })}
                 disabled={saving}
@@ -219,14 +219,14 @@ export default function EditCarPage() {
               <input
                 type="number"
                 placeholder="Year"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.year}
                 onChange={(e) => setForm({ ...form, year: e.target.value })}
                 disabled={saving}
               />
               <input
                 placeholder="Color"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.color}
                 onChange={(e) => setForm({ ...form, color: e.target.value })}
                 disabled={saving}
@@ -237,7 +237,7 @@ export default function EditCarPage() {
               <input
                 type="number"
                 placeholder="Price (₹)"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 disabled={saving}
@@ -245,7 +245,7 @@ export default function EditCarPage() {
               <input
                 type="number"
                 placeholder="KM Driven"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.km_driven}
                 onChange={(e) => setForm({ ...form, km_driven: e.target.value })}
                 disabled={saving}
@@ -255,14 +255,14 @@ export default function EditCarPage() {
             <div className="grid grid-cols-2 gap-4">
               <input
                 placeholder="Fuel Type"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.fuel_type}
                 onChange={(e) => setForm({ ...form, fuel_type: e.target.value })}
                 disabled={saving}
               />
               <input
                 placeholder="Transmission"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.transmission}
                 onChange={(e) => setForm({ ...form, transmission: e.target.value })}
                 disabled={saving}
@@ -271,7 +271,7 @@ export default function EditCarPage() {
 
             <textarea
               placeholder="Description"
-              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition h-24"
+              className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200 h-24"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               disabled={saving}
@@ -283,14 +283,14 @@ export default function EditCarPage() {
             <button
               onClick={handleUpdate}
               disabled={saving}
-              className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold p-3 rounded-lg transition disabled:opacity-50"
+              className="flex-1 bg-primary hover:opacity-90 text-primary-foreground font-semibold p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
               disabled={saving}
-              className="flex-1 bg-red-900/30 hover:bg-red-900/50 border border-red-800 text-red-400 font-semibold p-3 rounded-lg transition disabled:opacity-50"
+              className="flex-1 bg-muted text-foreground border border-border font-semibold p-3 rounded-lg hover:bg-muted/70 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
             >
               Delete Car
             </button>
@@ -298,21 +298,21 @@ export default function EditCarPage() {
 
           {/* Delete Confirmation */}
           {showDeleteConfirm && (
-            <div className="bg-red-900/20 border border-red-800 p-6 rounded-lg space-y-4">
-              <p className="text-red-300 font-semibold">Are you sure you want to delete this car?</p>
-              <p className="text-sm text-red-300/70">This action cannot be undone and will also delete all associated images.</p>
+            <div className="bg-muted border border-border p-6 rounded-lg space-y-4">
+                <p className="text-muted-foreground font-semibold">Are you sure you want to delete this car?</p>
+                <p className="text-sm text-muted-foreground">This action cannot be undone and will also delete all associated images.</p>
               <div className="flex gap-3">
                 <button
                   onClick={handleDelete}
                   disabled={saving}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold p-2 rounded-lg transition disabled:opacity-50"
+                  className="flex-1 bg-primary hover:opacity-90 text-primary-foreground font-semibold p-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
                 >
                   {saving ? 'Deleting...' : 'Yes, Delete'}
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={saving}
-                  className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold p-2 rounded-lg transition disabled:opacity-50"
+                  className="flex-1 bg-muted text-foreground border border-border font-semibold p-2 rounded-lg hover:bg-muted/70 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
                 >
                   Cancel
                 </button>

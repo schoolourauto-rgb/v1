@@ -57,31 +57,31 @@ export default function DealerDashboard() {
   const isUnlocked = totalCars >= 6
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl font-bold mb-2">Dealer Dashboard</h1>
-          <p className="text-zinc-400">Manage your car inventory</p>
+          <p className="text-muted-foreground">Manage your car inventory</p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
-            <p className="text-zinc-400 text-sm font-medium">Total Cars</p>
+          <div className="bg-card text-card-foreground border border-border p-6 rounded-xl shadow-sm">
+            <p className="text-muted-foreground text-sm font-medium">Total Cars</p>
             <p className="text-4xl font-bold mt-2">{totalCars}</p>
           </div>
-          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
-            <p className="text-zinc-400 text-sm font-medium">Active Listings</p>
+          <div className="bg-card text-card-foreground border border-border p-6 rounded-xl shadow-sm">
+            <p className="text-muted-foreground text-sm font-medium">Active Listings</p>
             <p className="text-4xl font-bold mt-2 text-green-500">{activeCars}</p>
           </div>
-          <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
-            <p className="text-zinc-400 text-sm font-medium">Drafts</p>
+          <div className="bg-card text-card-foreground border border-border p-6 rounded-xl shadow-sm">
+            <p className="text-muted-foreground text-sm font-medium">Drafts</p>
             <p className="text-4xl font-bold mt-2 text-yellow-500">{draftCars}</p>
           </div>
           <div
-            className={`border p-6 rounded-xl ${
-              isUnlocked ? 'bg-green-900/30 border-green-800' : 'bg-yellow-900/30 border-yellow-800'
+            className={`border border-border p-6 rounded-xl shadow-sm ${
+              isUnlocked ? 'bg-green-900/30' : 'bg-yellow-900/30'
             }`}
           >
             <p className={`text-sm font-medium ${isUnlocked ? 'text-green-400' : 'text-yellow-400'}`}>
@@ -95,7 +95,7 @@ export default function DealerDashboard() {
 
         {/* Unlock Progress */}
         {!isUnlocked && (
-          <div className="bg-yellow-900/20 border border-yellow-800 p-6 rounded-xl mb-12">
+          <div className="bg-yellow-900/20 border border-yellow-800 p-6 rounded-xl shadow-sm mb-12">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-yellow-400">Unlock Marketplace</h3>
@@ -103,14 +103,14 @@ export default function DealerDashboard() {
               </div>
               <Link
                 href="/dealer/add-car"
-                className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-lg transition"
+                className="bg-primary hover:opacity-90 text-primary-foreground font-semibold px-6 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40"
               >
                 + Add Car
               </Link>
             </div>
             <div className="w-full bg-yellow-900/30 rounded-full h-2">
               <div
-                className="bg-yellow-500 h-2 rounded-full transition-all"
+                className="bg-primary h-2 rounded-full transition-all"
                 style={{ width: `${(totalCars / 6) * 100}%` }}
               />
             </div>
@@ -122,7 +122,7 @@ export default function DealerDashboard() {
           <div className="mb-12">
             <Link
               href="/dealer/add-car"
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-3 rounded-lg transition inline-block"
+              className="bg-primary hover:opacity-90 text-primary-foreground font-semibold px-8 py-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 inline-block"
             >
               + Add Another Car
             </Link>
@@ -138,11 +138,11 @@ export default function DealerDashboard() {
               <p className="text-zinc-400">Loading your cars...</p>
             </div>
           ) : cars.length === 0 ? (
-            <div className="bg-zinc-900 border border-zinc-800 p-12 rounded-xl text-center">
-              <p className="text-zinc-400 mb-4">No cars added yet</p>
+            <div className="bg-card text-card-foreground border border-border p-12 rounded-xl shadow-sm text-center">
+              <p className="text-muted-foreground mb-4">No cars added yet</p>
               <Link
                 href="/dealer/add-car"
-                className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2.5 rounded-lg transition inline-block"
+                className="bg-primary hover:opacity-90 text-primary-foreground font-semibold px-6 py-2.5 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 inline-block"
               >
                 Add Your First Car
               </Link>
@@ -150,15 +150,15 @@ export default function DealerDashboard() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {cars.map((car) => (
-                <div key={car.id} className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-yellow-500 transition">
-                  <div className="bg-zinc-800 h-40 flex items-center justify-center">
-                    <p className="text-zinc-500 text-sm">No image yet</p>
+                <div key={car.id} className="bg-card text-card-foreground border border-border rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
+                  <div className="bg-muted h-40 flex items-center justify-center">
+                    <p className="text-muted-foreground text-sm">No image yet</p>
                   </div>
 
                   <div className="p-4 space-y-3">
                     <div>
                       <h3 className="text-lg font-semibold">{car.name}</h3>
-                      <p className="text-sm text-zinc-400">
+                      <p className="text-sm text-muted-foreground">
                         {car.year} • {car.brand} {car.model}
                       </p>
                     </div>
@@ -181,13 +181,13 @@ export default function DealerDashboard() {
                     <div className="flex gap-2 pt-2">
                       <Link
                         href={`/dealer/edit-car/${car.id}`}
-                        className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white text-sm py-2 rounded-lg transition text-center"
+                        className="flex-1 bg-muted hover:bg-muted/70 text-foreground text-sm py-2 rounded-lg border border-border transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 text-center"
                       >
                         Edit
                       </Link>
                       <Link
                         href={`/car/${car.id}`}
-                        className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-sm py-2 rounded-lg transition text-center"
+                        className="flex-1 bg-primary hover:opacity-90 text-primary-foreground font-semibold text-sm py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 text-center"
                       >
                         View
                       </Link>
@@ -202,7 +202,7 @@ export default function DealerDashboard() {
 
                           fetchCars()
                         }}
-                        className="mt-2 text-sm px-3 py-1 border rounded"
+                        className="mt-2 text-sm px-3 py-1 border border-border rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40"
                       >
                         {car.status === 'active' ? 'Set Draft' : 'Activate'}
                       </button>

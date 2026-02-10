@@ -141,14 +141,14 @@ export default function AddCarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen bg-background text-foreground p-6">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Add New Car</h1>
-          <p className="text-zinc-400">List your vehicle on OurAuto marketplace</p>
+          <p className="text-muted-foreground">List your vehicle on OurAuto marketplace</p>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl space-y-6">
+        <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm space-y-6">
           {error && (
             <div className="bg-red-900/20 border border-red-800 text-red-300 p-4 rounded-lg text-sm">
               ⚠️ {error}
@@ -161,7 +161,7 @@ export default function AddCarPage() {
 
             <input
               placeholder="Car Title (e.g., 2023 Honda Civic Type-R)"
-              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+              className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               disabled={loading}
@@ -170,14 +170,14 @@ export default function AddCarPage() {
             <div className="grid grid-cols-2 gap-4">
               <input
                 placeholder="Brand"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.brand}
                 onChange={(e) => setForm({ ...form, brand: e.target.value })}
                 disabled={loading}
               />
               <input
                 placeholder="Model"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.model}
                 onChange={(e) => setForm({ ...form, model: e.target.value })}
                 disabled={loading}
@@ -188,7 +188,7 @@ export default function AddCarPage() {
               <input
                 type="number"
                 placeholder="Year"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.year}
                 onChange={(e) => setForm({ ...form, year: e.target.value })}
                 disabled={loading}
@@ -196,7 +196,7 @@ export default function AddCarPage() {
               <input
                 type="number"
                 placeholder="Price (₹)"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 disabled={loading}
@@ -206,7 +206,7 @@ export default function AddCarPage() {
             <input
               type="number"
               placeholder="KM Driven"
-              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+              className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
               value={form.km_driven}
               onChange={(e) => setForm({ ...form, km_driven: e.target.value })}
               disabled={loading}
@@ -215,14 +215,14 @@ export default function AddCarPage() {
             <div className="grid grid-cols-2 gap-4">
               <input
                 placeholder="Fuel Type"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.fuel_type}
                 onChange={(e) => setForm({ ...form, fuel_type: e.target.value })}
                 disabled={loading}
               />
               <input
                 placeholder="Transmission"
-                className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition"
+                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
                 value={form.transmission}
                 onChange={(e) => setForm({ ...form, transmission: e.target.value })}
                 disabled={loading}
@@ -231,7 +231,7 @@ export default function AddCarPage() {
 
             <textarea
               placeholder="Description (condition, features, service history, etc.)"
-              className="w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500 transition h-24"
+              className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200 h-24"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               disabled={loading}
@@ -242,7 +242,7 @@ export default function AddCarPage() {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-yellow-500">Photos (Minimum 5 Required)</h2>
 
-            <div className="border-2 border-dashed border-zinc-700 rounded-lg p-8 text-center hover:border-yellow-500 transition">
+            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary transition-colors duration-200">
               <input
                 type="file"
                 multiple
@@ -253,8 +253,8 @@ export default function AddCarPage() {
                 disabled={loading}
               />
               <label htmlFor="file-input" className="cursor-pointer block">
-                <p className="text-zinc-400 text-sm">Click to upload or drag and drop</p>
-                <p className="text-yellow-500 font-semibold mt-2">
+                <p className="text-muted-foreground text-sm">Click to upload or drag and drop</p>
+                <p className="text-primary font-semibold mt-2">
                   {images ? `${images.length} files selected` : 'Choose images'}
                 </p>
               </label>
@@ -263,10 +263,10 @@ export default function AddCarPage() {
             {/* Image Preview */}
             {preview.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm text-zinc-400">{preview.length} images selected</p>
+                <p className="text-sm text-muted-foreground">{preview.length} images selected</p>
                 <div className="grid grid-cols-3 gap-3">
                   {preview.map((img, idx) => (
-                    <div key={idx} className="aspect-video rounded-lg overflow-hidden border border-zinc-700">
+                    <div key={idx} className="aspect-video rounded-md overflow-hidden border border-border">
                       <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
                     </div>
                   ))}
@@ -279,12 +279,12 @@ export default function AddCarPage() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold p-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-primary hover:opacity-90 text-primary-foreground font-semibold p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Uploading Car & Images...' : 'List Car on Marketplace'}
           </button>
 
-          <p className="text-xs text-zinc-500 text-center">
+          <p className="text-xs text-muted-foreground text-center">
             Your car will be saved as draft. You can publish after adding 5+ cars.
           </p>
         </div>

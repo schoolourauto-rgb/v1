@@ -41,10 +41,10 @@ export default function Header() {
   }
 
   return (
-    <header className="border-b border-zinc-800 bg-black sticky top-0 z-50">
+    <header className="border-b border-zinc-800 bg-background sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-white hover:text-yellow-500 transition">
+        <Link href="/" className="text-2xl font-bold text-foreground hover:text-yellow-500 transition">
           OurAuto
         </Link>
 
@@ -73,7 +73,7 @@ export default function Header() {
                     </Link>
                     <Link
                       href="/signup"
-                      className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-5 py-2 rounded-lg transition text-sm"
+                      className="bg-yellow-500 hover:bg-yellow-600 text-foreground font-semibold px-5 py-2 rounded-lg transition text-sm"
                     >
                       Become Dealer
                     </Link>
