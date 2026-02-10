@@ -1,78 +1,50 @@
-'use client'
-
-import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import CarCard from '@/components/marketplace/CarCard'
+import ListingCardSkeleton from '@/components/marketplace/ListingCardSkeleton'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 interface Car {
   id: string
-  name?: string
-  title?: string
-  brand?: string
-  model?: string
-  year?: number
-  price?: number
-  mileage?: number
-  fuel_type?: string
-  transmission?: string
-  status?: string
+  name: string
+  brand: string
+  year: number
+  price: number
+  location: string
+  status: string
+  created_at: string
   car_images?: Array<{ image_url?: string }>
 }
 
-export default function MarketplacePage() {
+export default async function MarketplacePage({ searchParams }: { searchParams?: Promise<any> }) {
   const supabase = createClient()
-  const [cars, setCars] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState({
-    brand: '',
-    minPrice: '',
-    maxPrice: '',
-  })
+  let query = supabase
+    .from('cars')
+    .select('id, name, brand, year, price, location, status, created_at, car_images(image_url)')
+    .eq('status', 'active')
 
-  useEffect(() => {
-    const fetchCars = async () => {
-      let query = supabase
-        .from('cars')
-        .select(`
-          *,
-          car_images(image_url)
-        `)
-        .eq('is_active', true)
-
-      if (filters.brand) {
-        query = query.ilike('brand', `%${filters.brand}%`)
-      }
-
-      if (filters.minPrice) {
-        query = query.gte('price', Number(filters.minPrice))
-      }
-
-      if (filters.maxPrice) {
-        query = query.lte('price', Number(filters.maxPrice))
-      }
-
-      const { data, error } = await query.order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error fetching cars:', error)
-      } else {
-        setCars(data || [])
-      }
-
-      setLoading(false)
-    }
-
-    fetchCars()
-  }, [filters, supabase])
-
-  const formatPrice = (price: number) => {
-    if (price >= 10000000) {
-      return `₹${(price / 10000000).toFixed(1)}Cr`
-    } else if (price >= 100000) {
-      return `₹${(price / 100000).toFixed(1)}L`
-    }
-    return `₹${price.toLocaleString()}`
+  // Filters from URL
+  let params: any = {}
+  if (searchParams) {
+    params = await searchParams
   }
+  const { brand, city, min, max, sort } = params || {}
+  if (brand) query = query.eq('brand', brand)
+  if (city) query = query.eq('location', city)
+  if (min) query = query.gte('price', Number(min))
+  if (max) query = query.lte('price', Number(max))
+
+  // Sorting
+  if (sort === 'price_low') query = query.order('price', { ascending: true })
+  else if (sort === 'price_high') query = query.order('price', { ascending: false })
+  else query = query.order('created_at', { ascending: false })
+
+  const { data: cars, error } = await query
+
+  // Helper for price formatting
+  const formatPrice = (price: number) =>
+    price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })
 
   return (
     <div className="bg-black min-h-screen">
@@ -84,36 +56,56 @@ export default function MarketplacePage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl mb-12 space-y-4">
+        <form className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl mb-12 space-y-4" method="get">
           <h3 className="font-semibold text-yellow-500">Filters</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <input
+              name="brand"
               placeholder="Brand (e.g., Honda, BMW)"
               className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500"
-              value={filters.brand}
-              onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
+              defaultValue={brand || ''}
             />
             <input
+              name="city"
+              placeholder="City (e.g., Mumbai)"
+              className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500"
+              defaultValue={city || ''}
+            />
+            <input
+              name="min"
               placeholder="Min Price"
               type="number"
               className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500"
-              value={filters.minPrice}
-              onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
+              defaultValue={min || ''}
             />
             <input
+              name="max"
               placeholder="Max Price"
               type="number"
               className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500"
-              value={filters.maxPrice}
-              onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+              defaultValue={max || ''}
             />
+            <select
+              name="sort"
+              className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-yellow-500"
+              defaultValue={sort || 'newest'}
+            >
+              <option value="newest">Newest</option>
+              <option value="price_low">Price Low → High</option>
+              <option value="price_high">Price High → Low</option>
+            </select>
           </div>
-        </div>
+          <button type="submit" className="mt-6 px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black font-semibold">
+            Apply Filters
+          </button>
+        </form>
 
         {/* Results */}
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-zinc-400">Loading cars...</p>
+        {!cars ? (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 animate-fadeInUp">
+            {[...Array(6)].map((_, i) => (
+              <ListingCardSkeleton key={i} />
+            ))}
           </div>
         ) : cars.length === 0 ? (
           <div className="bg-zinc-900 border border-zinc-800 p-12 rounded-xl text-center">
@@ -122,38 +114,18 @@ export default function MarketplacePage() {
         ) : (
           <>
             <p className="text-sm text-zinc-400 mb-6">{cars.length} cars found</p>
-            <div className="p-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cars?.map((car: any) => {
-                const image = car.car_images?.[0]?.image_url
-
-                return (
-                  <Link
-                    key={car.id}
-                    href={`/car/${car.id}`}
-                    className="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow hover:scale-[1.02] transition-all duration-300"
-                  >
-                    {image && (
-                      <img
-                        src={image}
-                        alt={car.title ?? car.name}
-                        className="w-full h-48 object-cover"
-                      />
-                    )}
-
-                    <div className="p-4">
-                      <h2 className="font-semibold text-lg">{car.title ?? car.name}</h2>
-
-                      <p className="text-sm opacity-70">
-                        {car.brand} • {car.year}
-                      </p>
-
-                      <p className="mt-2 text-yellow-500 font-bold text-xl">
-                        {car.price ? `₹ ${car.price}` : ''}
-                      </p>
-                    </div>
-                  </Link>
-                )
-              })}
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 animate-fadeInUp">
+              {cars.map((car: Car) => (
+                <CarCard
+                  key={car.id}
+                  id={car.id}
+                  image={car.car_images?.[0]?.image_url || "/logo.png"}
+                  title={car.name}
+                  year={car.year}
+                  price={formatPrice(car.price)}
+                  location={car.location}
+                />
+              ))}
             </div>
           </>
         )}

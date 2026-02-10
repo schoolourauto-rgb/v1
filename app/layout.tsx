@@ -1,10 +1,10 @@
 export const metadata = {
   title: "OurAuto",
-  description: "Buy & Sell Cars Easily",
+  description: "Premium Automotive Marketplace",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/icon-192.png",
   },
   manifest: "/manifest.json",
 };
@@ -30,11 +30,9 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground antialiased">
         <ThemeProvider>
           <Header />
-          <main className="flex-1 flex flex-col">
-            {children}
-            <LocationPopup />
-            <InstallAppPopup />
-          </main>
+          <LocationPopup />
+          <InstallAppPopup />
+          {children}
         </ThemeProvider>
       </body>
     </html>
