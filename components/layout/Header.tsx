@@ -13,12 +13,26 @@ export default function Header() {
     <header className="w-full border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-black/90 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
-        {/* LEFT SIDE */}
-        <Link
-          href="/"
-          className="text-2xl font-bold tracking-tight text-white"
-        >
-          OurAuto
+        {/* LEFT SIDE: Logo */}
+        <Link href="/" className="flex items-center" aria-label="OurAuto Home">
+          <div className="relative transition-opacity duration-300">
+            <Image
+              src="/logo-dark.svg"
+              alt="OurAuto"
+              width={160}
+              height={40}
+              className="block dark:hidden h-8 w-auto"
+              priority
+            />
+            <Image
+              src="/logo-light.svg"
+              alt="OurAuto"
+              width={160}
+              height={40}
+              className="hidden dark:block h-8 w-auto"
+              priority
+            />
+          </div>
         </Link>
 
         {/* DESKTOP MENU */}
