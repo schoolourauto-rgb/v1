@@ -1,53 +1,86 @@
+
 "use client"
 
-import Link from "next/link"
 import Image from "next/image"
-import { useTheme } from "next-themes"
+import Link from "next/link"
+import { useState } from "react"
+import { Menu, X } from "lucide-react"
 
 export default function Header() {
-  const { theme } = useTheme()
+  const [open, setOpen] = useState(false)
+
   return (
-    <header
-      className={`border-b w-full ${
-        theme === "dark" ? "bg-black border-border" : "bg-white border-gray-200"
-      }`}
-    >
-      <div className="mx-auto max-w-[1280px] flex items-center justify-between px-4 py-2">
-        <Link href="/" className="flex items-center" aria-label="OurAuto Home">
+    <header className="w-full border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-black/90 backdrop-blur-md sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+
+        {/* LEFT SIDE - LOGO */}
+        <Link href="/" className="flex items-center">
           <Image
             src="/logo.png"
-            alt="OurAuto Logo"
+            alt="OurAuto"
             width={140}
             height={40}
             priority
-            className="hidden md:block h-10 w-auto"
-          />
-          <Image
-            src="/logo.png"
-            alt="OurAuto Logo"
-            width={110}
-            height={32}
-            priority
-            className="md:hidden h-8 w-auto"
+            className="object-contain"
           />
         </Link>
-        <nav className="flex items-center space-x-4">
-          {/* Add navigation links here */}
-          <div className="md:hidden">
-            {/* Mobile menu placeholder */}
-            <button
-              className="rounded-lg p-2 text-gray-500 hover:text-primary focus:outline-none"
-              aria-label="Open mobile menu"
-            >
-              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-          </div>
+
+        {/* DESKTOP MENU */}
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+          <Link href="/marketplace" className="hover:text-blue-600 transition">
+            Marketplace
+          </Link>
+          <Link href="/sell" className="hover:text-blue-600 transition">
+            Sell Car
+          </Link>
+          <Link href="/dealer" className="hover:text-blue-600 transition">
+            Dealers
+          </Link>
+          <Link href="/about" className="hover:text-blue-600 transition">
+            About
+          </Link>
+
+          <Link
+            href="/login"
+            className="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black font-semibold transition"
+          >
+            Login
+          </Link>
         </nav>
+
+        {/* MOBILE MENU BUTTON */}
+        <button
+          className="md:hidden"
+          onClick={() => setOpen(!open)}
+        >
+          {open ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+
+      {/* MOBILE DROPDOWN */}
+      {open && (
+        <div className="md:hidden bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 px-6 py-4 space-y-4">
+          <Link href="/marketplace" onClick={() => setOpen(false)} className="block">
+            Marketplace
+          </Link>
+          <Link href="/sell" onClick={() => setOpen(false)} className="block">
+            Sell Car
+          </Link>
+          <Link href="/dealer" onClick={() => setOpen(false)} className="block">
+            Dealers
+          </Link>
+          <Link href="/about" onClick={() => setOpen(false)} className="block">
+            About
+          </Link>
+          <Link
+            href="/login"
+            onClick={() => setOpen(false)}
+            className="block px-4 py-2 bg-yellow-500 text-black rounded-lg font-semibold"
+          >
+            Login
+          </Link>
+        </div>
+      )}
     </header>
   )
 }
