@@ -1,3 +1,4 @@
+// Moved to /docs/QUICK_START.md
 # ⚡ Quick Start - Add Car System (5 Min Setup)
 
 ## 🎯 What's Ready to Test NOW

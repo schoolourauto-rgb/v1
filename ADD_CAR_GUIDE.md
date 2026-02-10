@@ -1,3 +1,4 @@
+// Moved to /docs/ADD_CAR_GUIDE.md
 # 🚀 Add Car System - Complete Implementation
 
 ## ✅ What's Built

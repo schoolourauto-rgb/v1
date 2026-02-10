@@ -1,0 +1,2 @@
+-- Paste your full schema export here.
+-- Example: CREATE TABLE, ALTER TABLE, etc.
