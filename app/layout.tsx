@@ -1,25 +1,20 @@
-import './globals.css'
-import Header from '../components/layout/Header'
-import Footer from '../components/layout/Footer'
-import ThemeProviderClient from './ThemeProviderClient'
+import Header from "@/components/layout/Header";
+
+import "./globals.css";
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProviderClient>
-          <div className="bg-white dark:bg-black text-black dark:text-white min-h-screen transition-colors duration-300">
-            {/* ...existing code... */}
-            <Header />
-            <main>{children}</main>
-            <Footer />
-          </div>
-        </ThemeProviderClient>
+    <html lang="en" className="dark">
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <Header />
+        <main className="flex-1 flex flex-col">
+        {children}
+        </main>
       </body>
     </html>
-  )
+  );
 }
