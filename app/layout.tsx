@@ -1,3 +1,13 @@
+export const metadata = {
+  title: "OurAuto",
+  description: "Buy & Sell Cars Easily",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
+  manifest: "/manifest.json",
+};
 
 import Header from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -13,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/favicon.png" sizes="32x32" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
       </head>
