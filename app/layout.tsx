@@ -13,8 +13,7 @@ export default function RootLayout({
       <body>
         <ThemeProviderClient>
           <div className="bg-white dark:bg-black text-black dark:text-white min-h-screen transition-colors duration-300">
-            {/* TEMP: Tailwind test box */}
-            <div className="bg-red-500 text-white p-10 text-4xl">TEST TAILWIND</div>
+            {/* ...existing code... */}
             <Header />
             <main>{children}</main>
             <Footer />
