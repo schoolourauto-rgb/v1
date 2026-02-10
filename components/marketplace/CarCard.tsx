@@ -26,11 +26,13 @@ export default function CarCard({
       {/* Image */}
       <div className="relative w-full aspect-[4/3]">
         <Image
-          src={image}
+          src={image || "/placeholder.jpg"}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover group-hover:scale-110 transition duration-700 ease-out"
+          className="rounded-xl object-cover group-hover:scale-110 transition duration-300 shadow-md hover:shadow-xl"
+          priority={false}
+          loading="lazy"
         />
       </div>
 
@@ -39,20 +41,20 @@ export default function CarCard({
         <h3 className="text-lg font-semibold text-white">
           {title}
         </h3>
-
+        <div className="flex items-center gap-2">
+          <span className="bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
+            ₹{price}
+          </span>
+          <span className="bg-neutral-800 text-white px-2 py-1 rounded text-xs">
+            {year}
+          </span>
+          <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs">
+            {location}
+          </span>
+        </div>
         <p className="text-sm text-gray-400">
           {year} • {location}
         </p>
-
-        <p className="text-xl font-bold text-yellow-500">
-          {price}
-        </p>
-
-        <div className="pt-3">
-          <span className="text-sm text-yellow-500 group-hover:underline">
-            View Details →
-          </span>
-        </div>
       </div>
     </Link>
   )
