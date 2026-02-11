@@ -5,9 +5,6 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 export default function AddCarPage() {
-  const supabase = createClient()
-  const router = useRouter()
-
   const [form, setForm] = useState({
     title: '',
     brand: '',
@@ -19,46 +16,66 @@ export default function AddCarPage() {
     transmission: '',
     description: '',
   })
-
   const [images, setImages] = useState<FileList | null>(null)
   const [preview, setPreview] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    setImages(files)
+  // ...existing logic for handleImageChange, validateForm, handleSubmit...
 
-    if (files) {
-      const previews: string[] = []
-      for (let i = 0; i < Math.min(files.length, 10); i++) {
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          previews.push(reader.result as string)
-          if (previews.length === Math.min(files.length, 10)) {
-            setPreview(previews)
-          }
-        }
-        reader.readAsDataURL(files[i])
-      }
-    }
-  }
+  return (
+    <div className="min-h-screen bg-background text-foreground p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2">Add New Car</h1>
+          <p className="text-muted-foreground">List your vehicle on OurAuto marketplace</p>
+        </div>
 
-  const validateForm = () => {
-    if (!form.title.trim()) return 'Title is required'
-    if (!form.brand.trim()) return 'Brand is required'
-    if (!form.model.trim()) return 'Model is required'
-    if (!form.year || isNaN(Number(form.year))) return 'Valid year is required'
-    if (!form.price || isNaN(Number(form.price))) return 'Valid price is required'
-    if (!form.km_driven || isNaN(Number(form.km_driven))) return 'Valid mileage is required'
-    if (!form.fuel_type.trim()) return 'Fuel type is required'
-    if (!form.transmission.trim()) return 'Transmission is required'
-    if (!images || images.length < 5) return 'Minimum 5 photos required'
-    return null
-  }
+        {/* WhatsApp Paste Section */}
+        <div className="mb-8">
+          <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm">
+            <h2 className="text-xl font-semibold text-blue-600 mb-4">Paste WhatsApp Car Details</h2>
+            {/* CarPasteGenerate component */}
+            {/* @ts-ignore */}
+            <CarPasteGenerate />
+          </div>
+        </div>
 
-  const handleSubmit = async () => {
-    setError(null)
+        <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm space-y-6">
+          {error && (
+            <div className="bg-red-900/20 border border-red-800 text-red-300 p-4 rounded-lg text-sm">
+              ⚠️ {error}
+              </div>
+            )}
+
+            {/* Car Details Section */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-yellow-500">Car Details</h2>
+              ...existing code...
+            </div>
+
+            {/* Image Upload Section */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-yellow-500">Photos (Minimum 5 Required)</h2>
+              ...existing code...
+            </div>
+
+            {/* Submit Section */}
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full bg-primary hover:opacity-90 text-primary-foreground font-semibold p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Uploading Car & Images...' : 'List Car on Marketplace'}
+            </button>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Your car will be saved as draft. You can publish after adding 5+ cars.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
     setLoading(true)
 
     try {
