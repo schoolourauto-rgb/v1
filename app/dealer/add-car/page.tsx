@@ -117,7 +117,7 @@ export default function AddCarPage() {
             .upload(`${car.id}/${fileName}`, file)
 
           if (uploadError) {
-            console.error('Upload error:', uploadError)
+            // ...existing code...
             continue
           }
 

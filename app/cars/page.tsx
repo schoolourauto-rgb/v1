@@ -29,7 +29,7 @@ export default async function CarsPage({ searchParams }: { searchParams: Promise
     .order("created_at", { ascending: false })
     .range(from, to);
   if (error) {
-    console.error(error);
+    // Error logging removed for production
   }
   const totalPages = Math.ceil((count || 0) / pageSize);
   if (!cars || cars.length === 0) {

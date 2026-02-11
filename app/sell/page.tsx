@@ -63,7 +63,7 @@ export default function SellPage() {
       setImage(null);
     } catch (e) {
       setStatus("Error listing car. Please try again.");
-      console.error(e);
+      // ...existing code...
     }
   };
 

@@ -41,12 +41,12 @@ export default function DealerDashboardPage() {
         .eq('seller_id', user.id)
         .order('created_at', { ascending: false })
       if (carsError) {
-        console.error('Error fetching cars:', carsError)
+        // ...existing code...
       } else {
         setCars(carsData || [])
       }
       if (leadsError) {
-        console.error('Error fetching leads:', leadsError)
+        // ...existing code...
       } else {
         setLeads(leadsData || [])
       }

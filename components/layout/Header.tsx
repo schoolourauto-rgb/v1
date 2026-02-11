@@ -1,10 +1,12 @@
 
 "use client"
 
+
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
+import Logo from "../Logo"
 
 export default function Header() {
   const [open, setOpen] = useState(false)
@@ -16,22 +18,10 @@ export default function Header() {
         {/* LEFT SIDE: Logo */}
         <Link href="/" className="flex items-center" aria-label="OurAuto Home">
           <div className="relative transition-opacity duration-300">
-            <Image
-              src="/logo-dark.svg"
-              alt="OurAuto"
-              width={160}
-              height={40}
-              className="block dark:hidden h-8 w-auto"
-              priority
-            />
-            <Image
-              src="/logo-light.svg"
-              alt="OurAuto"
-              width={160}
-              height={40}
-              className="hidden dark:block h-8 w-auto"
-              priority
-            />
+            {/* Professional SVG Logo component */}
+            <span className="block h-9 md:h-10 w-auto">
+              <Logo />
+            </span>
           </div>
         </Link>
 
