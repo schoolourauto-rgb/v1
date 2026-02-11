@@ -91,7 +91,32 @@ export default function LoginPage() {
             </Link>
           </p>
           <p>
-            <button className="text-yellow-500 hover:underline">
+            <button
+              className="text-yellow-500 hover:underline"
+              onClick={async () => {
+                if (!form.email) {
+                  setError('Enter your email to reset password.')
+                  return
+                }
+                setLoading(true)
+                setError(null)
+                try {
+                  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ourauto.in'
+                  const { error: resetError } = await supabase.auth.resetPasswordForEmail(form.email, {
+                    redirectTo: `${siteUrl}/reset-password`
+                  })
+                  if (resetError) {
+                    setError(resetError.message)
+                  } else {
+                    setError('Password reset email sent. Check your inbox.')
+                  }
+                } catch (err) {
+                  setError('Failed to send reset email.')
+                }
+                setLoading(false)
+              }}
+              disabled={loading}
+            >
               Forgot password?
             </button>
           </p>

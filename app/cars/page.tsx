@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import CarCard from "@/components/marketplace/CarCard";
