@@ -1,11 +1,10 @@
-
-import { createClient } from '@/lib/supabase/server'
-import Link from 'next/link'
-import CarDetail from '../CarDetailClient'
-import { Car, CarImage } from '@/types'
-
-export default async function Page({ params }: { params: { id: string } }) {
-  const supabase = createClient()
+import { createClient } from '@/lib/supabase/server';
+import Link from 'next/link';
+import { CarImage } from '@/types';
+import CarDetail from '../CarDetailClient';
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const supabase = createClient();
 
   const { data: car } = await supabase
     .from('cars')
@@ -14,8 +13,8 @@ export default async function Page({ params }: { params: { id: string } }) {
       car_images(image_url),
       profiles(mobile, business_name)
     `)
-    .eq('id', params.id)
-    .single()
+    .eq('id', id)
+    .single();
 
   const {
     data: { user },

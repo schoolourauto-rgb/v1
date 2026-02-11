@@ -1,8 +1,12 @@
 export const dynamic = "force-dynamic"
 import { createClient } from "@/lib/supabase/server";
 
+
 export default async function AdminCarsPage() {
   const supabase = createClient();
+  if (!supabase) {
+    throw new Error("Supabase client not initialized");
+  }
   const { data: cars } = await supabase
     .from("cars")
     .select("id, title, brand, model, year, price, dealer_id")

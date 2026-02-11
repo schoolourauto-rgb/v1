@@ -91,7 +91,7 @@ export default async function CarsPage({ searchParams }: { searchParams: Promise
           </form>
           <div className="mb-4 text-sm text-muted-foreground">{cars.length} cars found</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {cars.map(car => (
+            {cars.map((car: any) => (
               <CarCard
                 key={car.id}
                 id={car.id}

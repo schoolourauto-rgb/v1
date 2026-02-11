@@ -1,4 +1,5 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 
-export const createClient = () => null;
+// TODO: Implement actual Supabase client logic for production
+export const createClient = () => {
+	return null as any;
+};
