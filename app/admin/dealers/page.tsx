@@ -1,11 +1,15 @@
+
 import { createClient } from "@/lib/supabase/server";
+import { Dealer } from "@/types";
 
 export default async function AdminDealersPage() {
   const supabase = createClient();
-  const { data: dealers } = await supabase
-    .from("dealers")
-    .select("id, dealership_name, phone, location, verified")
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, business_name, owner_name, mobile, role, created_at, updated_at")
+    .eq("role", "dealer")
     .order("created_at", { ascending: false });
+  const dealers: Dealer[] = data ?? [];
 
   return (
     <div className="p-6">
@@ -21,12 +25,12 @@ export default async function AdminDealersPage() {
           </tr>
         </thead>
         <tbody>
-          {dealers?.map((dealer: any) => (
+          {dealers.map((dealer: Dealer) => (
             <tr key={dealer.id}>
-              <td>{dealer.dealership_name}</td>
-              <td>{dealer.phone}</td>
-              <td>{dealer.location}</td>
-              <td>{dealer.verified ? "Yes" : "No"}</td>
+              <td>{dealer.business_name}</td>
+              <td>{dealer.mobile}</td>
+              <td>-</td>
+              <td>Yes</td>
               <td>
                 {/* Approve/Reject toggle will be implemented here */}
               </td>

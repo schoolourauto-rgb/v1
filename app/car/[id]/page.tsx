@@ -1,8 +1,10 @@
+
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import CarDetail from '../CarDetailClient'
+import { Car, CarImage } from '@/types'
 
-export default async function Page({ params }: any) {
+export default async function Page({ params }: { params: { id: string } }) {
   const supabase = createClient()
 
   const { data: car } = await supabase
@@ -33,7 +35,7 @@ export default async function Page({ params }: any) {
   }
 
   // Structured data for SEO
-  const images = car.car_images?.map((img: any) => img.image_url) || []
+  const images = car.car_images?.map((img: CarImage) => img.image_url) ?? []
   const schemaProduct = {
     "@context": "https://schema.org",
     "@type": "Product",

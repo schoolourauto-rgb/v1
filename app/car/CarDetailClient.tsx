@@ -1,9 +1,17 @@
 "use client"
 
+
 import { useState } from 'react'
 import LeadForm from './[id]/LeadForm'
+import { CarWithImages } from '@/types'
+import { User } from '@supabase/supabase-js'
 
-export default function CarDetail({ car, user }: any) {
+interface CarDetailProps {
+  car: CarWithImages & { profiles?: { mobile?: string; business_name?: string } }
+  user: User | null
+}
+
+export default function CarDetail({ car, user }: CarDetailProps) {
   const images = car.car_images || []
   const [selected, setSelected] = useState(images[0]?.image_url)
   const dealerMobile = car.profiles?.mobile
@@ -18,7 +26,7 @@ export default function CarDetail({ car, user }: any) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
         {/* Gallery */}
         <div>
-          <h1 className="text-3xl font-bold mb-4">{car.title || car.name}</h1>
+          <h1 className="text-3xl font-bold mb-4">{car.name}</h1>
           {selected && (
             <img
               src={selected}
@@ -27,7 +35,7 @@ export default function CarDetail({ car, user }: any) {
           )}
           {/* Thumbnails */}
           <div className="flex gap-3 mt-4">
-            {images.map((img: any, index: number) => (
+            {images.map((img, index) => (
               <img
                 key={index}
                 src={img.image_url}
@@ -57,7 +65,7 @@ export default function CarDetail({ car, user }: any) {
             {dealerMobile && (
               <a
                 href={`https://wa.me/91${dealerMobile}?text=${encodeURIComponent(
-                  `I'm interested in ${car.title || car.name}`
+                  `I'm interested in ${car.name}`
                 )}`}
                 target="_blank"
                 rel="noreferrer"
