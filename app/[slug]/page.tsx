@@ -38,6 +38,28 @@ function parseSlug(slug: string) {
   return { brand, city, category }
 }
 
-export default function TestPage() {
-  return <div>Slug route working</div>;
+
+export default function LocationLandingPage() {
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    console.error("Supabase ENV variables missing");
+
+    return (
+      <div className="p-10 text-center">
+        <h1 className="text-2xl font-semibold">
+          Service temporarily unavailable
+        </h1>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-10 text-center">
+      <h1 className="text-2xl font-semibold">
+        Slug page working
+      </h1>
+    </div>
+  );
 }
