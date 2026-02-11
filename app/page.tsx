@@ -1,7 +1,6 @@
 export default function Home() {
   return <div>Home working</div>;
-    }
-                </section>
+}
 
                 {/* Social Proof Block */}
                 <section className="py-16 text-center">

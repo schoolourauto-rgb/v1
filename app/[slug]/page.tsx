@@ -50,7 +50,23 @@ export default function LocationLandingPage() {
       <div className="p-10 text-center">
         <h1 className="text-2xl font-semibold">
           Service temporarily unavailable
+    return (
+      <div className="p-10 text-center">
+        <h1 className="text-2xl font-semibold">
+          Service temporarily unavailable
         </h1>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-10 text-center">
+      <h1 className="text-2xl font-semibold">
+        Slug page working
+      </h1>
+    </div>
+  );
+}
       </div>
     );
   }
