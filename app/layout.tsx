@@ -1,6 +1,22 @@
 export const metadata = {
-  title: "OurAuto",
-  description: "Find and list verified cars across India.",
+  metadataBase: new URL("https://ourauto.in"),
+  title: {
+    default: "OurAuto | Buy & Sell Cars",
+    template: "%s | OurAuto",
+  },
+  description: "Find the best new and used cars across India.",
+  openGraph: {
+    type: "website",
+    url: "https://ourauto.in",
+    title: "OurAuto | Buy & Sell Cars",
+    description: "Explore cars, dealers, and listings on OurAuto.",
+    siteName: "OurAuto",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OurAuto | Buy & Sell Cars",
+    description: "Explore cars, dealers, and listings on OurAuto.",
+  },
   icons: {
     icon: "/favicon.svg",
     apple: "/apple-touch-icon.png",

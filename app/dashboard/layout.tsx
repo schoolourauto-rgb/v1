@@ -8,18 +8,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (!session) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
 
-  // Fetch user profile
-  const { data: profile } = await supabase
+  const { data: profile, error } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", session.user.id)
     .single();
 
-  if (!profile || (profile.role !== "dealer" && profile.role !== "admin")) {
+  if (error || !profile) {
+    redirect("/");
+  }
+
+  if (profile.role !== "dealer" && profile.role !== "admin") {
     redirect("/");
   }
 

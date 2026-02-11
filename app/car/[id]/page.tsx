@@ -1,116 +1,71 @@
-import { createServerClient } from '@/lib/supabase/server';
-import Link from 'next/link';
-import { CarImage } from '@/types';
-import CarDetail from '../CarDetailClient';
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const supabase = createServerClient();
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
 
-  const { data: car } = await supabase
-    .from('cars')
-    .select(`
-      *,
-      car_images(image_url),
-      profiles(mobile, business_name)
-    `)
-    .eq('id', id)
-    .single();
+  const title = `Car ${id} | OurAuto`
+  const description = `Explore specifications, features, pricing and dealer details for Car ${id} on OurAuto.`
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!car) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-zinc-400">Car not found</p>
-          <Link href="/marketplace" className="text-yellow-500 hover:underline">
-            Back to marketplace
-          </Link>
-        </div>
-      </div>
-    )
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://ourauto.in/car/${id}`,
+      siteName: "OurAuto",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   }
+}
 
-  // Structured data for SEO
-  const images = car.car_images?.map((img: CarImage) => img.image_url) ?? []
-  const schemaProduct = {
+export const revalidate = 60
+type Params = {
+  id: string
+}
+
+export default async function CarDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+
+  const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: car.title || car.name,
-    image: images,
-    description: `${car.year} ${car.brand} ${car.model} available in ${car.location || car.city}`,
+    "@type": "Vehicle",
+    name: `Car ${id}`,
     brand: {
       "@type": "Brand",
-      name: car.brand
+      name: "OurAuto",
     },
+    description: `Explore specifications and pricing for Car ${id}.`,
     offers: {
       "@type": "Offer",
       priceCurrency: "INR",
-      price: car.price,
+      price: "Contact for price",
       availability: "https://schema.org/InStock",
-      url: `https://ourauto.in/cars/${car.id}`
     },
-    vehicleModelDate: car.year,
-    mileageFromOdometer: {
-      "@type": "QuantitativeValue",
-      value: car.mileage,
-      unitCode: "KMT"
-    },
-    fuelType: car.fuel_type,
-    vehicleTransmission: car.transmission
-  }
-  const schemaBreadcrumb = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: "https://ourauto.in"
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Marketplace",
-        item: "https://ourauto.in/marketplace"
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: car.title || car.name,
-        item: `https://ourauto.in/cars/${car.id}`
-      }
-    ]
   }
 
   return (
-    <>
+    <div className="min-h-screen p-8">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaProduct) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd),
+        }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBreadcrumb) }}
-      />
-      <CarDetail car={car} user={user} />
-      {/* Internal links for topic clusters */}
-      <div className="max-w-5xl mx-auto mt-10 mb-20">
-        <div className="flex flex-wrap gap-4 justify-center">
-          <Link href={`/${car.brand?.toLowerCase()}-in-${car.location?.toLowerCase() || car.city?.toLowerCase() || ''}`} className="text-sm bg-neutral-900 text-yellow-500 px-4 py-2 rounded hover:bg-yellow-500 hover:text-black transition">
-            More {car.brand} cars in {car.location || car.city}
-          </Link>
-          <Link href={`/cars-in-${car.location?.toLowerCase() || car.city?.toLowerCase() || ''}`} className="text-sm bg-neutral-900 text-yellow-500 px-4 py-2 rounded hover:bg-yellow-500 hover:text-black transition">
-            More cars in {car.location || car.city}
-          </Link>
-          <Link href={`/dealer/${car.dealer_id}`} className="text-sm bg-neutral-900 text-yellow-500 px-4 py-2 rounded hover:bg-yellow-500 hover:text-black transition">
-            Other cars by this dealer
-          </Link>
-        </div>
-      </div>
-    </>
+      <h1 className="text-2xl font-bold">
+        Car ID: {id}
+      </h1>
+    </div>
   )
 }

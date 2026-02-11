@@ -1,3 +1,5 @@
+
+"use client"
 import { createClient } from '@/lib/supabase/client'
 import CarCard from '@/components/marketplace/CarCard'
 import ListingCardSkeleton from '@/components/marketplace/ListingCardSkeleton'
