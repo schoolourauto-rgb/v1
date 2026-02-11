@@ -21,16 +21,16 @@ export default function CarCard({
   return (
     <Link
       href={`/cars/${id}`}
-      className="group block bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 hover:border-yellow-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-yellow-500/10"
+      className="group block bg-background rounded-2xl overflow-hidden border border-muted shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-yellow-500"
     >
       {/* Image */}
-      <div className="relative w-full aspect-[4/3]">
+      <div className="relative w-full aspect-[4/3] bg-muted">
         <Image
           src={image || "/placeholder.jpg"}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="rounded-xl object-cover group-hover:scale-110 transition duration-300 shadow-md hover:shadow-xl"
+          className="object-cover group-hover:scale-105 transition duration-300"
           priority={false}
           loading="lazy"
         />

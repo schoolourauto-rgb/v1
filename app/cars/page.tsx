@@ -15,7 +15,9 @@ export default async function CarsPage({ searchParams }: { searchParams: Promise
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  let query = supabase.from("cars").select("*", { count: "exact" });
+  let query = supabase
+    .from("cars")
+    .select("*, dealers!inner(verified)", { count: "exact" });
   if (brand) {
     query = query.eq("brand", brand);
   }
@@ -25,6 +27,8 @@ export default async function CarsPage({ searchParams }: { searchParams: Promise
   if (max) {
     query = query.lte("price", Number(max));
   }
+  // Only show cars from verified dealers
+  query = query.eq("dealers.verified", true);
   const { data: cars, count, error } = await query
     .order("created_at", { ascending: false })
     .range(from, to);

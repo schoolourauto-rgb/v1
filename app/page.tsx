@@ -26,9 +26,9 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted text-foreground">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted text-foreground animate-in fade-in duration-500">
       {/* Premium Hero Section */}
-      <section className="relative bg-black text-white">
+      <section className="relative min-h-[70vh] flex flex-col justify-center bg-gradient-to-b from-black via-neutral-900 to-black text-white pt-24 before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,rgba(234,179,8,0.08),transparent_60%)] before:pointer-events-none">
         <div className="absolute inset-0">
           <div className="relative w-full h-full aspect-[16/7]">
             <Image
@@ -38,51 +38,82 @@ export default function Page() {
               priority
               sizes="100vw"
               className="object-cover opacity-30"
+              onError={(e) => { (e.target as HTMLImageElement).src = "/categories/fallback.jpg"; }}
             />
           </div>
         </div>
-        <div className="relative max-w-7xl mx-auto px-6 py-24 text-center">
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center gap-4">
-              <Image src="/logo.png" alt="OurAuto" width={120} height={40} className="object-contain" />
-              <nav className="hidden md:flex gap-6 text-lg">
-                <a href="/marketplace" className="hover:text-yellow-400">Marketplace</a>
-                <a href="/dealer/dashboard" className="hover:text-yellow-400">Dealer</a>
-                <a href="/about" className="hover:text-yellow-400">About</a>
-              </nav>
-            </div>
-            <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-6 py-2 rounded-lg transition">Sell Car</button>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold">Find Your Perfect Car</h1>
-          <p className="mt-4 text-gray-300">Search from hundreds of verified listings across India</p>
+        <div className="relative max-w-7xl mx-auto px-6 text-center flex flex-col items-center justify-center min-h-[60vh]">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+            Buy Cars from Verified Dealers Only
+          </h1>
+          <p className="mt-4 text-lg md:text-xl text-muted-foreground">
+            No individuals. No spam. Only trusted car showrooms with real inventory.
+          </p>
+                {/* Trust Section */}
+                <section className="py-16 md:py-24 border-t border-border">
+                  <div className="max-w-7xl mx-auto px-6 text-center">
+                    <h2 className="text-2xl md:text-3xl font-semibold mb-10">
+                      Why OurAuto?
+                    </h2>
+                    <div className="grid md:grid-cols-4 gap-8 text-sm md:text-base">
+                      <div>✅ Verified showroom dealers only</div>
+                      <div>✅ Real, curated inventory</div>
+                      <div>✅ Direct dealer contact</div>
+                      <div>✅ No middlemen or fake listings</div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Social Proof Block */}
+                <section className="py-16 text-center">
+                  <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-3 gap-8">
+                    <div>
+                      <p className="text-3xl font-bold">52+</p>
+                      <p className="text-muted-foreground">Verified Dealers</p>
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold">1,284+</p>
+                      <p className="text-muted-foreground">Cars Listed</p>
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold">12</p>
+                      <p className="text-muted-foreground">Cities Covered</p>
+                    </div>
+                  </div>
+                </section>
           {/* Search Bar */}
-          <form onSubmit={handleHeroSearch} className="mt-10 bg-white rounded-xl p-4 flex flex-col md:flex-row gap-4 shadow-xl">
+          <form onSubmit={handleHeroSearch} className="mt-12 bg-white/5 dark:bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-4 px-6 py-4 w-full max-w-2xl mx-auto hover:scale-[1.02] transition-all duration-200">
             <input
               placeholder="Brand (BMW, Audi...)"
-              className="flex-1 px-4 py-3 rounded-lg text-black outline-none"
+              className="flex-1 rounded-xl px-6 py-4 text-black dark:text-white bg-background border border-muted focus:ring-2 focus:ring-yellow-500 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition"
               value={brand}
               onChange={e => setBrand(e.target.value)}
             />
             <input
               placeholder="City"
-              className="flex-1 px-4 py-3 rounded-lg text-black outline-none"
+              className="flex-1 rounded-xl px-6 py-4 text-black dark:text-white bg-background border border-muted focus:ring-2 focus:ring-yellow-500 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition"
               value={city}
               onChange={e => setCity(e.target.value)}
             />
             <input
               placeholder="Max Price"
-              className="flex-1 px-4 py-3 rounded-lg text-black outline-none"
+              className="flex-1 rounded-xl px-6 py-4 text-black dark:text-white bg-background border border-muted focus:ring-2 focus:ring-yellow-500 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition"
               value={max}
               onChange={e => setMax(e.target.value)}
               type="number"
               min="0"
             />
-            <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-3 rounded-lg transition">Search</button>
+            <button type="submit" className="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold px-8 py-3 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+              Search
+            </button>
           </form>
           {/* Quick Filter Chips */}
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            {["BMW", "Audi", "Mercedes", "Hyundai", "Toyota", "Tata"].map((brand) => (
-              <button key={brand} className="px-5 py-2 rounded-full bg-neutral-800 text-gray-200 hover:bg-yellow-500 hover:text-black font-medium transition border border-neutral-700">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {['BMW', 'Audi', 'Mercedes', 'Hyundai', 'Toyota', 'Tata'].map((brand) => (
+              <button
+                key={brand}
+                className="px-5 py-2 rounded-full border border-muted bg-background text-foreground hover:bg-muted transition font-medium focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              >
                 {brand}
               </button>
             ))}
