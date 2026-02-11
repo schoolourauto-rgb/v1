@@ -27,7 +27,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
       </head>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body className="min-h-screen bg-background text-foreground antialiased transition-colors duration-300">
         <ThemeProvider>
           <Header />
           <LocationPopup />

@@ -4,19 +4,19 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-zinc-800 bg-background mt-20">
+    <footer className="border-t border-border bg-background mt-20">
       <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-foreground">OurAuto</h3>
-            <p className="text-sm text-zinc-400">Premium automotive marketplace for dealers</p>
+            <p className="text-sm text-muted-foreground">Premium automotive marketplace for dealers</p>
           </div>
 
           {/* Links */}
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground text-sm">Platform</h4>
-            <ul className="space-y-2 text-sm text-zinc-400">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/marketplace" className="hover:text-yellow-500 transition">
                   Browse Cars
@@ -33,7 +33,7 @@ export default function Footer() {
           {/* Support */}
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground text-sm">Support</h4>
-            <ul className="space-y-2 text-sm text-zinc-400">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <a href="#" className="hover:text-yellow-500 transition">
                   FAQ
@@ -47,10 +47,20 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Customer Care */}
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground">
+              <p className="font-medium text-foreground mb-1">Customer Care</p>
+              <a href="tel:9408000012" className="hover:text-yellow-500 transition block">
+                +91 94080 00012
+              </a>
+            </div>
+          </div>
+
           {/* Legal */}
           <div className="space-y-4">
             <h4 className="font-semibold text-foreground text-sm">Legal</h4>
-            <ul className="space-y-2 text-sm text-zinc-400">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <a href="#" className="hover:text-yellow-500 transition">
                   Privacy Policy
@@ -66,9 +76,9 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-zinc-800 pt-8 flex justify-between items-center">
-          <p className="text-sm text-zinc-500">© {currentYear} OurAuto. All rights reserved.</p>
-          <p className="text-sm text-zinc-500">Designed for premium dealers</p>
+        <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-muted-foreground">© {currentYear} OurAuto. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">Designed for premium dealers</p>
         </div>
       </div>
     </footer>

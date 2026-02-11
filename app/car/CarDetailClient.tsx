@@ -41,41 +41,18 @@ export default function CarDetail({ car, user }: any) {
         <div>
           <p className="text-2xl text-yellow-500 font-bold mb-4">{formatPrice(car.price)}</p>
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <span className="text-sm text-gray-400">Brand</span>
-              <div className="text-base font-medium">{car.brand}</div>
-            </div>
-            <div>
-              <span className="text-sm text-gray-400">Year</span>
-              <div className="text-base font-medium">{car.year}</div>
-            </div>
-            <div>
-              <span className="text-sm text-gray-400">Mileage</span>
-              <div className="text-base font-medium">{car.mileage} km</div>
-            </div>
-            <div>
-              <span className="text-sm text-gray-400">Fuel</span>
-              <div className="text-base font-medium">{car.fuel_type}</div>
-            </div>
-            <div>
-              <span className="text-sm text-gray-400">Transmission</span>
-              <div className="text-base font-medium">{car.transmission}</div>
-            </div>
-            <div>
-              <span className="text-sm text-gray-400">Color</span>
-              <div className="text-base font-medium">{car.color || '—'}</div>
-            </div>
+            {/* Removed duplicate stray JSX block here. All specs are rendered in the return block below. */}
           </div>
           <div className="mb-6">
-            <span className="text-sm text-gray-400">Description</span>
+            <span className="text-sm text-muted-foreground">Description</span>
             <div className={!user ? 'blur-md mt-2' : 'mt-2'}>{car.description || 'No description provided.'}</div>
             {!user && (
               <p className="text-primary mt-4">Login to view full details</p>
             )}
           </div>
           {/* Seller Info */}
-          <div className="bg-neutral-900 rounded-xl p-4 mb-6">
-            <span className="text-sm text-gray-400">Seller</span>
+          <div className="bg-card rounded-xl p-4 mb-6">
+            <span className="text-sm text-muted-foreground">Seller</span>
             <div className="text-base font-medium mt-1">{dealerName || 'Dealer'}</div>
             {dealerMobile && (
               <a
@@ -91,7 +68,7 @@ export default function CarDetail({ car, user }: any) {
             )}
           </div>
           {/* Lead Form */}
-          <div className="bg-neutral-900 rounded-xl p-6">
+          <div className="bg-card rounded-xl p-6">
             <h3 className="text-lg font-semibold mb-2">Contact Seller</h3>
             <LeadForm carId={car.id} sellerId={car.dealer_id} />
           </div>
@@ -100,7 +77,7 @@ export default function CarDetail({ car, user }: any) {
       {/* Related Cars */}
       <div className="mt-12">
         <span className="text-lg font-semibold mb-4 block">Related Cars</span>
-        <div className="text-gray-400">Coming soon...</div>
+        <div className="text-muted-foreground">Coming soon...</div>
       </div>
     </div>
   )

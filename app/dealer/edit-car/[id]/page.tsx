@@ -150,7 +150,7 @@ export default function EditCarPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-zinc-400">Loading car...</p>
+        <p className="text-muted-foreground">Loading car...</p>
       </div>
     )
   }
@@ -159,7 +159,7 @@ export default function EditCarPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <p className="text-zinc-400">Car not found</p>
+          <p className="text-muted-foreground">Car not found</p>
           <Link href="/dealer/dashboard" className="text-yellow-500 hover:underline">
             Back to dashboard
           </Link>

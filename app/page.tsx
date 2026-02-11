@@ -26,9 +26,9 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted text-foreground animate-in fade-in duration-500">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 animate-in fade-in duration-500">
       {/* Premium Hero Section */}
-      <section className="relative min-h-[70vh] flex flex-col justify-center bg-gradient-to-b from-black via-neutral-900 to-black text-white pt-24 before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,rgba(234,179,8,0.08),transparent_60%)] before:pointer-events-none">
+      <section className="relative min-h-[70vh] flex flex-col justify-center bg-background text-foreground transition-colors duration-300 dark:bg-gradient-to-b dark:from-black dark:via-neutral-900 dark:to-black pt-24 before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,rgba(234,179,8,0.08),transparent_60%)] before:pointer-events-none">
         <div className="absolute inset-0">
           <div className="relative w-full h-full aspect-[16/7]">
             <Image
@@ -82,22 +82,22 @@ export default function Page() {
                   </div>
                 </section>
           {/* Search Bar */}
-          <form onSubmit={handleHeroSearch} className="mt-12 bg-white/5 dark:bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-4 px-6 py-4 w-full max-w-2xl mx-auto hover:scale-[1.02] transition-all duration-200">
+          <form onSubmit={handleHeroSearch} className="mt-12 bg-card/80 dark:bg-card/60 backdrop-blur-xl border border-border rounded-2xl shadow-2xl flex flex-col md:flex-row gap-4 px-6 py-4 w-full max-w-2xl mx-auto hover:scale-[1.02] transition-all duration-200">
             <input
               placeholder="Brand (BMW, Audi...)"
-              className="flex-1 rounded-xl px-6 py-4 text-black dark:text-white bg-background border border-muted focus:ring-2 focus:ring-yellow-500 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition"
+              className="flex-1 rounded-xl px-6 py-4 bg-background text-foreground border border-border focus:ring-2 focus:ring-yellow-500 placeholder:text-muted-foreground transition"
               value={brand}
               onChange={e => setBrand(e.target.value)}
             />
             <input
               placeholder="City"
-              className="flex-1 rounded-xl px-6 py-4 text-black dark:text-white bg-background border border-muted focus:ring-2 focus:ring-yellow-500 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition"
+              className="flex-1 rounded-xl px-6 py-4 bg-background text-foreground border border-border focus:ring-2 focus:ring-yellow-500 placeholder:text-muted-foreground transition"
               value={city}
               onChange={e => setCity(e.target.value)}
             />
             <input
               placeholder="Max Price"
-              className="flex-1 rounded-xl px-6 py-4 text-black dark:text-white bg-background border border-muted focus:ring-2 focus:ring-yellow-500 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition"
+              className="flex-1 rounded-xl px-6 py-4 bg-background text-foreground border border-border focus:ring-2 focus:ring-yellow-500 placeholder:text-muted-foreground transition"
               value={max}
               onChange={e => setMax(e.target.value)}
               type="number"
@@ -121,9 +121,9 @@ export default function Page() {
         </div>
       </section>
       {/* Premium Category Cards Section */}
-      <section className="py-20 bg-black">
+      <section className="py-20 bg-background text-foreground transition-colors duration-300 dark:bg-gradient-to-b dark:from-black dark:to-neutral-900">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-white mb-10 text-center">Browse by Category</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-10 text-center">Browse by Category</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
               { name: "SUV", image: "/categories/suv.jpg" },
@@ -142,8 +142,8 @@ export default function Page() {
                   loading="lazy"
                   alt={cat.name}
                 />
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <span className="text-xl font-semibold text-white">{cat.name}</span>
+                <div className="absolute inset-0 bg-background/80 dark:bg-black/50 flex items-center justify-center">
+                  <span className="text-xl font-semibold text-foreground">{cat.name}</span>
                 </div>
               </a>
             ))}
@@ -151,7 +151,7 @@ export default function Page() {
         </div>
       </section>
       {/* Grid */}
-      <section className="py-20 bg-black">
+      <section className="py-20 bg-background text-foreground transition-colors duration-300 dark:bg-gradient-to-b dark:from-black dark:to-neutral-900">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 animate-fadeInUp">
             {/* Cars fetched from Supabase */}

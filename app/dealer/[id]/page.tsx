@@ -39,7 +39,7 @@ export default async function DealerProfilePage({ params }: any) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <p className="text-zinc-400">Dealer not found</p>
+          <p className="text-muted-foreground">Dealer not found</p>
         </div>
       </div>
     )
@@ -68,8 +68,8 @@ export default async function DealerProfilePage({ params }: any) {
       <div className="min-h-screen bg-background text-foreground py-12 max-w-5xl mx-auto">
         <div className="mb-10 text-center">
           <h1 className="text-3xl font-bold mb-2">{dealer.business_name}</h1>
-          <p className="text-lg text-gray-400 mb-2">City: {dealer.city || 'N/A'}</p>
-          <p className="text-lg text-gray-400 mb-2">Phone: {dealer.mobile || 'N/A'}</p>
+          <p className="text-lg text-muted-foreground mb-2">City: {dealer.city || 'N/A'}</p>
+          <p className="text-lg text-muted-foreground mb-2">Phone: {dealer.mobile || 'N/A'}</p>
         </div>
         {/* Internal links for topic clusters */}
         <div className="flex flex-wrap gap-4 justify-center mb-8">
@@ -96,7 +96,7 @@ export default async function DealerProfilePage({ params }: any) {
                 />
               ))
             ) : (
-              <p className="text-gray-400 col-span-full">No cars listed yet.</p>
+              <p className="text-muted-foreground col-span-full">No cars listed yet.</p>
             )}
           </div>
         </div>

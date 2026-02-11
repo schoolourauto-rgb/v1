@@ -40,7 +40,7 @@ export default async function LocationLandingPage({ params }: any) {
     : `Cars in ${city.charAt(0).toUpperCase() + city.slice(1)} | OurAuto Marketplace`
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-12 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 py-12 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-8 text-center">{title}</h1>
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {cars && cars.length > 0 ? (
@@ -56,7 +56,7 @@ export default async function LocationLandingPage({ params }: any) {
             />
           ))
         ) : (
-          <p className="text-gray-400 col-span-full">No cars found for this search.</p>
+          <p className="text-muted-foreground col-span-full">No cars found for this search.</p>
         )}
       </div>
     </div>
