@@ -1,10 +1,10 @@
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { CarImage } from '@/types';
 import CarDetail from '../CarDetailClient';
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = createClient();
+  const supabase = createServerClient();
 
   const { data: car } = await supabase
     .from('cars')

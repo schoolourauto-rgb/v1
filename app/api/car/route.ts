@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const form = await req.formData();
 
   const title = form.get("title");
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   // Find dealer_id
   const { data: dealer } = await supabase
-    .from("dealers")
+    .from("profiles")
     .select("id")
     .eq("user_id", session.user.id)
     .single();

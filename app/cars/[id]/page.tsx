@@ -1,10 +1,10 @@
 
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
 export default async function CarDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = createClient();
+  const supabase = createServerClient();
   const { data: car } = await supabase
     .from("cars")
     .select("id, title, brand, model, year, price, fuel_type, transmission, mileage, images")

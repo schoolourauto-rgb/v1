@@ -2,11 +2,11 @@ export const dynamic = "force-dynamic"
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import CarCard from "@/components/marketplace/CarCard";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 
 
 export default async function CarsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const params = await searchParams;
   const brand = params?.brand || "";
   const min = params?.min || "";

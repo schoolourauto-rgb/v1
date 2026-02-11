@@ -1,8 +1,8 @@
 export const dynamic = "force-dynamic"
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 
 export default async function sitemap() {
-  const supabase = createClient()
+  const supabase = createServerClient()
 
   // Fetch all cars
   const { data: cars } = await supabase

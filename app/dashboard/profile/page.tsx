@@ -24,7 +24,7 @@ export default function DealerProfilePage() {
         return
       }
       const { data, error } = await supabase
-        .from("dealers")
+        .from("profiles")
         .select("*")
         .eq("user_id", user.id)
         .single()
@@ -48,7 +48,7 @@ export default function DealerProfilePage() {
         return
       }
       const { error } = await supabase
-        .from("dealers")
+        .from("profiles")
         .update({
           dealership_name: profile.dealership_name,
           phone: profile.phone,
