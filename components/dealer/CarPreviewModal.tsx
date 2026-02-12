@@ -89,168 +89,93 @@ const CarPreviewModal: React.FC<CarPreviewModalProps> = ({ onClose, onPublish })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="relative max-w-3xl w-full rounded-2xl bg-card border border-border shadow-xl p-8">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
-          aria-label="Close"
-        >
-          ×
-        </button>
-        <h2 className="text-2xl font-semibold mb-6 text-foreground">Publish Car</h2>
-        <form onSubmit={handleSubmit} className="space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="bg-card w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl border border-border p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-foreground">
+            Add New Car
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Title */}
+            <div>
+              <label className="block text-sm mb-1">Title *</label>
+              <input
+                type="text"
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                required
+                className="w-full rounded-lg border border-border bg-background p-3"
+              />
+            </div>
+
+            {/* Price */}
+            <div>
+              <label className="block text-sm mb-1">Price *</label>
+              <input
+                type="number"
+                name="price"
+                value={form.price}
+                onChange={handleChange}
+                required
+                className="w-full rounded-lg border border-border bg-background p-3"
+              />
+            </div>
+          </div>
+
+          {/* Description */}
           <div>
-            <label className="block text-sm text-muted-foreground mb-1" htmlFor="title">Title *</label>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              required
-              value={form.title}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-muted-foreground mb-1" htmlFor="price">Price *</label>
-            <input
-              id="price"
-              name="price"
-              type="text"
-              required
-              value={form.price}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="brand">Brand</label>
-              <input
-                id="brand"
-                name="brand"
-                type="text"
-                value={form.brand}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="model">Model</label>
-              <input
-                id="model"
-                name="model"
-                type="text"
-                value={form.model}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="year">Year</label>
-              <input
-                id="year"
-                name="year"
-                type="text"
-                value={form.year}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="phone">Phone</label>
-              <input
-                id="phone"
-                name="phone"
-                type="text"
-                value={form.phone}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="fuel">Fuel</label>
-              <select
-                id="fuel"
-                name="fuel"
-                value={form.fuel}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              >
-                <option value="">Select fuel</option>
-                {fuelOptions.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="transmission">Transmission</label>
-              <select
-                id="transmission"
-                name="transmission"
-                value={form.transmission}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              >
-                <option value="">Select transmission</option>
-                {transmissionOptions.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm text-muted-foreground mb-1" htmlFor="description">Description</label>
+            <label className="block text-sm mb-1">Description</label>
             <textarea
-              id="description"
               name="description"
-              rows={4}
               value={form.description}
               onChange={handleChange}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+              rows={4}
+              className="w-full rounded-lg border border-border bg-background p-3"
             />
           </div>
+
+          {/* Images */}
           <div>
-            <label className="block text-sm text-muted-foreground mb-1" htmlFor="images">Images (max 10)</label>
+            <label className="block text-sm mb-2">Images (max 10)</label>
             <input
-              id="images"
-              name="images"
               type="file"
-              accept="image/*"
               multiple
+              accept="image/*"
               onChange={handleImageUpload}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              disabled={form.images.length >= 10}
             />
-            {imagePreviews.length > 0 && (
-              <div className="mt-3 grid grid-cols-5 gap-2">
-                {imagePreviews.map((src, idx) => (
-                  <div key={idx} className="relative">
-                    <img src={src} alt="Preview" className="w-full h-20 object-cover rounded-lg border border-border" />
-                    <button
-                      type="button"
-                      onClick={() => handleImageDelete(idx)}
-                      className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                      aria-label="Delete image"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-primary text-white py-2 mt-4 disabled:bg-muted-foreground"
-            disabled={!form.title || !form.price}
-          >
-            Publish
-          </button>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-border"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              className="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
+            >
+              Publish Car
+            </button>
+          </div>
+
         </form>
       </div>
     </div>
