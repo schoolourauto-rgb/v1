@@ -17,6 +17,10 @@ export default async function NewCarPage() {
         <input name="transmission" placeholder="Transmission" required className="input" />
         <input name="mileage" placeholder="Mileage" type="number" required className="input" />
         {/* Image upload will be handled separately */}
+        <div className="flex items-center space-x-2">
+          <input type="checkbox" id="featured" name="featured" className="form-checkbox" />
+          <label htmlFor="featured" className="text-sm">Use Featured Credit</label>
+        </div>
         <button type="submit" className="btn btn-primary">Add Car</button>
       </form>
     </div>

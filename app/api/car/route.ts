@@ -58,6 +58,7 @@ export async function POST(req: Request) {
   // Extract other fields
   const title = formData.get("title");
   const brand = formData.get("brand");
+
   const model = formData.get("model");
   const year = formData.get("year");
   const price = formData.get("price");
@@ -65,8 +66,32 @@ export async function POST(req: Request) {
   const transmission = formData.get("transmission");
   const mileage = formData.get("mileage");
   const images = formData.get("images");
+  const useFeatured = formData.get("featured") === "on";
+
+  let carFeatured = false;
+  if (useFeatured) {
+    // Validate wallet and decrement credit
+    const { data: wallet, error: walletError } = await supabase
+      .from("dealer_wallet")
+      .select("featured_credits")
+      .eq("dealer_id", dealer.id)
+      .maybeSingle();
+    if (walletError || !wallet) {
+      return NextResponse.json({ error: "Wallet not found" }, { status: 400 });
+    }
+    if (wallet.featured_credits < 1) {
+      return NextResponse.json({ error: "Not enough featured credits" }, { status: 400 });
+    }
+    // Decrement credit
+    await supabase
+      .from("dealer_wallet")
+      .update({ featured_credits: wallet.featured_credits - 1 })
+      .eq("dealer_id", dealer.id);
+    carFeatured = true;
+  }
 
   // Insert car
+
   const { error } = await supabase.from("cars").insert([
     {
       dealer_id: dealer.id,
@@ -79,10 +104,19 @@ export async function POST(req: Request) {
       transmission,
       mileage,
       images,
+      featured: carFeatured,
     },
   ]);
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
+
+  // Call handle_first_car_publish RPC (fail-safe)
+  try {
+    await supabase.rpc("handle_first_car_publish", { p_dealer: dealer.id });
+  } catch (e) {
+    // fail-safe: ignore error
+  }
+
   return NextResponse.redirect(new URL("/dashboard/cars", req.url));
 }

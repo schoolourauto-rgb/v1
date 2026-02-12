@@ -35,7 +35,7 @@ export default function CarDetail({ car, user }: CarDetailProps) {
           )}
           {/* Thumbnails */}
           <div className="flex gap-3 mt-4">
-            {images.map((img, index) => (
+            {images.map((img: { image_url: string }, index: number) => (
               <img
                 key={index}
                 src={img.image_url}

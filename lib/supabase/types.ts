@@ -14,6 +14,32 @@ export type Database = {
         Insert: Omit<Database['public']['Tables']['profiles']['Row'], 'created_at' | 'updated_at'>
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
       }
+      dealer_wallet: {
+        Row: {
+          dealer_id: string
+          featured_credits: number
+          first_car_published: boolean
+          total_reward_credits: number
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['dealer_wallet']['Row'], 'created_at'>
+        Update: Partial<Database['public']['Tables']['dealer_wallet']['Insert']>
+      }
+      dealers: {
+        Row: {
+          id: string
+          user_id: string
+          dealership_name: string
+          phone: string | null
+          location: string | null
+          verified: boolean
+          created_at: string
+          referral_code: string | null
+          referred_by: string | null
+        }
+        Insert: Omit<Database['public']['Tables']['dealers']['Row'], 'id' | 'created_at'>
+        Update: Partial<Database['public']['Tables']['dealers']['Insert']>
+      }
       cars: {
         Row: {
           id: string

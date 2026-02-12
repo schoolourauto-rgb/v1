@@ -5,9 +5,8 @@ import { Dealer } from "@/types";
 export default async function AdminDealersPage() {
   const supabase = createServerClient();
   const { data } = await supabase
-    .from("profiles")
-    .select("id, business_name, owner_name, mobile, role, created_at, updated_at")
-    .eq("role", "dealer")
+    .from("dealers")
+    .select("id, user_id, dealership_name, phone, location, verified, created_at, referral_code, referred_by")
     .order("created_at", { ascending: false });
   const dealers: Dealer[] = data ?? [];
 
@@ -27,10 +26,10 @@ export default async function AdminDealersPage() {
         <tbody>
           {dealers.map((dealer: Dealer) => (
             <tr key={dealer.id}>
-              <td>{dealer.business_name}</td>
-              <td>{dealer.mobile}</td>
-              <td>-</td>
-              <td>Yes</td>
+              <td>{dealer.dealership_name}</td>
+              <td>{dealer.phone}</td>
+              <td>{dealer.location || '-'}</td>
+              <td>{dealer.verified ? 'Yes' : 'No'}</td>
               <td>
                 {/* Approve/Reject toggle will be implemented here */}
               </td>

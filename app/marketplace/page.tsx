@@ -21,7 +21,7 @@ export default async function MarketplacePage({ searchParams }: { searchParams?:
   const supabase = createClient()
   let query = supabase
     .from('cars')
-    .select('id, name, brand, year, price, location, status, created_at, car_images(image_url)')
+    .select('id, name, brand, year, price, location, status, created_at, featured, car_images(image_url)')
     .eq('status', 'active')
 
   // Filters from URL
@@ -38,7 +38,7 @@ export default async function MarketplacePage({ searchParams }: { searchParams?:
   // Sorting
   if (sort === 'price_low') query = query.order('price', { ascending: true })
   else if (sort === 'price_high') query = query.order('price', { ascending: false })
-  else query = query.order('created_at', { ascending: false })
+  else query = query.order('featured', { ascending: false }).order('created_at', { ascending: false })
 
   const { data: cars, error } = await query
 

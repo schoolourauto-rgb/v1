@@ -24,6 +24,19 @@ create table dealers (
 	created_at timestamp with time zone default now()
 );
 
+-- Add referral_code and referred_by to dealers
+alter table dealers add column if not exists referral_code text unique;
+alter table dealers add column if not exists referred_by uuid references dealers(id);
+
+-- Dealer wallet table
+create table if not exists dealer_wallet (
+  dealer_id uuid primary key references dealers(id) on delete cascade,
+  featured_credits int not null default 5,
+  first_car_published boolean not null default false,
+  total_reward_credits int not null default 0,
+  created_at timestamp with time zone default now()
+);
+
 -- Cars table
 create table cars (
 	id uuid default gen_random_uuid() primary key,

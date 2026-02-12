@@ -14,54 +14,114 @@ export default function SignupPage() {
     business_name: '',
     owner_name: '',
     mobile: '',
+    referral_code: '', // code entered by new dealer (optional)
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Generate a random 6-8 char uppercase alphanumeric code
+  function generateReferralCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    return code;
+  }
+
   const handleSignup = async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
+      // 1. Create user
       const { data, error: signupError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
-      })
-
+      });
       if (signupError) {
-        setError(signupError.message)
-        setLoading(false)
-        return
+        setError(signupError.message);
+        setLoading(false);
+        return;
       }
-
-      const user = data.user
+      const user = data.user;
       if (!user) {
-        setError('Failed to create user')
-        setLoading(false)
-        return
+        setError('Failed to create user');
+        setLoading(false);
+        return;
       }
 
+      // 2. Find referrer dealer if referral code entered
+      let referred_by: string | null = null;
+      if (form.referral_code) {
+        const { data: refDealers, error: refFindErr } = await supabase
+          .from('dealers')
+          .select('id')
+          .eq('referral_code', form.referral_code.trim().toUpperCase())
+          .maybeSingle();
+        if (!refFindErr && refDealers && refDealers.id) {
+          referred_by = refDealers.id;
+        }
+      }
+
+      // 3. Create dealer row with unique referral_code
+      let newReferralCode = generateReferralCode();
+      let codeUnique = false;
+      for (let i = 0; i < 5 && !codeUnique; i++) {
+        const { data: exists } = await supabase
+          .from('dealers')
+          .select('id')
+          .eq('referral_code', newReferralCode)
+          .maybeSingle();
+        if (!exists) codeUnique = true;
+        else newReferralCode = generateReferralCode();
+      }
+
+      const { data: dealerRow, error: dealerError } = await supabase
+        .from('dealers')
+        .insert({
+          user_id: user.id,
+          dealership_name: form.business_name,
+          phone: form.mobile,
+          location: null,
+          verified: false,
+          referral_code: newReferralCode,
+          referred_by,
+        })
+        .select()
+        .maybeSingle();
+      if (dealerError || !dealerRow) {
+        setError('Failed to create dealer profile');
+        setLoading(false);
+        return;
+      }
+
+      // 4. Create wallet row
+      await supabase.from('dealer_wallet').insert({
+        dealer_id: dealerRow.id,
+        featured_credits: 5,
+        first_car_published: false,
+        total_reward_credits: 0,
+      });
+
+      // 5. Create profile row (for auth)
       const { error: profileError } = await supabase.from('profiles').insert({
         id: user.id,
         business_name: form.business_name,
         owner_name: form.owner_name,
         mobile: form.mobile,
         role: 'dealer',
-      })
-
+      });
       if (profileError) {
-        setError(profileError.message)
-        setLoading(false)
-        return
+        setError(profileError.message);
+        setLoading(false);
+        return;
       }
 
-      // Onboarding flow frozen for V1. Go to dashboard after signup.
-      router.push('/dealer/dashboard')
+      router.push('/dealer/dashboard');
     } catch (err) {
-      setError('Something went wrong')
-      setLoading(false)
+      setError('Something went wrong');
+      setLoading(false);
     }
-  }
+  } 
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
@@ -100,6 +160,16 @@ export default function SignupPage() {
             value={form.mobile}
             onChange={(e) => setForm({ ...form, mobile: e.target.value })}
             disabled={loading}
+          />
+
+          <input
+            placeholder="Referral Code (optional)"
+            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+            value={form.referral_code}
+            onChange={(e) => setForm({ ...form, referral_code: e.target.value })}
+            disabled={loading}
+            maxLength={8}
+            style={{ textTransform: 'uppercase' }}
           />
 
           <input
