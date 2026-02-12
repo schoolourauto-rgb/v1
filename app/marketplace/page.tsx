@@ -95,7 +95,7 @@ export default async function MarketplacePage({ searchParams }: { searchParams?:
               <option value="price_high">Price High → Low</option>
             </select>
           </div>
-          <button type="submit" className="mt-6 px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black font-semibold">
+          <button type="submit" className="mt-6 px-6 py-2 rounded-xl bg-primary text-primary-foreground font-medium transition-all duration-200 hover:opacity-90">
             Apply Filters
           </button>
         </form>

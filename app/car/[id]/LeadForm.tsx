@@ -56,7 +56,7 @@ export default function LeadForm({ carId, sellerId }: { carId: string, sellerId:
       <input type="email" placeholder="Your Email" className="w-full p-3 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground transition-colors duration-300" value={email} onChange={e => setEmail(e.target.value)} />
       <input type="tel" placeholder="Your Phone" className="w-full p-3 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground transition-colors duration-300" value={phone} onChange={e => setPhone(e.target.value)} />
       <textarea placeholder="Message" className="w-full p-3 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground transition-colors duration-300" rows={3} value={message} onChange={e => setMessage(e.target.value)} />
-      <button type="submit" className="w-full py-3 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black font-semibold mt-2" disabled={loading}>{loading ? "Sending..." : "Send Inquiry"}</button>
+      <button type="submit" className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-medium transition-all duration-200 hover:opacity-90 mt-2" disabled={loading}>{loading ? "Sending..." : "Send Inquiry"}</button>
       {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
       {success && <div className="text-green-500 text-sm mt-2">Inquiry sent successfully!</div>}
     </form>

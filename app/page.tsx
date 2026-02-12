@@ -108,7 +108,7 @@ export default function Page() {
               type="number"
               min="0"
             />
-            <button type="submit" className="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold px-8 py-3 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <button type="submit" className="bg-primary text-primary-foreground font-medium px-8 py-3 rounded-xl transition-all duration-200 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/40">
               Search
             </button>
           </form>
