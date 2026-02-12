@@ -2,27 +2,44 @@
 "use client";
 
 
-import ChatInput from "@/components/dealer/ChatInput";
+import { useState, useEffect } from "react";
 import CarPreviewModal from "@/components/dealer/CarPreviewModal";
 import DashboardWallet from "../DashboardWallet";
-import { useState, useEffect } from "react";
-import TERMS from "./termsContent";
+import WelcomeBlock from "./components/WelcomeBlock";
+import PostedCars from "./components/PostedCars";
+import ProfilePanel from "./components/ProfilePanel";
+import GuidelinesPanel from "./components/GuidelinesPanel";
+import BottomUtilityBar from "./components/BottomUtilityBar";
+import SidebarLink from "./components/SidebarLink";
 
 export default function DealerDashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [parsedCar, setParsedCar] = useState<any>(null);
   const [dealerId, setDealerId] = useState<string | null>(null);
   const [cars, setCars] = useState<any[]>([]);
+  const [profile, setProfile] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'cars' | 'profile' | 'guidelines'>('cars');
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
-  const [lang, setLang] = useState<'en' | 'gu' | 'hi'>('en');
 
   useEffect(() => {
     // Get dealerId from local/session storage or fetch from supabase auth
     const id = window.localStorage.getItem('dealer_id');
     if (id) setDealerId(id);
-    // Fetch cars for this dealer
-    if (id) fetchCars(id);
+    // Fetch cars and profile for this dealer
+    if (id) {
+      fetchCars(id);
+      fetchProfile(id);
+    }
+    async function fetchProfile(dealerId: string) {
+      const supabase = (await import("@/lib/supabase/client")).createClient();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", dealerId)
+        .maybeSingle();
+      if (!error && data) setProfile(data);
+    }
   }, []);
 
   async function fetchCars(dealerId: string) {
@@ -49,11 +66,16 @@ export default function DealerDashboard() {
     }
   }
 
+  async function handleProfileSave(data: any) {
+    if (!dealerId) return;
+    const supabase = (await import("@/lib/supabase/client")).createClient();
+    await supabase.from("profiles").update(data).eq("id", dealerId);
+    setProfile({ ...profile, ...data });
+  }
+
   async function handlePublish() {
     if (!parsedCar || !dealerId) return;
-    // Insert car into cars table, apply featured credit if selected
     const supabase = (await import("@/lib/supabase/client")).createClient();
-    // TODO: Add featured credit logic if needed
     await supabase.from("cars").insert({
       ...parsedCar,
       dealer_id: dealerId,
@@ -67,101 +89,42 @@ export default function DealerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative transition-colors duration-300">
-      {/* Header */}
-      <header className="w-full py-4 px-6 flex flex-col gap-1 bg-background border-b border-[#C9A227] relative transition-colors duration-300">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-white">Welcome Dealer 👋</h1>
-          {/* Language Selector */}
-          <div className="relative">
-            <button
-              className="flex items-center gap-2 px-3 py-1 rounded border border-yellow-400 bg-background text-yellow-700 dark:text-yellow-300 text-sm hover:bg-yellow-50 hover:text-yellow-900 dark:hover:bg-zinc-900 transition"
-              aria-label="Select language"
-              type="button"
-            >
-              <span role="img" aria-label="Language">🌐</span> Language
-            </button>
-            <select
-              className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-              value={lang}
-              onChange={e => setLang(e.target.value as 'en' | 'gu' | 'hi')}
-              aria-label="Language selector"
-            >
-              <option value="en">English</option>
-              <option value="gu">Gujarati</option>
-              <option value="hi">Hindi</option>
-            </select>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="md:grid md:grid-cols-[240px_1fr] md:gap-10">
+          {/* Sidebar for desktop */}
+          <div className="hidden md:block sticky top-24 space-y-2">
+            <SidebarLink label="Posted Cars" active={activeTab === 'cars'} onClick={() => setActiveTab('cars')} />
+            <SidebarLink label="Edit Profile" active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
+            <SidebarLink label="Guidelines" active={activeTab === 'guidelines'} onClick={() => setActiveTab('guidelines')} />
+            <SidebarLink label="Leads" active={activeTab === 'leads'} onClick={() => setActiveTab('leads')} />
+          </div>
+          {/* Main content */}
+          <div>
+            <WelcomeBlock profile={profile} activeCars={cars.filter((c) => c.status === 'active').length} />
+            <div className="mt-8">
+              {activeTab === 'cars' && <PostedCars cars={cars} setAddCarOpen={setModalOpen} />}
+              {activeTab === 'profile' && <ProfilePanel profile={profile} onSave={handleProfileSave} />}
+              {activeTab === 'guidelines' && <GuidelinesPanel />}
+              {activeTab === 'leads' && dealerId && <LeadsPanel dealerId={dealerId} />}
+            </div>
           </div>
         </div>
-        {dealerId && <DashboardWallet dealerId={dealerId} />}
-      </header>
-
-      {/* Car Preview Modal */}
+      </div>
+      <BottomUtilityBar />
+      {/* Modal for car preview/publish */}
       <CarPreviewModal
         open={modalOpen}
         parsedCar={parsedCar}
         onClose={() => setModalOpen(false)}
         onPublish={handlePublish}
       />
-
       {/* Success Toast */}
       {success && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-[#C9A227] to-[#FFD700] text-black px-6 py-3 rounded-xl shadow-lg font-semibold animate-in fade-in duration-300">
           Car published successfully!
         </div>
       )}
-
-      {/* Main Content: Car Grid */}
-      <main className="flex-1 px-2 md:px-6 py-4 md:py-8 max-w-4xl mx-auto w-full">
-        {/* Conditional Dealer Terms Section */}
-        {!loading && cars.length < 6 && (
-          <section
-            className="mb-8 rounded-2xl border border-primary/40 bg-primary/10 px-4 py-6 shadow-xl max-w-2xl mx-auto overflow-x-auto transition-colors duration-300"
-            aria-label="Dealer Terms and Platform Guidelines"
-          >
-            <h2 className="text-2xl font-bold text-primary mb-4">{TERMS[lang].title}</h2>
-            <div className="flex flex-col gap-4">
-              {TERMS[lang].sections.map((section, idx) => (
-                <div key={idx}>
-                  <h3 className="text-lg font-semibold text-primary mb-1">{section.heading}</h3>
-                  <ul className="list-disc pl-5 text-foreground">
-                    {section.content.map((line, i) => (
-                      <li key={i} className="mb-1 whitespace-pre-line">{line}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-        <h2 className="text-lg font-semibold mb-4">Your Live Cars</h2>
-        {loading ? (
-          <div className="text-center text-muted-foreground py-12">Loading cars...</div>
-        ) : cars.length === 0 ? (
-          <div className="text-center text-muted-foreground py-12">No cars listed yet.</div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {cars.map((car) => (
-              <div key={car.id} className="bg-card border border-[#C9A227] rounded-xl p-4 flex flex-col gap-2 shadow transition-colors duration-300">
-                <div className="text-lg font-bold text-yellow-400">{car.title || car.make + ' ' + car.model}</div>
-                <div className="text-sm text-muted-foreground">{car.year} • {car.fuel_type || car.fuel} • {car.transmission || 'Manual'}</div>
-                <div className="text-base font-semibold">₹{car.price?.toLocaleString('en-IN')}</div>
-                <div className="text-xs text-muted-foreground">{car.mileage || car.km} KM</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-
-      {/* Chat-style Input Bar */}
-      <div className="sticky bottom-0 left-0 w-full z-40">
-        <ChatInput
-          onParse={car => {
-            setParsedCar(car);
-            setModalOpen(true);
-          }}
-        />
-      </div>
     </div>
   );
 }
