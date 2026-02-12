@@ -45,6 +45,28 @@ export default function CarPasteGenerate() {
     make: "",
     model: "",
     version: "",
+  interface CarForm {
+    title: string;
+    make: string;
+    model: string;
+    version: string;
+    year: string;
+    fuel: string;
+    transmission: string;
+    price: string;
+    km: string;
+    owner: string;
+    insurance: string;
+    colour: string;
+    description: string;
+    images: File[];
+  }
+
+  const [form, setForm] = useState<CarForm>({
+    title: "",
+    make: "",
+    model: "",
+    version: "",
     year: "",
     fuel: "",
     transmission: "",
@@ -54,32 +76,9 @@ export default function CarPasteGenerate() {
     insurance: "",
     colour: "",
     description: "",
-    images: [],
+    images: [] as File[],
   });
   const [description, setDescription] = useState("");
-  const [images, setImages] = useState<File[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-  const isClient = typeof window !== "undefined";
-
-
-  // Senior dev: full auto extraction from description
-  const handleDescriptionChange = (value: string) => {
-    setDescription(value);
-
-    // Extract fields
-    const extract = (label: string, regex: RegExp) => value.match(regex)?.[1]?.trim() || "";
-    const year = extract("Year", /Year\s*[:-]\s*(\d{4})/i);
-    const make = extract("Make", /Make\s*[:-]\s*(.*)/i);
-    const model = extract("Model", /Model\s*[:-]\s*(.*)/i);
-    const version = extract("Version", /Version\s*[:-]\s*(.*)/i);
-    const fuel = extract("Fuel", /Fuel\s*[:-]\s*(.*)/i);
-    const transmission = extract("Transmission", /Transmission\s*[:-]\s*(.*)/i);
-    const priceRaw = extract("Price", /Price\s*[:-]\s*([\d,]+)/i);
-    const kmRaw = extract("KM", /KM\s*[:-]\s*([\d,]+)/i) || extract("K/m", /K\/m\s*[:-]\s*([\d,]+)/i);
-    const owner = extract("Owner", /Owner\s*[:-]\s*(.*)/i);
-    const colour = extract("Colour", /Colour\s*[:-]\s*(.*)/i);
     const insurance = extract("Insurance", /Insurance\s*[:-]\s*(.*)/i);
 
     const cleanPrice = priceRaw ? priceRaw.replace(/,/g, "") : "";
@@ -106,23 +105,21 @@ export default function CarPasteGenerate() {
     }));
   };
 
-  // Senior dev: instant preview, removal, max 10
+  // Senior dev: instant preview, removal, max 10, single source of truth
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const files = Array.from(e.target.files);
-    setImages((prev) => {
-      const newImages = [...prev, ...files].slice(0, 10);
-      setForm(f => ({ ...f, images: newImages }));
-      return newImages;
-    });
+    setForm(prev => ({
+      ...prev,
+      images: [...prev.images, ...files].slice(0, 10),
+    }));
   };
 
   const removeImage = (index: number) => {
-    setImages((prev) => {
-      const newImages = prev.filter((_, i) => i !== index);
-      setForm(f => ({ ...f, images: newImages }));
-      return newImages;
-    });
+    setForm(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -246,7 +243,7 @@ export default function CarPasteGenerate() {
       <div className="mb-6">
         <Label>Upload Images (max 10)</Label>
         <div className="flex flex-wrap gap-3 mb-2">
-          {images.map((file, idx) => (
+          {form.images.map((file, idx) => (
             <div key={idx} className="relative group">
               <img
                 src={URL.createObjectURL(file)}
@@ -263,7 +260,7 @@ export default function CarPasteGenerate() {
               </button>
             </div>
           ))}
-          {images.length < 10 && (
+          {form.images.length < 10 && (
             <label className="w-24 h-24 flex items-center justify-center border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/30 transition">
               <input
                 type="file"
