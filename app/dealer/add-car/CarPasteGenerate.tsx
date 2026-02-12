@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -19,7 +19,23 @@ const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), { ssr: false }
 
 
 export default function CarPasteGenerate() {
-  const [paste, setPaste] = useState("");
+  // New: State for WhatsApp paste input
+  const [rawInput, setRawInput] = useState("");
+  // New: State for car form fields
+  const [form, setForm] = useState({
+    title: "",
+    brand: "",
+    model: "",
+    version: "",
+    year: "",
+    fuel: "",
+    price: "",
+    km: "",
+    owner: "",
+    insurance: "",
+    description: "",
+    images: [],
+  });
   const [description, setDescription] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
@@ -27,36 +43,57 @@ export default function CarPasteGenerate() {
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
   const isClient = typeof window !== "undefined";
 
-  // Smart parse WhatsApp message
-  const parsed = useMemo(() => parseCarMessage(paste), [paste]);
 
-  // Only extract required fields for auto-fill
-  const autoFields = {
-    year: parsed.year && parsed.year >= 2000 ? parsed.year : "",
-    mileage: parsed.km || "",
-    insurance:
-      /\b(tp|third)\b/i.test(paste)
-        ? "THIRD PARTY"
-        : /\bfull\b/i.test(paste)
-        ? "FULL"
-        : /\b(nil|expired)\b/i.test(paste)
-        ? "NIL"
-        : "",
-    transmission: /auto/i.test(paste)
-      ? "Automatic"
-      : /manual/i.test(paste)
-      ? "Manual"
-      : "",
-    fuel:
-      /petrol/i.test(paste)
-        ? "Petrol"
-        : /diesel/i.test(paste)
-        ? "Diesel"
-        : /cng/i.test(paste)
-        ? "CNG"
-        : /electric/i.test(paste)
-        ? "Electric"
-        : "",
+  // New: Smart WhatsApp parser and auto-fill
+  const handleAutoFill = () => {
+    if (!rawInput.trim()) return;
+
+    const text = rawInput;
+
+    const extract = (keywords: string[]) => {
+      for (const key of keywords) {
+        const regex = new RegExp(
+          `${key}\\s*[:\\-]*\\s*(.+)`,
+          "i"
+        );
+        const match = text.match(regex);
+        if (match) return match[1].trim();
+      }
+      return "";
+    };
+
+    const make = extract(["Make", "Brand"]);
+    const model = extract(["Model"]);
+    const version = extract(["Version", "Variant"]);
+    const year = extract(["Year"]);
+    const fuel = extract(["Fuel"]);
+    const owner = extract(["Owner"]);
+    const km = extract(["K/m", "Km", "Kilometer"]);
+    const insurance = extract(["Insurance"]);
+    const priceRaw = extract(["Price"]);
+
+    const cleanPrice = priceRaw
+      ? priceRaw.replace(/[₹,/-]/g, "").replace(/\s/g, "")
+      : "";
+
+    const cleanKm = km ? km.replace(/[^\d]/g, "") : "";
+
+    const title = `${make} ${model} ${version}`.trim();
+
+    setForm((prev) => ({
+      ...prev,
+      title: title || prev.title,
+      brand: make || prev.brand,
+      model: model || prev.model,
+      version: version || prev.version,
+      year: year || prev.year,
+      fuel: fuel || prev.fuel,
+      description: text,
+      price: cleanPrice || prev.price,
+      km: cleanKm || prev.km,
+      owner: owner || prev.owner,
+      insurance: insurance || prev.insurance,
+    }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,57 +176,48 @@ export default function CarPasteGenerate() {
       className="relative flex flex-col min-h-[80vh]"
       autoComplete="off"
     >
+      {/* Premium Auto-Fill UI (Below Images) */}
+      <div className="mt-6 space-y-3">
+        <label className="text-sm font-medium text-muted-foreground">
+          Paste WhatsApp Vehicle Details
+        </label>
+        <textarea
+          value={rawInput}
+          onChange={(e) => setRawInput(e.target.value)}
+          placeholder="Paste full vehicle details here..."
+          className="w-full h-36 rounded-xl bg-card border border-border p-4 text-sm resize-none"
+        />
+        <button
+          type="button"
+          onClick={handleAutoFill}
+          className="w-full bg-yellow-500 text-black font-semibold py-2 rounded-xl hover:opacity-90"
+        >
+          Auto Detect & Fill
+        </button>
+      </div>
+
+      {/* Live Preview of Auto-Filled Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-        {/* Left: WhatsApp Paste */}
         <div>
-          <Label>Paste WhatsApp Car Details</Label>
-          <textarea
-            className="w-full min-h-[140px] rounded-lg border border-border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-foreground resize-vertical"
-            placeholder="Paste car details from WhatsApp..."
-            value={paste}
-            onChange={e => setPaste(e.target.value)}
-            required
-          />
-        </div>
-        {/* Right: Live Preview */}
-        <div>
-          <Label>Live Preview</Label>
+          <Label>Auto-Filled Car Details</Label>
           <Card>
             <div className="space-y-2">
+              <Input name="title" placeholder="Title" value={form.title} readOnly />
               <div className="flex gap-2">
-                <Input
-                  name="year"
-                  placeholder="Year"
-                  value={autoFields.year}
-                  readOnly
-                />
-                <Input
-                  name="mileage"
-                  placeholder="Mileage"
-                  value={autoFields.mileage}
-                  readOnly
-                />
+                <Input name="brand" placeholder="Brand" value={form.brand} readOnly />
+                <Input name="model" placeholder="Model" value={form.model} readOnly />
+                <Input name="version" placeholder="Version" value={form.version} readOnly />
               </div>
               <div className="flex gap-2">
-                <Input
-                  name="insurance"
-                  placeholder="Insurance"
-                  value={autoFields.insurance}
-                  readOnly
-                />
-                <Input
-                  name="transmission"
-                  placeholder="Transmission"
-                  value={autoFields.transmission}
-                  readOnly
-                />
+                <Input name="year" placeholder="Year" value={form.year} readOnly />
+                <Input name="fuel" placeholder="Fuel" value={form.fuel} readOnly />
+                <Input name="price" placeholder="Price" value={form.price} readOnly />
               </div>
-              <Input
-                name="fuel_type"
-                placeholder="Fuel Type"
-                value={autoFields.fuel}
-                readOnly
-              />
+              <div className="flex gap-2">
+                <Input name="km" placeholder="KM" value={form.km} readOnly />
+                <Input name="owner" placeholder="Owner" value={form.owner} readOnly />
+                <Input name="insurance" placeholder="Insurance" value={form.insurance} readOnly />
+              </div>
             </div>
           </Card>
         </div>
