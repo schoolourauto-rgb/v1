@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import { createClient } from "@supabase/supabase-js";
 
@@ -14,7 +14,7 @@ const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), { ssr: false }
 export default function CarPasteGenerate() {
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
-  const recaptchaRef = useRef<any>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
   const isClient = typeof window !== "undefined";
 
@@ -45,8 +45,8 @@ export default function CarPasteGenerate() {
       return;
     }
 
-    // Defensive: check ref
-    const token = recaptchaRef.current?.getValue?.();
+    // Defensive: check token from state
+    const token = captchaToken;
     if (!token) {
       alert("Please verify CAPTCHA");
       setLoading(false);
@@ -83,7 +83,7 @@ export default function CarPasteGenerate() {
     });
 
     setLoading(false);
-    recaptchaRef.current?.reset();
+    setCaptchaToken(null);
 
     if (!res.ok) {
       alert("Submission failed");
@@ -139,7 +139,7 @@ export default function CarPasteGenerate() {
         {isClient && siteKey ? (
           <ReCAPTCHA
             sitekey={siteKey}
-            ref={recaptchaRef}
+            onChange={(token) => setCaptchaToken(token)}
           />
         ) : (
           <div className="text-red-500 text-sm">reCAPTCHA unavailable. Please contact support.</div>
