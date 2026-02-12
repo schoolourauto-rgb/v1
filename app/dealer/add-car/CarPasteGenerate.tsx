@@ -140,11 +140,11 @@ export default function CarPasteGenerate() {
     }
 
     const formData = new FormData(e.currentTarget);
-    formData.set("year", autoFields.year ? String(autoFields.year) : "");
-    formData.set("mileage", autoFields.mileage ? String(autoFields.mileage) : "");
-    formData.set("insurance", autoFields.insurance);
-    formData.set("transmission", autoFields.transmission);
-    formData.set("fuel_type", autoFields.fuel);
+    formData.set("year", form.year ? String(form.year) : "");
+    formData.set("mileage", form.km ? String(form.km) : "");
+    formData.set("insurance", form.insurance);
+    formData.set("transmission", form.version); // Adjust if you have a transmission field
+    formData.set("fuel_type", form.fuel);
     formData.set("description", description);
     formData.append("token", captchaToken);
     formData.append("images", JSON.stringify(uploadedUrls));
