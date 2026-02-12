@@ -105,14 +105,17 @@ export default function CarPasteGenerate() {
     }));
   };
 
-  // Senior dev: instant preview, removal, max 10, single source of truth
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const files = Array.from(e.target.files);
+  // Single source of truth for images
+  const handleImageUpload = (files: File[]) => {
     setForm(prev => ({
       ...prev,
       images: [...prev.images, ...files].slice(0, 10),
     }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    handleImageUpload(Array.from(e.target.files));
   };
 
   const removeImage = (index: number) => {
@@ -139,7 +142,7 @@ export default function CarPasteGenerate() {
 
     // Upload images
     const uploadedUrls: string[] = [];
-    for (const file of images) {
+    for (const file of form.images) {
       const filePath = `cars/${Date.now()}-${file.name}`;
       const { error } = await supabase.storage
         .from("car-images")
