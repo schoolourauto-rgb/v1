@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Label } from "@/components/ui/Label";
 import { createClient } from "@supabase/supabase-js";
-import { parseCarMessage } from "@/lib/carParser";
+
+import { generateTitleFromDescription } from "@/lib/generateCarTitle";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,56 +45,26 @@ export default function CarPasteGenerate() {
   const isClient = typeof window !== "undefined";
 
 
-  // New: Smart WhatsApp parser and auto-fill
-  const handleAutoFill = () => {
-    if (!rawInput.trim()) return;
+  // Auto-fill title and price from description
+  const handleDescriptionChange = (value: string) => {
+    setDescription(value);
 
-    const text = rawInput;
-
-    const extract = (keywords: string[]) => {
-      for (const key of keywords) {
-        const regex = new RegExp(
-          `${key}\\s*[:\\-]*\\s*(.+)`,
-          "i"
-        );
-        const match = text.match(regex);
-        if (match) return match[1].trim();
-      }
-      return "";
-    };
-
-    const make = extract(["Make", "Brand"]);
-    const model = extract(["Model"]);
-    const version = extract(["Version", "Variant"]);
-    const year = extract(["Year"]);
-    const fuel = extract(["Fuel"]);
-    const owner = extract(["Owner"]);
-    const km = extract(["K/m", "Km", "Kilometer"]);
-    const insurance = extract(["Insurance"]);
-    const priceRaw = extract(["Price"]);
-
-    const cleanPrice = priceRaw
-      ? priceRaw.replace(/[₹,/-]/g, "").replace(/\s/g, "")
-      : "";
-
-    const cleanKm = km ? km.replace(/[^\d]/g, "") : "";
-
-    const title = `${make} ${model} ${version}`.trim();
-
+    // Auto Title
+    const autoTitle = generateTitleFromDescription(value);
     setForm((prev) => ({
       ...prev,
-      title: title || prev.title,
-      brand: make || prev.brand,
-      model: model || prev.model,
-      version: version || prev.version,
-      year: year || prev.year,
-      fuel: fuel || prev.fuel,
-      description: text,
-      price: cleanPrice || prev.price,
-      km: cleanKm || prev.km,
-      owner: owner || prev.owner,
-      insurance: insurance || prev.insurance,
+      title: autoTitle || prev.title,
     }));
+
+    // Auto Price
+    const priceMatch = value.match(/Price\s*[:-]\s*([\d,]+)/i);
+    if (priceMatch) {
+      const cleanPrice = priceMatch[1].replace(/,/g, "");
+      setForm((prev) => ({
+        ...prev,
+        price: cleanPrice,
+      }));
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -268,7 +239,7 @@ export default function CarPasteGenerate() {
           className="w-full min-h-[80px] rounded-lg border border-border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-foreground resize-vertical"
           placeholder="Add any extra details (optional)"
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={e => handleDescriptionChange(e.target.value)}
           name="description"
         />
       </div>
