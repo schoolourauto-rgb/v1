@@ -59,6 +59,22 @@ interface CarForm {
 
   const [form, setForm] = useState<CarForm>({
     title: "",
+interface CarForm {
+  title: string;
+  make: string;
+  model: string;
+  version: string;
+  year: string;
+  fuel: string;
+  transmission: string;
+  price: string;
+  km: string;
+  owner: string;
+  insurance: string;
+  colour: string;
+  description: string;
+  images: File[];
+}
     make: "",
     model: "",
     version: "",
