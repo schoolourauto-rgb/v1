@@ -163,7 +163,7 @@ export default function CarPasteGenerate() {
     }
 
     alert("Car added successfully 🚗");
-    setPaste("");
+    setRawInput("");
     setDescription("");
     setImages([]);
     // @ts-expect-error: grecaptcha is injected by reCAPTCHA script
