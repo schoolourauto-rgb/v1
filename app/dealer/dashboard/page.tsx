@@ -16,6 +16,16 @@ export default function DealerDashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [dealerId, setDealerId] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [previewCar, setPreviewCar] = useState<any | null>(null);
+  const handlePublishCar = async (car: any) => {
+    try {
+      // TODO: replace with real insert logic
+      console.log("Publishing car:", car)
+      setModalOpen(false)
+    } catch (error) {
+      console.error("Publish failed:", error)
+    }
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -127,7 +137,12 @@ export default function DealerDashboard() {
         <LeadsSection />
         <ProfileSection />
       </div>
-      <CarPreviewModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <CarPreviewModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        parsedCar={previewCar || {}}
+        onPublish={handlePublishCar}
+      />
       {success && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-card text-foreground px-6 py-3 rounded-xl shadow-lg font-semibold animate-in fade-in duration-300">
           Car published successfully!
