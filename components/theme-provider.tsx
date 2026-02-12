@@ -1,14 +1,18 @@
 "use client"
 
-import { ThemeProvider as NextThemesProvider } from "next-themes"
-import { ReactNode } from "react"
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { ThemeProviderProps } from "next-themes/dist/types"
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="dark"
-      enableSystem={false}
+      defaultTheme="system"
+      enableSystem={true}
+      storageKey="ourauto-theme"
+      disableTransitionOnChange={false}
+      {...props}
     >
       {children}
     </NextThemesProvider>
