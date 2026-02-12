@@ -25,7 +25,7 @@ export default function Header() {
         <nav className="hidden md:flex gap-8 font-medium">
           <Link href="/marketplace">Marketplace</Link>
           <Link href="/sell">Sell Car</Link>
-          <Link href="/dealer">Dealers</Link>
+          <Link href="/dealer">Sell Car with Help of Trusted Dealers</Link>
           <Link href="/about">About</Link>
         </nav>
 
