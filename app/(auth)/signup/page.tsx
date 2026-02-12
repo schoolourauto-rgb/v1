@@ -31,98 +31,24 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    try {
-      // 1. Create user
-      const { data, error: signupError } = await supabase.auth.signUp({
-        email: form.email,
-        password: form.password,
-      });
-      if (signupError) {
-        setError(signupError.message);
-        setLoading(false);
-        return;
-      }
-      const user = data.user;
-      if (!user) {
-        setError('Failed to create user');
-        setLoading(false);
-        return;
-      }
+    const { data, error } = await supabase.auth.signUp({
+      email: form.email,
+      password: form.password,
+    });
 
-      // 2. Find referrer dealer if referral code entered
-      let referred_by: string | null = null;
-      if (form.referral_code) {
-        const { data: refDealers, error: refFindErr } = await supabase
-          .from('dealers')
-          .select('id')
-          .eq('referral_code', form.referral_code.trim().toUpperCase())
-          .maybeSingle();
-        if (!refFindErr && refDealers && refDealers.id) {
-          referred_by = refDealers.id;
-        }
+    if (error) {
+      if (error.message.includes("User already registered")) {
+        setError("Account already exists. Please login.");
+      } else {
+        setError(error.message);
       }
-
-      // 3. Create dealer row with unique referral_code
-      let newReferralCode = generateReferralCode();
-      let codeUnique = false;
-      for (let i = 0; i < 5 && !codeUnique; i++) {
-        const { data: exists } = await supabase
-          .from('dealers')
-          .select('id')
-          .eq('referral_code', newReferralCode)
-          .maybeSingle();
-        if (!exists) codeUnique = true;
-        else newReferralCode = generateReferralCode();
-      }
-
-      const { data: dealerRow, error: dealerError } = await supabase
-        .from('dealers')
-        .insert({
-          user_id: user.id,
-          dealership_name: form.business_name,
-          phone: form.mobile,
-          location: null,
-          verified: false,
-          referral_code: newReferralCode,
-          referred_by,
-        })
-        .select()
-        .maybeSingle();
-      if (dealerError || !dealerRow) {
-        console.error('Dealer profile creation error:', dealerError);
-        setError(dealerError?.message || 'Failed to create dealer profile');
-        setLoading(false);
-        return;
-      }
-
-      // 4. Create wallet row
-      await supabase.from('dealer_wallet').insert({
-        dealer_id: dealerRow.id,
-        featured_credits: 5,
-        first_car_published: false,
-        total_reward_credits: 0,
-      });
-
-      // 5. Create profile row (for auth)
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: user.id,
-        business_name: form.business_name,
-        owner_name: form.owner_name,
-        mobile: form.mobile,
-        role: 'dealer',
-      });
-      if (profileError) {
-        setError(profileError.message);
-        setLoading(false);
-        return;
-      }
-
-      router.push('/dealer/dashboard');
-    } catch (err) {
-      setError('Something went wrong');
       setLoading(false);
+      return;
     }
-  } 
+
+    setLoading(false);
+    router.push("/dealer/dashboard");
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">

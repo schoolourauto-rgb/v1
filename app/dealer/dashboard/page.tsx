@@ -28,9 +28,25 @@ export default function DealerDashboard() {
   async function fetchCars(dealerId: string) {
     setLoading(true);
     const supabase = (await import("@/lib/supabase/client")).createClient();
-    const { data } = await supabase.from("cars").select("*", { count: "exact" }).eq("dealer_id", dealerId).order("created_at", { ascending: false });
-    setCars(data || []);
-    setLoading(false);
+    try {
+      const { data, error } = await supabase
+        .from("cars")
+        .select("*", { count: "exact" })
+        .eq("dealer_id", dealerId)
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.error("Car fetch error:", error);
+        setCars([]);
+        setLoading(false);
+        return;
+      }
+      setCars(data || []);
+    } catch (err) {
+      console.error("Unexpected error fetching cars:", err);
+      setCars([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handlePublish() {

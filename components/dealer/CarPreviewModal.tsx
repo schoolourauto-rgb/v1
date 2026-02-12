@@ -18,6 +18,7 @@ export default function CarPreviewModal({ open, parsedCar, onClose, onPublish }:
 
   // ...existing code...
 
+  // Production-safe: always use z-50 and open state for modal
   return (
     <AnimatePresence>
       {open && (
