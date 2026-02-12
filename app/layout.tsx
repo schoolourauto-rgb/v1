@@ -41,7 +41,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#C9A227" />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased transition-colors duration-300">
         <ThemeProvider>
