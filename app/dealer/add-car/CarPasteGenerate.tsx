@@ -209,7 +209,7 @@ export default function CarPasteGenerate() {
               <button
                 type="button"
                 onClick={() => removeImage(idx)}
-                className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-80 group-hover:opacity-100"
+                className="absolute top-1 right-1 bg-danger text-white rounded-full w-6 h-6 flex items-center justify-center opacity-80 hover:opacity-90 transition-all duration-200"
                 aria-label="Remove image"
               >
                 ×
