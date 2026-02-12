@@ -18,7 +18,7 @@ export const metadata = {
     description: "Explore cars, dealers, and listings on OurAuto.",
   },
   icons: {
-    icon: "/favicon.svg",
+    icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
   manifest: "/manifest.json",
@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#C9A227" />
