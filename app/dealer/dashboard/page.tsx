@@ -2,6 +2,8 @@
 import { useState } from "react";
 import CarPreviewModal from "@/components/dealer/CarPreviewModal";
 import { Button } from "@/components/ui/Button";
+import { MessageCircle } from "lucide-react";
+import Link from "next/link";
 
 type Car = {
   id: number;
@@ -144,11 +146,17 @@ export default function DealerDashboard() {
               Manage listings, respond to buyers, and grow your dealership.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Button onClick={() => setModalOpen(true)}>➕ Add Car</Button>
-            <Button variant="secondary">📋 Listings</Button>
-            <Button variant="secondary">✏️ Profile</Button>
-            <Button variant="secondary">💬 Leads</Button>
+          <div className="flex items-center gap-3">
+            <Button onClick={() => setModalOpen(true)}>
+              + Add New Car
+            </Button>
+
+            <Link
+              href="/dealer/leads"
+              className="flex items-center justify-center w-10 h-10 rounded-xl border border-border bg-card hover:bg-muted transition"
+            >
+              <MessageCircle className="w-5 h-5 text-foreground" />
+            </Link>
           </div>
         </div>
         {/* Stats Row */}
