@@ -18,28 +18,28 @@ const supabase = createClient(
 const ReCAPTCHA = dynamic(() => import("react-google-recaptcha"), { ssr: false });
 
 
+// Move CarForm type outside component for global type safety
+type CarForm = {
+  title: string;
+  make: string;
+  model: string;
+  version: string;
+  year: string;
+  fuel: string;
+  transmission: string;
+  price: string;
+  km: string;
+  owner: string;
+  insurance: string;
+  colour: string;
+  description: string;
+  images: File[];
+};
 
 export default function CarPasteGenerate() {
   // New: State for WhatsApp paste input
   const [rawInput, setRawInput] = useState("");
   // New: State for car form fields
-  type CarForm = {
-    title: string;
-    make: string;
-    model: string;
-    version: string;
-    year: string;
-    fuel: string;
-    transmission: string;
-    price: string;
-    km: string;
-    owner: string;
-    insurance: string;
-    colour: string;
-    description: string;
-    images: File[];
-  };
-
   const [form, setForm] = useState<CarForm>({
     title: "",
     make: "",
