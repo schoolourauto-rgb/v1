@@ -28,7 +28,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300 animate-in fade-in duration-500">
       {/* Premium Hero Section */}
-      <section className="relative min-h-[70vh] flex flex-col justify-center bg-background text-foreground transition-colors duration-300 dark:bg-gradient-to-b dark:from-black dark:via-neutral-900 dark:to-black pt-24 before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,rgba(234,179,8,0.08),transparent_60%)] before:pointer-events-none">
+      <section className="relative min-h-[70vh] flex flex-col justify-center bg-background text-foreground transition-colors duration-300 pt-24 before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,rgba(234,179,8,0.08),transparent_60%)] before:pointer-events-none">
         <div className="absolute inset-0">
           <div className="relative w-full h-full aspect-[16/7]">
             <Image
@@ -126,7 +126,7 @@ export default function Page() {
         </div>
       </section>
       {/* Premium Category Cards Section */}
-      <section className="py-20 bg-background text-foreground transition-colors duration-300 dark:bg-gradient-to-b dark:from-black dark:to-neutral-900">
+      <section className="py-20 bg-background text-foreground transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-foreground mb-10 text-center">Browse by Category</h2>
           <div className="grid md:grid-cols-4 gap-6">
@@ -156,7 +156,7 @@ export default function Page() {
         </div>
       </section>
       {/* Grid */}
-      <section className="py-20 bg-background text-foreground transition-colors duration-300 dark:bg-gradient-to-b dark:from-black dark:to-neutral-900">
+      <section className="py-20 bg-background text-foreground transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 animate-fadeInUp">
             {/* Cars fetched from Supabase */}

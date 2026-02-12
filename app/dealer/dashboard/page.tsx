@@ -100,14 +100,14 @@ export default function DealerDashboard() {
         {/* Conditional Dealer Terms Section */}
         {!loading && cars.length < 6 && (
           <section
-            className="mb-8 rounded-xl border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-zinc-900/60 px-4 py-6 shadow max-w-2xl mx-auto overflow-x-auto transition-colors duration-300"
+            className="mb-8 rounded-2xl border border-primary/40 bg-primary/10 px-4 py-6 shadow-xl max-w-2xl mx-auto overflow-x-auto transition-colors duration-300"
             aria-label="Dealer Terms and Platform Guidelines"
           >
-            <h2 className="text-2xl font-bold text-yellow-900 dark:text-yellow-200 mb-4">{TERMS[lang].title}</h2>
+            <h2 className="text-2xl font-bold text-primary mb-4">{TERMS[lang].title}</h2>
             <div className="flex flex-col gap-4">
               {TERMS[lang].sections.map((section, idx) => (
                 <div key={idx}>
-                  <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-100 mb-1">{section.heading}</h3>
+                  <h3 className="text-lg font-semibold text-primary mb-1">{section.heading}</h3>
                   <ul className="list-disc pl-5 text-foreground">
                     {section.content.map((line, i) => (
                       <li key={i} className="mb-1 whitespace-pre-line">{line}</li>

@@ -55,7 +55,7 @@ export default function AboutPage() {
       </section>
         {/* Safety & Anti-Fraud Policy */}
         <section
-          className="mb-10 rounded-lg border border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-zinc-900/60 px-4 py-6"
+          className="mb-10 rounded-2xl border border-border bg-card backdrop-blur-xl shadow-xl px-4 py-6"
           aria-label="Safety and Anti-Fraud Policy"
         >
           <h2 className="text-2xl font-semibold mb-2">Your Safety Comes First</h2>

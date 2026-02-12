@@ -1,47 +1,41 @@
 * {
-	transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@keyframes fadeInUp {
-	from {
-		opacity: 0;
-		transform: translateY(30px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-.animate-fadeInUp {
-	animation: fadeInUp 0.8s ease forwards;
-}
-
 @layer base {
-	:root {
-		--background: 0 0% 100%;
-		--foreground: 0 0% 3.9%;
-		--primary: 48 96% 53%;
-		--primary-foreground: 0 0% 0%;
-		--muted: 60 4.8% 95.9%;
-		--muted-foreground: 60 3.8% 46.1%;
-		--card: 0 0% 100%;
-		--card-foreground: 0 0% 3.9%;
-		--border: 0 0% 89.8%;
-	}
+  :root {
+    /* Core */
+    --background: 255 255 255;
+    --foreground: 15 15 15;
 
-	.dark {
-		--background: 0 0% 3.9%;
-		--foreground: 0 0% 98%;
-		--primary: 48 96% 53%;
-		--primary-foreground: 0 0% 100%;
-		--muted: 0 0% 14.9%;
-		--muted-foreground: 0 0% 63.9%;
-		--card: 0 0% 14.9%;
-		--card-foreground: 0 0% 98%;
-		--border: 0 0% 20%;
-	}
+    /* Surfaces */
+    --card: 255 255 255 / 0.6;
+    --muted: 245 245 245;
+    --border: 0 0 0 / 0.08;
+
+    /* Brand */
+    --primary: 255 193 7;
+    --primary-foreground: 0 0 0;
+
+    /* Status */
+    --success: 34 197 94;
+    --danger: 239 68 68;
+  }
+  .dark {
+    --background: 10 10 10;
+    --foreground: 240 240 240;
+
+    --card: 255 255 255 / 0.05;
+    --muted: 25 25 25;
+    --border: 255 255 255 / 0.1;
+
+    --primary: 255 193 7;
+    --primary-foreground: 0 0 0;
+
+    --success: 34 197 94;
+    --danger: 239 68 68;
+  }
 }

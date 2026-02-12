@@ -21,10 +21,10 @@ export default function CarCard({
   return (
     <Link
       href={`/cars/${id}`}
-      className="group block bg-background rounded-2xl overflow-hidden border border-muted shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-yellow-500"
+      className="group block bg-card backdrop-blur-xl border border-border rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-yellow-500"
     >
       {/* Image */}
-      <div className="relative w-full aspect-[4/3] bg-muted">
+      <div className="relative w-full aspect-[4/3] bg-card/60">
         <Image
           src={image || "/placeholder.jpg"}
           alt={title}
@@ -45,7 +45,7 @@ export default function CarCard({
           <span className="bg-yellow-400 text-black px-3 py-1 rounded-full font-bold text-sm">
             ₹{price}
           </span>
-          <span className="bg-neutral-800 text-white px-2 py-1 rounded text-xs">
+          <span className="bg-card/80 text-foreground px-2 py-1 rounded text-xs">
             {year}
           </span>
           <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs">

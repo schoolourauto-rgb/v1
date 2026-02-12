@@ -4,7 +4,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-zinc-800 bg-black mt-20">
+    <footer className="border-t border-border bg-background mt-20">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
@@ -66,7 +66,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-zinc-800 pt-8 flex justify-between items-center">
+        <div className="border-t border-border pt-8 flex justify-between items-center">
             <p className="text-sm text-zinc-500">© {currentYear} OurAuto.in. All rights reserved.</p>
           <p className="text-sm text-zinc-500">Designed for premium dealers</p>
         </div>
