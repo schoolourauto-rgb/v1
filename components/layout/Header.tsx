@@ -1,64 +1,61 @@
+
 "use client"
 
-import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
 import Link from "next/link"
-import { Sun, Moon, Menu, X } from "lucide-react"
-import Logo from "../Logo"
+import { useState } from "react"
+import { Menu, X } from "lucide-react"
 
 export default function Header() {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   return (
-    <header className="w-full border-b border-border bg-background/90 backdrop-blur-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center h-16">
-          <Logo />
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+
+        {/* Logo */}
+        <Link href="/" className="text-xl font-bold">
+          OurAuto
         </Link>
 
-        <nav className="hidden md:flex gap-8 font-medium">
-           <Link href="/marketplace">Marketplace</Link>
-           <Link href="/about">About</Link>
-        </nav>
-
-        <div className="flex items-center gap-3">
-          {mounted && (
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="rounded-full p-2"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-          )}
-
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-6">
+          <Link href="/about" className="hover:text-primary transition-colors">
+            About
+          </Link>
           <Link
             href="/login"
-            className="px-4 py-2 rounded bg-yellow-500 text-black font-semibold"
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:opacity-90 transition"
+          >
+            Login
+          </Link>
+        </div>
+
+        {/* Mobile Controls */}
+        <div className="md:hidden flex items-center gap-3">
+          <Link
+            href="/login"
+            className="bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-sm"
           >
             Login
           </Link>
 
-          <button
-            className="md:hidden"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <X size={24} /> : <Menu size={24} />}
+          <button onClick={() => setOpen(!open)}>
+            {open ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
+      {/* Mobile Dropdown */}
       {open && (
-          <div className="md:hidden px-6 py-4 space-y-3">
-            <Link href="/marketplace" onClick={() => setOpen(false)}>Marketplace</Link>
-            <Link href="/about" onClick={() => setOpen(false)}>About</Link>
-          </div>
+        <div className="md:hidden bg-card border-t border-border px-4 py-4 space-y-4">
+          <Link
+            href="/about"
+            onClick={() => setOpen(false)}
+            className="block"
+          >
+            About
+          </Link>
+        </div>
       )}
     </header>
   )
