@@ -46,10 +46,6 @@ export default function Page() {
                 {/* Customer Care Strip */}
                 <div className="w-full bg-card border-t border-border py-3 flex justify-center items-center mt-4">
                   <span className="text-sm text-muted-foreground">
-                    Customer Care:{" "}
-                    <a href="tel:9408000012" className="font-medium text-foreground hover:text-yellow-500 transition">
-                      +91 94080 00012
-                    </a>
                   </span>
                 </div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">

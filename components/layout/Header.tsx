@@ -23,10 +23,8 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex gap-8 font-medium">
-          <Link href="/marketplace">Marketplace</Link>
-          <Link href="/sell">Sell Car</Link>
-          <Link href="/dealer">Sell Car with Help of Trusted Dealers</Link>
-          <Link href="/about">About</Link>
+           <Link href="/marketplace">Marketplace</Link>
+           <Link href="/about">About</Link>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -57,12 +55,10 @@ export default function Header() {
       </div>
 
       {open && (
-        <div className="md:hidden px-6 py-4 space-y-3">
-          <Link href="/marketplace" onClick={() => setOpen(false)}>Marketplace</Link>
-          <Link href="/sell" onClick={() => setOpen(false)}>Sell Car</Link>
-          <Link href="/dealer" onClick={() => setOpen(false)}>Dealers</Link>
-          <Link href="/about" onClick={() => setOpen(false)}>About</Link>
-        </div>
+          <div className="md:hidden px-6 py-4 space-y-3">
+            <Link href="/marketplace" onClick={() => setOpen(false)}>Marketplace</Link>
+            <Link href="/about" onClick={() => setOpen(false)}>About</Link>
+          </div>
       )}
     </header>
   )
