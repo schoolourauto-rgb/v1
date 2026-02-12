@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { Label } from "@/components/ui/Label";
 import { createClient } from "@supabase/supabase-js";
 
-import { generateTitleFromDescription } from "@/lib/generateCarTitle";
+import { generateTitleFromDescription, generateCarTitle } from "@/lib/generateCarTitle";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,15 +25,17 @@ export default function CarPasteGenerate() {
   // New: State for car form fields
   const [form, setForm] = useState({
     title: "",
-    brand: "",
+    make: "",
     model: "",
     version: "",
     year: "",
     fuel: "",
+    transmission: "",
     price: "",
     km: "",
     owner: "",
     insurance: "",
+    colour: "",
     description: "",
     images: [],
   });
@@ -45,36 +47,65 @@ export default function CarPasteGenerate() {
   const isClient = typeof window !== "undefined";
 
 
-  // Auto-fill title and price from description
+  // Senior dev: full auto extraction from description
   const handleDescriptionChange = (value: string) => {
     setDescription(value);
 
+    // Extract fields
+    const extract = (label: string, regex: RegExp) => value.match(regex)?.[1]?.trim() || "";
+    const year = extract("Year", /Year\s*[:-]\s*(\d{4})/i);
+    const make = extract("Make", /Make\s*[:-]\s*(.*)/i);
+    const model = extract("Model", /Model\s*[:-]\s*(.*)/i);
+    const version = extract("Version", /Version\s*[:-]\s*(.*)/i);
+    const fuel = extract("Fuel", /Fuel\s*[:-]\s*(.*)/i);
+    const transmission = extract("Transmission", /Transmission\s*[:-]\s*(.*)/i);
+    const priceRaw = extract("Price", /Price\s*[:-]\s*([\d,]+)/i);
+    const kmRaw = extract("KM", /KM\s*[:-]\s*([\d,]+)/i) || extract("K/m", /K\/m\s*[:-]\s*([\d,]+)/i);
+    const owner = extract("Owner", /Owner\s*[:-]\s*(.*)/i);
+    const colour = extract("Colour", /Colour\s*[:-]\s*(.*)/i);
+    const insurance = extract("Insurance", /Insurance\s*[:-]\s*(.*)/i);
+
+    const cleanPrice = priceRaw ? priceRaw.replace(/,/g, "") : "";
+    const cleanKm = kmRaw ? kmRaw.replace(/,/g, "") : "";
+
     // Auto Title
-    const autoTitle = generateTitleFromDescription(value);
+    const autoTitle = generateCarTitle({ year, make, model, version, fuel, transmission });
+
     setForm((prev) => ({
       ...prev,
-      title: autoTitle || prev.title,
+      title: autoTitle,
+      make,
+      model,
+      version,
+      year,
+      fuel,
+      transmission,
+      price: cleanPrice,
+      km: cleanKm,
+      owner,
+      colour,
+      insurance,
+      description: value,
     }));
-
-    // Auto Price
-    const priceMatch = value.match(/Price\s*[:-]\s*([\d,]+)/i);
-    if (priceMatch) {
-      const cleanPrice = priceMatch[1].replace(/,/g, "");
-      setForm((prev) => ({
-        ...prev,
-        price: cleanPrice,
-      }));
-    }
   };
 
+  // Senior dev: instant preview, removal, max 10
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const files = Array.from(e.target.files);
-    setImages((prev) => [...prev, ...files].slice(0, 6));
+    setImages((prev) => {
+      const newImages = [...prev, ...files].slice(0, 10);
+      setForm(f => ({ ...f, images: newImages }));
+      return newImages;
+    });
   };
 
   const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    setImages((prev) => {
+      const newImages = prev.filter((_, i) => i !== index);
+      setForm(f => ({ ...f, images: newImages }));
+      return newImages;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -175,16 +206,16 @@ export default function CarPasteGenerate() {
             <div className="space-y-2">
               <Input name="title" placeholder="Title" value={form.title} readOnly />
               <div className="flex gap-2">
-                <Input name="brand" placeholder="Brand" value={form.brand} readOnly />
+                <Input name="make" placeholder="Make" value={form.make} readOnly />
                 <Input name="model" placeholder="Model" value={form.model} readOnly />
                 <Input name="version" placeholder="Version" value={form.version} readOnly />
-              </div>
-              <div className="flex gap-2">
                 <Input name="year" placeholder="Year" value={form.year} readOnly />
                 <Input name="fuel" placeholder="Fuel" value={form.fuel} readOnly />
-                <Input name="price" placeholder="Price" value={form.price} readOnly />
+                <Input name="transmission" placeholder="Transmission" value={form.transmission} readOnly />
+                <Input name="colour" placeholder="Colour" value={form.colour} readOnly />
               </div>
               <div className="flex gap-2">
+                <Input name="price" placeholder="Price" value={form.price} readOnly />
                 <Input name="km" placeholder="KM" value={form.km} readOnly />
                 <Input name="owner" placeholder="Owner" value={form.owner} readOnly />
                 <Input name="insurance" placeholder="Insurance" value={form.insurance} readOnly />
@@ -196,7 +227,7 @@ export default function CarPasteGenerate() {
 
       {/* Image Upload Grid */}
       <div className="mb-6">
-        <Label>Upload Images (max 6)</Label>
+        <Label>Upload Images (max 10)</Label>
         <div className="flex flex-wrap gap-3 mb-2">
           {images.map((file, idx) => (
             <div key={idx} className="relative group">
@@ -215,7 +246,7 @@ export default function CarPasteGenerate() {
               </button>
             </div>
           ))}
-          {images.length < 6 && (
+          {images.length < 10 && (
             <label className="w-24 h-24 flex items-center justify-center border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/30 transition">
               <input
                 type="file"
@@ -229,7 +260,7 @@ export default function CarPasteGenerate() {
             </label>
           )}
         </div>
-        <div className="text-xs text-muted-foreground">You can upload up to 6 images.</div>
+        <div className="text-xs text-muted-foreground">You can upload up to 10 images.</div>
       </div>
 
       {/* Optional Description */}
