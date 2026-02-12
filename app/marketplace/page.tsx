@@ -1,11 +1,9 @@
 
-"use client"
+
 import { createClient } from '@/lib/supabase/client'
 import CarCard from '@/components/marketplace/CarCard'
 import ListingCardSkeleton from '@/components/marketplace/ListingCardSkeleton'
-import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 
 interface Car {
   id: string

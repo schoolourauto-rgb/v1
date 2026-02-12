@@ -129,7 +129,8 @@ export default function CarPasteGenerate() {
     setPaste("");
     setDescription("");
     setImages([]);
-    if (window.grecaptcha && window.grecaptcha.reset) window.grecaptcha.reset();
+    // @ts-expect-error: grecaptcha is injected by reCAPTCHA script
+    if (typeof window !== 'undefined' && window.grecaptcha && window.grecaptcha.reset) window.grecaptcha.reset();
   };
 
   return (
