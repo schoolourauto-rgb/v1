@@ -50,7 +50,7 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <div className="bg-red-900/20 border border-red-800 text-red-300 p-3 rounded-lg text-sm">
+          <div className="bg-danger/10 border border-danger/40 text-danger rounded-2xl p-3 text-sm">
             {error}
           </div>
         )}

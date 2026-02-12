@@ -181,7 +181,7 @@ export default function EditCarPage() {
 
         <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm space-y-6">
           {error && (
-            <div className="bg-red-900/20 border border-red-800 text-red-300 p-4 rounded-lg text-sm">
+            <div className="bg-danger/10 border border-danger/40 text-danger rounded-2xl p-4 text-sm">
               ⚠️ {error}
             </div>
           )}

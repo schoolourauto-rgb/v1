@@ -137,7 +137,7 @@ export default function DealerProfilePage() {
         >
           {saving ? "Saving..." : "Save Changes"}
         </button>
-        {error && <div className="bg-red-900/20 border border-red-800 text-red-300 p-3 rounded-lg text-sm">{error}</div>}
+        {error && <div className="bg-danger/10 border border-danger/40 text-danger rounded-2xl p-3 text-sm">{error}</div>}
         {success && <div className="bg-green-900/20 border border-green-800 text-green-300 p-3 rounded-lg text-sm">Profile updated successfully!</div>}
       </form>
     </div>
