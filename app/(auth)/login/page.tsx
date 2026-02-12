@@ -42,83 +42,50 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
-      <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm w-full max-w-md space-y-4">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Dealer Login</h1>
-          <p className="text-muted-foreground text-sm">Access Your OurAuto Dashboard</p>
-        </div>
-
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-b from-background via-background to-muted dark:from-black dark:via-neutral-950 dark:to-black">
+      <div className="w-full max-w-md bg-card backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-6">
+        <h1 className="text-4xl md:text-3xl font-bold mb-2">
+          Dealer Login
+        </h1>
+        <p className="text-muted-foreground mb-6">
+          Access your dashboard
+        </p>
         {error && (
-          <div className="bg-danger/10 border border-danger/40 text-danger rounded-2xl p-3 text-sm">
+          <div className="bg-danger/10 border border-danger/40 text-danger rounded-2xl p-3 text-sm mb-4">
             {error}
           </div>
         )}
-
-        <div className="space-y-3">
+        <div className="space-y-3 mb-6">
           <input
             placeholder="Email"
             type="email"
-            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+            className="w-full bg-background border border-border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/40"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             disabled={loading}
           />
-
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+            className="w-full bg-background border border-border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/40"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             disabled={loading}
           />
         </div>
-
         <button
           onClick={handleLogin}
           disabled={loading}
-          className="w-full bg-primary hover:opacity-90 text-primary-foreground font-semibold p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-primary text-primary-foreground rounded-xl py-3 text-lg font-medium hover:opacity-90 transition-all"
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
-
-        <div className="space-y-2 text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground mt-6">
           <p>
             Don't have an account?{' '}
             <Link href="/signup" className="text-yellow-500 hover:underline">
               Sign up
             </Link>
-          </p>
-          <p>
-            <button
-              className="text-yellow-500 hover:underline"
-              onClick={async () => {
-                if (!form.email) {
-                  setError('Enter your email to reset password.')
-                  return
-                }
-                setLoading(true)
-                setError(null)
-                try {
-                  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ourauto.in'
-                  const { error: resetError } = await supabase.auth.resetPasswordForEmail(form.email, {
-                    redirectTo: `${siteUrl}/reset-password`
-                  })
-                  if (resetError) {
-                    setError(resetError.message)
-                  } else {
-                    setError('Password reset email sent. Check your inbox.')
-                  }
-                } catch (err) {
-                  setError('Failed to send reset email.')
-                }
-                setLoading(false)
-              }}
-              disabled={loading}
-            >
-              Forgot password?
-            </button>
           </p>
         </div>
       </div>
