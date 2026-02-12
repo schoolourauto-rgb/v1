@@ -86,7 +86,7 @@ export default async function CarsPage({ searchParams }: { searchParams: Promise
               Apply
             </button>
             {(brand || min || max) && (
-              <a href="/cars" className="px-3 py-2 rounded-lg border bg-neutral-100 text-neutral-800">Clear Filters</a>
+              <a href="/cars" className="bg-card border border-border text-foreground hover:bg-muted rounded-xl px-4 py-2 font-medium transition-all duration-200">Clear Filters</a>
             )}
           </form>
           <div className="mb-4 text-sm text-muted-foreground">{cars.length} cars found</div>
@@ -119,7 +119,7 @@ export default async function CarsPage({ searchParams }: { searchParams: Promise
                   max,
                   page: String(i + 1),
                 })}`}
-                className={`px-3 py-1 border rounded-lg ${page === i + 1 ? 'bg-yellow-500 text-black' : 'bg-neutral-100 text-neutral-800'}`}
+                className={`px-3 py-1 border rounded-lg ${page === i + 1 ? 'bg-primary text-primary-foreground' : 'bg-card border border-border text-foreground hover:bg-muted'}`}
               >
                 {i + 1}
               </a>
