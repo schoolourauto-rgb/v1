@@ -1,10 +1,12 @@
 
 "use client";
 
+
 import ChatInput from "@/components/dealer/ChatInput";
 import CarPreviewModal from "@/components/dealer/CarPreviewModal";
 import DashboardWallet from "../DashboardWallet";
 import { useState, useEffect } from "react";
+import TERMS from "./termsContent";
 
 export default function DealerDashboard() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -13,6 +15,7 @@ export default function DealerDashboard() {
   const [cars, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
+  const [lang, setLang] = useState<'en' | 'gu' | 'hi'>('en');
 
   useEffect(() => {
     // Get dealerId from local/session storage or fetch from supabase auth
@@ -50,8 +53,30 @@ export default function DealerDashboard() {
   return (
     <div className="min-h-screen bg-[#0B0B0B] flex flex-col relative">
       {/* Header */}
-      <header className="w-full py-4 px-6 flex flex-col gap-1 bg-[#141414] border-b border-[#C9A227]">
-        <h1 className="text-xl font-bold text-white">Welcome Dealer 👋</h1>
+      <header className="w-full py-4 px-6 flex flex-col gap-1 bg-[#141414] border-b border-[#C9A227] relative">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-white">Welcome Dealer 👋</h1>
+          {/* Language Selector */}
+          <div className="relative">
+            <button
+              className="flex items-center gap-2 px-3 py-1 rounded border border-yellow-400 bg-[#181818] text-yellow-300 text-sm hover:bg-yellow-50 hover:text-yellow-900 dark:hover:bg-zinc-900 transition"
+              aria-label="Select language"
+              type="button"
+            >
+              <span role="img" aria-label="Language">🌐</span> Language
+            </button>
+            <select
+              className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+              value={lang}
+              onChange={e => setLang(e.target.value as 'en' | 'gu' | 'hi')}
+              aria-label="Language selector"
+            >
+              <option value="en">English</option>
+              <option value="gu">Gujarati</option>
+              <option value="hi">Hindi</option>
+            </select>
+          </div>
+        </div>
         {dealerId && <DashboardWallet dealerId={dealerId} />}
       </header>
 
@@ -72,6 +97,27 @@ export default function DealerDashboard() {
 
       {/* Main Content: Car Grid */}
       <main className="flex-1 px-2 md:px-6 py-4 md:py-8 max-w-4xl mx-auto w-full">
+        {/* Conditional Dealer Terms Section */}
+        {!loading && cars.length < 6 && (
+          <section
+            className="mb-8 rounded-xl border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-zinc-900/60 px-4 py-6 shadow max-w-2xl mx-auto overflow-x-auto"
+            aria-label="Dealer Terms and Platform Guidelines"
+          >
+            <h2 className="text-2xl font-bold text-yellow-900 dark:text-yellow-200 mb-4">{TERMS[lang].title}</h2>
+            <div className="flex flex-col gap-4">
+              {TERMS[lang].sections.map((section, idx) => (
+                <div key={idx}>
+                  <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-100 mb-1">{section.heading}</h3>
+                  <ul className="list-disc pl-5 text-gray-800 dark:text-gray-200">
+                    {section.content.map((line, i) => (
+                      <li key={i} className="mb-1 whitespace-pre-line">{line}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
         <h2 className="text-lg font-semibold text-white mb-4">Your Live Cars</h2>
         {loading ? (
           <div className="text-center text-muted-foreground py-12">Loading cars...</div>
