@@ -51,15 +51,15 @@ export default function DealerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0B0B] flex flex-col relative">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative transition-colors duration-300">
       {/* Header */}
-      <header className="w-full py-4 px-6 flex flex-col gap-1 bg-[#141414] border-b border-[#C9A227] relative">
+      <header className="w-full py-4 px-6 flex flex-col gap-1 bg-background border-b border-[#C9A227] relative transition-colors duration-300">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-white">Welcome Dealer 👋</h1>
           {/* Language Selector */}
           <div className="relative">
             <button
-              className="flex items-center gap-2 px-3 py-1 rounded border border-yellow-400 bg-[#181818] text-yellow-300 text-sm hover:bg-yellow-50 hover:text-yellow-900 dark:hover:bg-zinc-900 transition"
+              className="flex items-center gap-2 px-3 py-1 rounded border border-yellow-400 bg-background text-yellow-700 dark:text-yellow-300 text-sm hover:bg-yellow-50 hover:text-yellow-900 dark:hover:bg-zinc-900 transition"
               aria-label="Select language"
               type="button"
             >
@@ -100,7 +100,7 @@ export default function DealerDashboard() {
         {/* Conditional Dealer Terms Section */}
         {!loading && cars.length < 6 && (
           <section
-            className="mb-8 rounded-xl border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-zinc-900/60 px-4 py-6 shadow max-w-2xl mx-auto overflow-x-auto"
+            className="mb-8 rounded-xl border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-zinc-900/60 px-4 py-6 shadow max-w-2xl mx-auto overflow-x-auto transition-colors duration-300"
             aria-label="Dealer Terms and Platform Guidelines"
           >
             <h2 className="text-2xl font-bold text-yellow-900 dark:text-yellow-200 mb-4">{TERMS[lang].title}</h2>
@@ -108,7 +108,7 @@ export default function DealerDashboard() {
               {TERMS[lang].sections.map((section, idx) => (
                 <div key={idx}>
                   <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-100 mb-1">{section.heading}</h3>
-                  <ul className="list-disc pl-5 text-gray-800 dark:text-gray-200">
+                  <ul className="list-disc pl-5 text-foreground">
                     {section.content.map((line, i) => (
                       <li key={i} className="mb-1 whitespace-pre-line">{line}</li>
                     ))}
@@ -118,7 +118,7 @@ export default function DealerDashboard() {
             </div>
           </section>
         )}
-        <h2 className="text-lg font-semibold text-white mb-4">Your Live Cars</h2>
+        <h2 className="text-lg font-semibold mb-4">Your Live Cars</h2>
         {loading ? (
           <div className="text-center text-muted-foreground py-12">Loading cars...</div>
         ) : cars.length === 0 ? (
@@ -126,10 +126,10 @@ export default function DealerDashboard() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {cars.map((car) => (
-              <div key={car.id} className="bg-[#181818] border border-[#C9A227] rounded-xl p-4 flex flex-col gap-2 shadow">
+              <div key={car.id} className="bg-card border border-[#C9A227] rounded-xl p-4 flex flex-col gap-2 shadow transition-colors duration-300">
                 <div className="text-lg font-bold text-yellow-400">{car.title || car.make + ' ' + car.model}</div>
                 <div className="text-sm text-muted-foreground">{car.year} • {car.fuel_type || car.fuel} • {car.transmission || 'Manual'}</div>
-                <div className="text-base font-semibold text-white">₹{car.price?.toLocaleString('en-IN')}</div>
+                <div className="text-base font-semibold">₹{car.price?.toLocaleString('en-IN')}</div>
                 <div className="text-xs text-muted-foreground">{car.mileage || car.km} KM</div>
               </div>
             ))}
