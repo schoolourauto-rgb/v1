@@ -2,11 +2,20 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
-import { Menu, X } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Menu, X, Sun, Moon } from "lucide-react"
+import { useTheme } from "next-themes"
 
 export default function Header() {
   const [open, setOpen] = useState(false)
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border">
@@ -22,6 +31,13 @@ export default function Header() {
           <Link href="/about" className="hover:text-primary transition-colors">
             About
           </Link>
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="p-2 rounded-lg hover:bg-muted transition"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
           <Link
             href="/login"
             className="bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:opacity-90 transition"
@@ -32,13 +48,19 @@ export default function Header() {
 
         {/* Mobile Controls */}
         <div className="md:hidden flex items-center gap-3">
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="p-2 rounded-lg hover:bg-muted transition"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
           <Link
             href="/login"
             className="bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-sm"
           >
             Login
           </Link>
-
           <button onClick={() => setOpen(!open)}>
             {open ? <X size={22} /> : <Menu size={22} />}
           </button>

@@ -175,7 +175,7 @@ export default function EditCarPage() {
           <Link href="/dealer/dashboard" className="text-yellow-500 hover:underline mb-4 inline-block text-sm">
             ← Back to Dashboard
           </Link>
-          <h1 className="text-4xl font-bold mb-2">Edit Car</h1>
+          <h1 className="text-4xl font-bold mb-2 text-primary dark:text-white">Edit Car</h1>
           <p className="text-muted-foreground">Update your car listing</p>
         </div>
 
@@ -188,7 +188,7 @@ export default function EditCarPage() {
 
           {/* Car Details Section */}
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-yellow-500">Car Details</h2>
+            <h2 className="text-xl font-semibold text-primary dark:text-white">Car Details</h2>
 
             <input
               placeholder="Car Title"

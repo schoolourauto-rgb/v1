@@ -89,7 +89,8 @@ export default function SignupPage() {
         .select()
         .maybeSingle();
       if (dealerError || !dealerRow) {
-        setError('Failed to create dealer profile');
+        console.error('Dealer profile creation error:', dealerError);
+        setError(dealerError?.message || 'Failed to create dealer profile');
         setLoading(false);
         return;
       }
