@@ -40,27 +40,22 @@ export default function CarPasteGenerate() {
   // New: State for WhatsApp paste input
   const [rawInput, setRawInput] = useState("");
   // New: State for car form fields
-  const [form, setForm] = useState<CarForm>({
-    title: "",
-    make: "",
-    model: "",
-    version: "",
-  interface CarForm {
-    title: string;
-    make: string;
-    model: string;
-    version: string;
-    year: string;
-    fuel: string;
-    transmission: string;
-    price: string;
-    km: string;
-    owner: string;
-    insurance: string;
-    colour: string;
-    description: string;
-    images: File[];
-  }
+interface CarForm {
+  title: string;
+  make: string;
+  model: string;
+  version: string;
+  year: string;
+  fuel: string;
+  transmission: string;
+  price: string;
+  km: string;
+  owner: string;
+  insurance: string;
+  colour: string;
+  description: string;
+  images: File[];
+}
 
   const [form, setForm] = useState<CarForm>({
     title: "",
@@ -76,7 +71,7 @@ export default function CarPasteGenerate() {
     insurance: "",
     colour: "",
     description: "",
-    images: [] as File[],
+    images: [],
   });
   const [description, setDescription] = useState("");
     const insurance = extract("Insurance", /Insurance\s*[:-]\s*(.*)/i);
