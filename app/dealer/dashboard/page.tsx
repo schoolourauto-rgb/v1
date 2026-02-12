@@ -66,75 +66,7 @@ export default function DealerDashboard() {
     setModalOpen(false);
   };
 
-  // Onboarding gate: if profile incomplete, show onboarding form
-  const isProfileIncomplete = !profile.business_name || !profile.phone;
-  if (isProfileIncomplete) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-background to-muted/30">
-        <form
-          className="max-w-lg w-full bg-card border border-border rounded-2xl p-8 shadow-sm"
-          onSubmit={handleOnboardingSubmit}
-        >
-          <h2 className="text-2xl font-semibold mb-6 text-center">Complete Your Dealer Profile</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="business_name">Business Name</label>
-              <input
-                id="business_name"
-                name="business_name"
-                type="text"
-                required
-                value={onboardingForm.business_name}
-                onChange={e => setOnboardingForm(f => ({ ...f, business_name: e.target.value }))}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="phone">Phone</label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                required
-                value={onboardingForm.phone}
-                onChange={e => setOnboardingForm(f => ({ ...f, phone: e.target.value }))}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="city">City</label>
-              <input
-                id="city"
-                name="city"
-                type="text"
-                value={onboardingForm.city}
-                onChange={e => setOnboardingForm(f => ({ ...f, city: e.target.value }))}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1" htmlFor="description">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                rows={3}
-                value={onboardingForm.description}
-                onChange={e => setOnboardingForm(f => ({ ...f, description: e.target.value }))}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-              />
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="w-full mt-6 rounded-xl bg-primary text-primary-foreground py-2 font-semibold disabled:bg-muted-foreground"
-            disabled={onboardingLoading}
-          >
-            {onboardingLoading ? "Saving..." : "Complete Profile"}
-          </button>
-        </form>
-      </div>
-    );
-  }
+  // ...existing code...
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
