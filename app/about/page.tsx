@@ -53,6 +53,26 @@ export default function AboutPage() {
           <span>Customer Care: <a href="tel:+919408000012" className="underline">+91 94080 00012</a></span>
         </div>
       </section>
+        {/* Safety & Anti-Fraud Policy */}
+        <section
+          className="mb-10 rounded-lg border border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-zinc-900/60 px-4 py-6"
+          aria-label="Safety and Anti-Fraud Policy"
+        >
+          <h2 className="text-2xl font-semibold mb-2">Your Safety Comes First</h2>
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
+            At OurAuto, your safety and trust are our top priorities. We are committed to providing a secure, transparent platform for buying used cars from verified dealers.
+          </p>
+          <ul className="list-disc pl-6 mb-4 text-gray-800 dark:text-gray-200">
+            <li>Never pay any advance amount before physically inspecting the vehicle.</li>
+            <li>Always visit the dealer’s official showroom before making payment.</li>
+            <li>Avoid transferring money to personal bank accounts.</li>
+            <li>OurAuto does not collect booking or advance payments on behalf of dealers.</li>
+            <li>Immediately report any suspicious activity to customer care.</li>
+          </ul>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            Disclaimer: OurAuto is a marketplace platform connecting buyers with verified dealers. We do not participate in financial transactions between buyers and dealers.
+          </div>
+        </section>
     </main>
   );
 }
