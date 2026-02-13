@@ -1,9 +1,9 @@
 
-import { createServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { Dealer } from "@/types";
 
 export default async function AdminDealersPage() {
-  const supabase = createServerClient();
+  const supabase = createClient();
   const { data } = await supabase
     .from("dealers")
     .select("id, user_id, dealership_name, phone, location, verified, created_at, referral_code, referred_by")

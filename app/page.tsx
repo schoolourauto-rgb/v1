@@ -1,169 +1,145 @@
-"use client"
-import Image from "next/image"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import CarCard from "@/components/marketplace/CarCard"
-import ListingCardSkeleton from "@/components/marketplace/ListingCardSkeleton"
-import { createClient } from "@/lib/supabase/client"
+// JSON-LD generator for Vehicle structured data
+function generateVehicleJsonLd(cars: Car[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: cars.slice(0, 6).map((car, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Vehicle",
+        name: car.title,
+        brand: {
+          "@type": "Brand",
+          name: car.make,
+        },
+        model: car.model,
+        vehicleModelDate: car.year,
+        fuelType: car.fuel,
+        vehicleTransmission: car.transmission,
+        offers: {
+          "@type": "Offer",
+          price: car.price,
+          priceCurrency: "INR",
+          availability: "https://schema.org/InStock",
+        },
+      },
+    })),
+  };
+}
 
+import HeroSection from "@/components/marketplace/HeroSection";
+import { createClient } from "@/lib/supabase/server";
+import { Car } from "@/types/car";
+import BrandGrid from "@/components/seo/BrandGrid";
+import CityGrid from "@/components/seo/CityGrid";
+import BudgetGrid from "@/components/seo/BudgetGrid";
+import FuelGrid from "@/components/seo/FuelGrid";
+import TransmissionGrid from "@/components/seo/TransmissionGrid";
 
+// Server Component: Fetch active cars from Supabase and pass to HeroSection
+export const revalidate = 60;
+export const runtime = "edge";
 
-export default function Page() {
-  // Smart hero search state
-  const [brand, setBrand] = useState("")
-  const [city, setCity] = useState("")
-  const [max, setMax] = useState("")
-  const router = useRouter()
+export default async function Page() {
+  const supabase = createClient();
 
-  const handleHeroSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    const params = []
-    if (brand) params.push(`brand=${encodeURIComponent(brand)}`)
-    if (city) params.push(`city=${encodeURIComponent(city)}`)
-    if (max) params.push(`max=${encodeURIComponent(max)}`)
-    const query = params.length ? `?${params.join("&")}` : ""
-    router.push(`/marketplace${query}`)
+  // Fetch mesh data from materialized views
+  const [
+    { data: brands },
+    { data: cities },
+    { data: budgets },
+    { data: fuels },
+    { data: transmissions },
+    { data: cars, error },
+  ] = await Promise.all([
+    supabase
+      .from("seo_brand_counts")
+      .select("brand, listing_count")
+      .order("listing_count", { ascending: false })
+      .limit(12),
+    supabase
+      .from("seo_city_counts")
+      .select("city, listing_count")
+      .order("listing_count", { ascending: false })
+      .limit(10),
+    supabase
+      .from("seo_budget_counts")
+      .select("budget, listing_count")
+      .order("listing_count", { ascending: false })
+      .limit(6),
+    supabase
+      .from("seo_fuel_counts")
+      .select("fuel, listing_count")
+      .order("listing_count", { ascending: false })
+      .limit(5),
+    supabase
+      .from("seo_transmission_counts")
+      .select("transmission, listing_count")
+      .order("listing_count", { ascending: false })
+      .limit(3),
+    supabase
+      .from("cars")
+      .select(`
+        id,
+        name,
+        brand,
+        model,
+        year,
+        price,
+        fuel_type,
+        transmission,
+        location,
+        car_images(image_url)
+      `)
+      .eq("status", "active")
+      .order("created_at", { ascending: false }),
+  ]);
+
+  let listings: Car[] = [];
+  let errorMsg = "";
+  if (error) {
+    errorMsg = "Failed to load cars.";
+  } else if (cars) {
+    listings = (cars as any[]).map((row) => ({
+      id: row.id,
+      title: row.name,
+      make: row.brand,
+      model: row.model,
+      year: row.year,
+      fuel: row.fuel_type,
+      price: row.price,
+      image: row.car_images?.[0]?.image_url ?? "/logo.png",
+      location: row.location ?? "Unknown",
+      transmission: row.transmission,
+    }));
   }
 
-  return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 animate-in fade-in duration-500">
-      {/* Premium Hero Section */}
-      <section className="relative min-h-[70vh] flex flex-col justify-center bg-background text-foreground transition-colors duration-300 pt-24 before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,rgba(234,179,8,0.08),transparent_60%)] before:pointer-events-none">
-        <div className="absolute inset-0">
-          <div className="relative w-full h-full aspect-[16/7]">
-            <Image
-              src="/hero-car.jpg"
-              alt="Luxury Cars"
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover opacity-30"
-              onError={(e) => { (e.target as HTMLImageElement).src = "/categories/fallback.jpg"; }}
-            />
-          </div>
-        </div>
-        <div className="relative max-w-7xl mx-auto px-6 text-center flex flex-col items-center justify-center min-h-[60vh]">
-                {/* Customer Care Strip */}
-                <div className="w-full bg-card border-t border-border py-3 flex justify-center items-center mt-4">
-                  <span className="text-sm text-muted-foreground">
-                  </span>
-                </div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-            Buy Cars from Verified Dealers Only
-          </h1>
-          <p className="mt-4 text-lg md:text-xl text-muted-foreground">
-            No individuals. No spam. Only trusted car showrooms with real inventory.
-          </p>
-                {/* Trust Section */}
-                <section className="py-16 md:py-24 border-t border-border">
-                  <div className="max-w-7xl mx-auto px-6 text-center">
-                    <h2 className="text-2xl md:text-3xl font-semibold mb-10">
-                      Why OurAuto?
-                    </h2>
-                    <div className="grid md:grid-cols-4 gap-8 text-sm md:text-base">
-                      <div>✅ Verified showroom dealers only</div>
-                      <div>✅ Real, curated inventory</div>
-                      <div>✅ Direct dealer contact</div>
-                      <div>✅ No middlemen or fake listings</div>
-                    </div>
-                  </div>
-                </section>
+  const jsonLd = generateVehicleJsonLd(listings);
 
-                {/* Social Proof Block */}
-                <section className="py-16 text-center">
-                  <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-3 gap-8">
-                    <div>
-                      <p className="text-3xl font-bold">52+</p>
-                      <p className="text-muted-foreground">Verified Dealers</p>
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold">1,284+</p>
-                      <p className="text-muted-foreground">Cars Listed</p>
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold">12</p>
-                      <p className="text-muted-foreground">Cities Covered</p>
-                    </div>
-                  </div>
-                </section>
-          {/* Search Bar */}
-          <form onSubmit={handleHeroSearch} className="mt-12 bg-card/80 dark:bg-card/60 backdrop-blur-xl border border-border rounded-2xl shadow-2xl flex flex-col md:flex-row gap-4 px-6 py-4 w-full max-w-2xl mx-auto hover:scale-[1.02] transition-all duration-200">
-            <input
-              placeholder="Brand (BMW, Audi...)"
-              className="flex-1 rounded-xl px-6 py-4 bg-background text-foreground border border-border focus:ring-2 focus:ring-yellow-500 placeholder:text-muted-foreground transition"
-              value={brand}
-              onChange={e => setBrand(e.target.value)}
-            />
-            <input
-              placeholder="City"
-              className="flex-1 rounded-xl px-6 py-4 bg-background text-foreground border border-border focus:ring-2 focus:ring-yellow-500 placeholder:text-muted-foreground transition"
-              value={city}
-              onChange={e => setCity(e.target.value)}
-            />
-            <input
-              placeholder="Max Price"
-              className="flex-1 rounded-xl px-6 py-4 bg-background text-foreground border border-border focus:ring-2 focus:ring-yellow-500 placeholder:text-muted-foreground transition"
-              value={max}
-              onChange={e => setMax(e.target.value)}
-              type="number"
-              min="0"
-            />
-            <button type="submit" className="bg-primary text-primary-foreground font-medium px-8 py-3 rounded-xl transition-all duration-200 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/40">
-              Search
-            </button>
-          </form>
-          {/* Quick Filter Chips */}
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {['BMW', 'Audi', 'Mercedes', 'Hyundai', 'Toyota', 'Tata'].map((brand) => (
-              <button
-                key={brand}
-                className="px-5 py-2 rounded-full border border-muted bg-background text-foreground hover:bg-muted transition font-medium focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              >
-                {brand}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* Premium Category Cards Section */}
-      <section className="py-20 bg-background text-foreground transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-foreground mb-10 text-center">Browse by Category</h2>
-          <div className="grid md:grid-cols-4 gap-6">
-            {[
-              { name: "SUV", image: "/categories/suv.jpg" },
-              { name: "Sedan", image: "/categories/sedan.jpg" },
-              { name: "Hatchback", image: "/categories/hatchback.jpg" },
-              { name: "Luxury", image: "/categories/luxury.jpg" },
-            ].map((cat) => (
-              <a
-                key={cat.name}
-                href={`/marketplace?category=${cat.name.toLowerCase()}`}
-                className="relative h-48 rounded-2xl overflow-hidden group"
-              >
-                <img
-                  src={cat.image}
-                  className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-                  loading="lazy"
-                  alt={cat.name}
-                />
-                <div className="absolute inset-0 bg-background/80 dark:bg-black/50 flex items-center justify-center">
-                  <span className="text-xl font-semibold text-foreground">{cat.name}</span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* Grid */}
-      <section className="py-20 bg-background text-foreground transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 animate-fadeInUp">
-            {/* Cars fetched from Supabase */}
-            {/* Placeholder: No cars data */}
-          </div>
-        </div>
-      </section>
-    </div>
-  )
+  return (
+    <>
+      {errorMsg && (
+        <div className="text-center text-red-500 py-4">{errorMsg}</div>
+      )}
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd),
+        }}
+      />
+
+      <HeroSection listings={listings} />
+
+      {/* Hierarchical mesh: Brand > City > Budget > Fuel > Transmission */}
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <BrandGrid brands={(brands ?? []).filter((b) => b.listing_count >= 3)} />
+        <CityGrid cities={(cities ?? []).filter((c) => c.listing_count >= 3)} />
+        <BudgetGrid budgets={(budgets ?? []).filter((b) => b.listing_count >= 3)} />
+        <FuelGrid fuels={(fuels ?? []).filter((f) => f.listing_count >= 3)} />
+        <TransmissionGrid transmissions={(transmissions ?? []).filter((t) => t.listing_count >= 3)} />
+      </div>
+    </>
+  );
 }

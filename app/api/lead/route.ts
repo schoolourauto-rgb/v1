@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createServerClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { v4 as uuidv4 } from "uuid"
 
 export async function POST(req: Request) {
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: "Invalid message." }, { status: 400 })
   }
 
-  const supabase = createServerClient()
+  const supabase = createClient()
   const { error } = await supabase.from("leads").insert([
     {
       id: uuidv4(),

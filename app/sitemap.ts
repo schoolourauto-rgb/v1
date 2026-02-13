@@ -1,39 +1,36 @@
-export const dynamic = "force-dynamic"
-import { createServerClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server';
 
 export default async function sitemap() {
-  const supabase = createServerClient()
+  const supabase = createClient();
 
-  // Fetch all cars
-  const { data: cars } = await supabase
-    .from('cars')
-    .select('id')
+  // Fetch all cars, brands, and cities
+  const [{ data: cars }, { data: brandsData }, { data: citiesData }] = await Promise.all([
+    supabase.from('cars').select('id'),
+    supabase.from('cars').select('brand'),
+    supabase.from('cars').select('location'),
+  ]);
 
-  // Fetch all dealers
-  const { data: dealers } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('role', 'dealer')
+  const brands = Array.from(new Set((brandsData || []).map((r) => r.brand).filter(Boolean)));
+  const cities = Array.from(new Set((citiesData || []).map((r) => r.location).filter(Boolean)));
+  const carIds = (cars || []).map((r) => r.id);
 
-  // Sitemap entries
   const urls = [
-    { url: 'https://ourauto.in', priority: 1 },
-    { url: 'https://ourauto.in/marketplace', priority: 0.9 },
-    ...cars?.map((car: any) => ({ url: `https://ourauto.in/cars/${car.id}`, priority: 0.8 })) || [],
-    ...dealers?.map((dealer: any) => ({ url: `https://ourauto.in/dealer/${dealer.id}`, priority: 0.7 })) || [],
-  ]
+    { url: 'https://ourauto.in/cars', priority: 1 },
+    ...brands.map((brand) => ({ url: `https://ourauto.in/cars/${encodeURIComponent(brand)}`, priority: 0.9 })),
+    ...cities.map((city) => ({ url: `https://ourauto.in/cars/city/${encodeURIComponent(city)}`, priority: 0.8 })),
+    ...carIds.map((id) => ({ url: `https://ourauto.in/cars/${id}`, priority: 0.7 })),
+  ];
 
-  // XML generation
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
     .map(
       (entry) =>
         `<url><loc>${entry.url}</loc><priority>${entry.priority}</priority></url>`
     )
-    .join('\n')}\n</sitemapindex>`
+    .join('\n')}\n</urlset>`;
 
   return new Response(xml, {
     headers: {
       'Content-Type': 'application/xml',
     },
-  })
+  });
 }

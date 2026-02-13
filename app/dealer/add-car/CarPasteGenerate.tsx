@@ -120,7 +120,9 @@ export default function CarPasteGenerate() {
   };
 
   const handleAnalyze = () => {
+    alert("ANALYZE CLICKED");
     const result = parseCarText(rawText);
+    console.log("FULL PARSED OBJECT:", result);
     setParsedData(result);
   };
 
@@ -182,7 +184,7 @@ export default function CarPasteGenerate() {
         onClick={handleAnalyze}
         className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
       >
-        Analyze
+        ANALYZE – DEBUG VERSION
       </button>
 
       {/* Image Upload */}
