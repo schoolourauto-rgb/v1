@@ -35,14 +35,14 @@ type CarForm = {
   make: string;
   model: string;
   version: string;
+  transmission: string;
   fuel: string;
   colour: string;
   owner: string;
   insurance: string;
-  transmission: string;
   km: string;
   price: string;
-  description: string;
+  remarks: string;
   images: File[];
 };
 
@@ -56,14 +56,14 @@ export default function CarPasteGenerate() {
     make: "",
     model: "",
     version: "",
+    transmission: "",
     fuel: "",
     colour: "",
     owner: "",
     insurance: "",
-    transmission: "",
     km: "",
     price: "",
-    description: "",
+    remarks: "",
     images: [],
   });
 
@@ -72,71 +72,72 @@ export default function CarPasteGenerate() {
   }
 
   const handleAnalyze = () => {
-    // 🔹 Normalize text (remove emojis + bold markers)
-    const normalized = rawInput
-      .replace(/\*/g, "")
-      .replace(/🗓|🏭|🚘|⛽|🎨|👤|📃|🎰|💵|💳|🕹️/g, "");
+    const lines = rawInput
+      .split("\n")
+      .map(l => l.replace(/\*/g, "").trim())
+      .filter(Boolean);
 
-    const extract = (regex: RegExp) =>
-      normalized.match(regex)?.[1]?.trim() || "";
+    const extractField = (regex: RegExp) =>
+      rawInput.match(regex)?.[1]?.trim() || "";
 
-    // Universal Year extraction with short format support
-    let year =
-      extract(/Year\*?\s*[:-]\s*(\d{4})/i) ||
-      extract(/\*Year\*\s*[:-]\s*(\d{4})/i) ||
-      extract(/(\d{4})/);
-
+    let year = extractField(/Year\s*[:-]\s*(\d{4})/i);
     if (!year) {
-      // try format like 10/21
-      const shortYearMatch = rawInput.match(/\b\d{1,2}\/(\d{2})\b/);
-      if (shortYearMatch) {
-        year = "20" + shortYearMatch[1];
-      }
+      const shortYear = rawInput.match(/\b\d{1,2}\/(\d{2})\b/);
+      if (shortYear) year = "20" + shortYear[1];
     }
 
-    const make = extract(/Make\s*[:-]\s*(.*)/i);
-    const model = extract(/Model\s*[:-]\s*(.*)/i);
-    const version = extract(/Version\s*[:-]\s*(.*)/i);
-    const fuel = extract(/Fuel\s*[:-]\s*(.*)/i);
-    const colour = extract(/Colour\s*[:-]\s*(.*)/i);
-    const owner = extract(/Owner\s*[:-]\s*(.*)/i);
-    const insurance = extract(/Insurance\s*[:-]\s*(.*)/i);
+    const make = extractField(/Make\s*[:-]\s*(.*)/i);
+    const model = extractField(/Model\s*[:-]\s*(.*)/i);
+    const version = extractField(/Version\s*[:-]\s*(.*)/i);
+    const fuel = extractField(/Fuel\s*[:-]\s*(.*)/i);
+    const colour = extractField(/Colour\s*[:-]\s*(.*)/i);
+    const owner = extractField(/Owner\s*[:-]\s*(.*)/i);
+    const insurance = extractField(/Insurance\s*[:-]\s*(.*)/i);
 
-    // Transmission default Manual logic
-    let transmission = extract(/Transmission\s*[:-]\s*(.*)/i);
-    if (!transmission) {
-      transmission = "Manual";
-    }
+    let transmission =
+      extractField(/Transmission\s*[:-]\s*(.*)/i) || "Manual";
 
-    const kmRaw = extract(/K\/?m\.?\s*[:-]\s*(.*)/i);
-    const priceRaw = extract(/Price\s*[:-]\s*(.*)/i);
+    const kmRaw = extractField(/K\/?m\s*[:-]\s*(.*)/i);
+    const priceRaw = extractField(/Price\s*[:-]\s*(.*)/i);
 
-    const cleanedKm = kmRaw
+    const km = kmRaw
       .replace(/Genuine/gi, "")
-      .replace(/km/gi, "")
       .replace(/[,]/g, "")
       .replace(/\s/g, "");
 
-    const cleanedPrice = priceRaw
+    const price = priceRaw
       .replace(/[,\/\-]/g, "")
       .replace(/\s/g, "");
 
-    const description = generateDescription({
-      year,
-      make,
-      model,
-      version,
-      fuel,
-      transmission,
-      km: cleanedKm,
-      owner,
-      colour,
-      insurance
-    });
-
+    // 🎯 TITLE FORMAT
     const title = `${make} ${model} ${version} ${transmission} (${year})`
       .replace(/\s+/g, " ")
       .trim();
+
+    // 🎯 REMOVE USED LINES → REMARKS
+    const usedKeywords = [
+      "Reg",
+      "Year",
+      "Make",
+      "Model",
+      "Version",
+      "Transmission",
+      "Fuel",
+      "Colour",
+      "Owner",
+      "Insurance",
+      "K/m",
+      "KM",
+      "Price",
+    ];
+
+    const remarksLines = lines.filter(
+      line => !usedKeywords.some(keyword =>
+        line.toLowerCase().includes(keyword.toLowerCase())
+      )
+    );
+
+    const remarks = remarksLines.join("\n");
 
     setForm(prev => ({
       ...prev,
@@ -145,14 +146,14 @@ export default function CarPasteGenerate() {
       make,
       model,
       version,
-      fuel,
       transmission,
+      fuel,
       colour,
       owner,
       insurance,
-      km: cleanedKm,
-      price: formatIndianPrice(cleanedPrice),
-      description
+      km,
+      price,
+      remarks
     }));
   };
 
