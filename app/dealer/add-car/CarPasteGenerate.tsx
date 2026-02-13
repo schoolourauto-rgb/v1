@@ -179,7 +179,9 @@ export default function CarPasteGenerate() {
 
       {/* PREVIEW FIRST */}
       {form.title && (
-        <div className="bg-muted rounded-xl p-4 text-sm space-y-2">
+        <div
+          className="rounded-xl p-5 bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 text-sm leading-relaxed"
+        >
           <h3 className="font-semibold text-base">{form.title}</h3>
           <p>• {form.km} KM Driven</p>
           <p>• {form.owner} Owner</p>
@@ -187,6 +189,12 @@ export default function CarPasteGenerate() {
           <p>• Insurance: {form.insurance}</p>
           <p>• Transmission: {form.transmission}</p>
           <p>• Fuel: {form.fuel}</p>
+          {form.remarks && (
+            <div className="mt-2">
+              <div className="font-semibold">Remarks:</div>
+              <pre className="whitespace-pre-wrap text-xs mt-1">{form.remarks}</pre>
+            </div>
+          )}
         </div>
       )}
 
@@ -196,9 +204,12 @@ export default function CarPasteGenerate() {
           value={rawInput}
           onChange={(e) => setRawInput(e.target.value)}
           placeholder="Paste WhatsApp vehicle message..."
-          className="w-full min-h-[180px] rounded-xl border p-4"
+          className="w-full min-h-[160px] rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 p-4 text-sm leading-relaxed resize-none transition-colors"
         />
-        <Button onClick={handleAnalyze} className="mt-3">
+        <Button
+          onClick={handleAnalyze}
+          className="mt-4 px-6 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 text-white transition"
+        >
           Analyze & Fill Details
         </Button>
       </div>
