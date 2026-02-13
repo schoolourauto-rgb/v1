@@ -21,18 +21,12 @@ export function parseCarMessage(text: string): ParsedCar {
     return text.match(regex)?.[1]?.trim() || "";
   };
 
-  // Clean and normalize price (strict: only from correct pattern)
-  const extractStrictPrice = (text: string) => {
-    // Remove asterisks for easier matching
-    const cleanText = text.replace(/\*/g, "");
-    // Strict regex: looks for 'Price' label with optional emoji, colon/dash, optional rupee, numbers, optional /-
-    const priceMatch = cleanText.match(/price\s*[:\-]?\s*₹?\s*([\d,]+)(?:\/-)?/i);
-    if (priceMatch) {
-      // Remove commas, parse as number
-      return Number(priceMatch[1].replace(/,/g, ""));
-    }
-    return null;
-  };
+  // Bulletproof price extraction: handles emoji, stars, formatting
+  function extractPrice(text: string): string {
+    const match = text.match(/price[^0-9]*([\d,]+)/i);
+    if (!match) return "";
+    return match[1].replace(/,/g, "");
+  }
 
   // Clean and normalize mileage
   const cleanKM = (raw: string) => {
@@ -116,8 +110,10 @@ export function parseCarMessage(text: string): ParsedCar {
   const kmRaw = get("K/m");
   const km = cleanKM(kmRaw);
 
-  // Price (strict extraction)
-  const price = extractStrictPrice(text);
+  // Price (bulletproof extraction)
+  const priceStr = extractPrice(text);
+  const price = priceStr ? Number(priceStr) : null;
+  console.log("Parsed price:", price);
 
   // Error validation
   const errors: string[] = [];
