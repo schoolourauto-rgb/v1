@@ -80,7 +80,20 @@ export default function CarPasteGenerate() {
     const extract = (regex: RegExp) =>
       normalized.match(regex)?.[1]?.trim() || "";
 
-    const year = extract(/Year\s*[:-]\s*(\d{4})/i);
+    // Universal Year extraction with short format support
+    let year =
+      extract(/Year\*?\s*[:-]\s*(\d{4})/i) ||
+      extract(/\*Year\*\s*[:-]\s*(\d{4})/i) ||
+      extract(/(\d{4})/);
+
+    if (!year) {
+      // try format like 10/21
+      const shortYearMatch = rawInput.match(/\b\d{1,2}\/(\d{2})\b/);
+      if (shortYearMatch) {
+        year = "20" + shortYearMatch[1];
+      }
+    }
+
     const make = extract(/Make\s*[:-]\s*(.*)/i);
     const model = extract(/Model\s*[:-]\s*(.*)/i);
     const version = extract(/Version\s*[:-]\s*(.*)/i);
@@ -88,8 +101,12 @@ export default function CarPasteGenerate() {
     const colour = extract(/Colour\s*[:-]\s*(.*)/i);
     const owner = extract(/Owner\s*[:-]\s*(.*)/i);
     const insurance = extract(/Insurance\s*[:-]\s*(.*)/i);
-    const transmissionRaw = extract(/Transmission\s*[:-]\s*(.*)/i);
-    const transmission = transmissionRaw || "Manual";
+
+    // Transmission default Manual logic
+    let transmission = extract(/Transmission\s*[:-]\s*(.*)/i);
+    if (!transmission) {
+      transmission = "Manual";
+    }
 
     const kmRaw = extract(/K\/?m\.?\s*[:-]\s*(.*)/i);
     const priceRaw = extract(/Price\s*[:-]\s*(.*)/i);
@@ -117,7 +134,7 @@ export default function CarPasteGenerate() {
       insurance
     });
 
-    const title = `${year} ${make} ${model} ${version} ${fuel} ${transmission}`
+    const title = `${make} ${model} ${version} ${transmission} (${year})`
       .replace(/\s+/g, " ")
       .trim();
 
@@ -157,64 +174,42 @@ export default function CarPasteGenerate() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6">
 
-      {/* Smart Paste Section */}
+      {/* PREVIEW FIRST */}
+      {form.title && (
+        <div className="bg-muted rounded-xl p-4 text-sm space-y-2">
+          <h3 className="font-semibold text-base">{form.title}</h3>
+          <p>• {form.km} KM Driven</p>
+          <p>• {form.owner} Owner</p>
+          <p>• {form.colour} Colour</p>
+          <p>• Insurance: {form.insurance}</p>
+          <p>• Transmission: {form.transmission}</p>
+          <p>• Fuel: {form.fuel}</p>
+        </div>
+      )}
+
+      {/* PASTE BOX */}
       <div>
-        <h2 className="text-lg font-bold mb-2">
-          🧠 Smart Paste Vehicle Details
-        </h2>
-
         <textarea
           value={rawInput}
           onChange={(e) => setRawInput(e.target.value)}
-          placeholder="Paste full WhatsApp vehicle message here..."
-          className="w-full min-h-[150px] rounded-lg border border-border bg-background p-3 text-base resize-none"
+          placeholder="Paste WhatsApp vehicle message..."
+          className="w-full min-h-[180px] rounded-xl border p-4"
         />
-
-        <Button
-          type="button"
-          onClick={handleAnalyze}
-          className="mt-3"
-        >
+        <Button onClick={handleAnalyze} className="mt-3">
           Analyze & Fill Details
         </Button>
       </div>
 
-      {/* Main Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {/* IMAGE UPLOAD BELOW */}
+      <div>
+        <Label>Upload Images (max 10)</Label>
+        <input type="file" multiple accept="image/*" onChange={handleImageChange}/>
+      </div>
 
-        <Card>
-          <Input value={form.title} placeholder="Title" readOnly />
-          <Input value={form.year} placeholder="Year" readOnly />
-          <Input value={form.make} placeholder="Make" readOnly />
-          <Input value={form.model} placeholder="Model" readOnly />
-          <Input value={form.version} placeholder="Version" readOnly />
-          <Input value={form.fuel} placeholder="Fuel" readOnly />
-          <Input value={form.colour} placeholder="Colour" readOnly />
-          <Input value={form.owner} placeholder="Owner" readOnly />
-          <Input value={form.insurance} placeholder="Insurance" readOnly />
-          <Input value={form.transmission} placeholder="Transmission" readOnly />
-          <Input value={form.km} placeholder="KM" readOnly />
-          <Input value={form.price} placeholder="Price" readOnly />
-          <Input value={form.description} placeholder="Description" readOnly />
-        </Card>
-
-        <div>
-          <Label>Upload Images (max 10)</Label>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-        </div>
-
-        <Button type="submit" disabled={loading}>
-          {loading ? "Submitting..." : "Add Car"}
-        </Button>
-
-      </form>
+      {/* FINAL FORM FIELDS (optional, can be expanded as needed) */}
+      {/* ...existing code... */}
     </div>
   );
 }
