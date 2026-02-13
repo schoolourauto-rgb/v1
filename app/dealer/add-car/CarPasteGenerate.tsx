@@ -178,25 +178,27 @@ export default function CarPasteGenerate() {
     <div className="max-w-4xl mx-auto space-y-6">
 
       {/* PREVIEW FIRST */}
-      {form.title && (
-        <div
-          className="rounded-xl p-5 bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 text-sm leading-relaxed"
-        >
-          <h3 className="font-semibold text-base">{form.title}</h3>
-          <p>• {form.km} KM Driven</p>
-          <p>• {form.owner} Owner</p>
-          <p>• {form.colour} Colour</p>
-          <p>• Insurance: {form.insurance}</p>
-          <p>• Transmission: {form.transmission}</p>
-          <p>• Fuel: {form.fuel}</p>
-          {form.remarks && (
-            <div className="mt-2">
-              <div className="font-semibold">Remarks:</div>
-              <pre className="whitespace-pre-wrap text-xs mt-1">{form.remarks}</pre>
-            </div>
-          )}
-        </div>
-      )}
+      <div className="rounded-xl p-5 
+                bg-muted 
+                text-foreground 
+                border border-border
+                space-y-2">
+        <h3 className="text-lg font-semibold text-foreground">
+          {form.title || "Vehicle Preview"}
+        </h3>
+        <p>• {form.km} KM Driven</p>
+        <p>• {form.owner} Owner</p>
+        <p>• {form.colour} Colour</p>
+        <p>• Insurance: {form.insurance}</p>
+        <p>• Transmission: {form.transmission}</p>
+        <p>• Fuel: {form.fuel}</p>
+        {form.remarks && (
+          <div className="mt-2">
+            <div className="font-semibold">Remarks:</div>
+            <pre className="whitespace-pre-wrap text-xs mt-1">{form.remarks}</pre>
+          </div>
+        )}
+      </div>
 
       {/* PASTE BOX */}
       <div>
@@ -206,12 +208,16 @@ export default function CarPasteGenerate() {
           placeholder="Paste WhatsApp vehicle message..."
           className="w-full min-h-[160px] rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 p-4 text-sm leading-relaxed resize-none transition-colors"
         />
-        <Button
+        <button
+          type="button"
           onClick={handleAnalyze}
-          className="mt-4 px-6 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 text-white transition"
+          className="mt-3 px-5 py-2 rounded-lg font-semibold 
+                     bg-blue-600 text-white 
+                     hover:bg-blue-700 
+                     transition-all duration-200"
         >
           Analyze & Fill Details
-        </Button>
+        </button>
       </div>
 
       {/* IMAGE UPLOAD BELOW */}
@@ -223,5 +229,80 @@ export default function CarPasteGenerate() {
       {/* FINAL FORM FIELDS (optional, can be expanded as needed) */}
       {/* ...existing code... */}
     </div>
-  );
-}
+  const handleAnalyze = () => {
+    const lines = rawInput
+      .split("\n")
+      .map(l => l.replace(/\*/g, "").trim())
+      .filter(Boolean);
+
+    const extractField = (regex: RegExp) =>
+      rawInput.match(regex)?.[1]?.trim() || "";
+
+    let year = extractField(/Year\s*[:-]\s*(\d{4})/i);
+    if (!year) {
+      const shortYear = rawInput.match(/\b\d{1,2}\/(\d{2})\b/);
+      if (shortYear) year = "20" + shortYear[1];
+    }
+
+    const make = extractField(/Make\s*[:-]\s*(.*)/i);
+    const model = extractField(/Model\s*[:-]\s*(.*)/i);
+    const version = extractField(/Version\s*[:-]\s*(.*)/i);
+    const fuel = extractField(/Fuel\s*[:-]\s*(.*)/i);
+    const colour = extractField(/Colour\s*[:-]\s*(.*)/i);
+    const owner = extractField(/Owner\s*[:-]\s*(.*)/i);
+    const insurance = extractField(/Insurance\s*[:-]\s*(.*)/i);
+
+    let transmission =
+      extractField(/Transmission\s*[:-]\s*(.*)/i) || "Manual";
+
+    const kmRaw = extractField(/K\/?m\s*[:-]\s*(.*)/i);
+    const priceRaw = extractField(/Price\s*[:-]\s*(.*)/i);
+
+    const cleanedKm = kmRaw
+      .replace(/Genuine/gi, "")
+      .replace(/[,]/g, "")
+      .replace(/\s/g, "");
+
+    const cleanedPrice = priceRaw
+      .replace(/[,\/\-]/g, "")
+      .replace(/\s/g, "");
+
+    const remarksLines = lines.filter(
+      line => ![
+        "Reg",
+        "Year",
+        "Make",
+        "Model",
+        "Version",
+        "Transmission",
+        "Fuel",
+        "Colour",
+        "Owner",
+        "Insurance",
+        "K/m",
+        "KM",
+        "Price",
+      ].some(keyword =>
+        line.toLowerCase().includes(keyword.toLowerCase())
+      )
+    );
+
+    const remarks = remarksLines.join("\n");
+
+    setForm(prev => ({
+      ...prev,
+      title: `${make} ${model} ${version} ${transmission} (${year})`.trim(),
+      year,
+      make,
+      model,
+      version,
+      fuel,
+      colour,
+      owner,
+      insurance,
+      transmission,
+      km: cleanedKm,
+      price: cleanedPrice,
+      remarks,
+    }));
+  };
