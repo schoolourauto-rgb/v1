@@ -1,35 +1,8 @@
 "use client";
-function formatIndianPrice(value: string) {
-  const num = Number(value);
-  if (isNaN(num)) return value;
-  return num.toLocaleString("en-IN");
-}
-function generateDescription(form: {
-  year: string;
-  make: string;
-  model: string;
-  version: string;
-  fuel: string;
-  transmission?: string;
-  km: string;
-  owner: string;
-  colour: string;
-  insurance: string;
-}) {
-  const transmission = form.transmission?.trim() || "Manual";
-  const cleanKm = form.km
-    ?.replace(/[,]/g, "")
-    ?.replace(/\s/g, "");
-  return `${form.make} ${form.model} ${form.version} ${transmission} (${form.year})\n\n• ${cleanKm} KM Driven\n• ${form.owner} Owner\n• ${form.colour} Colour\n• Insurance: ${form.insurance}\n• Transmission: ${transmission}\n• Fuel: ${form.fuel}\n\nWell maintained vehicle. Genuine mileage. Contact for more details.`;
-}
 
 import { useState } from "react";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Label } from "@/components/ui/Label";
 
-type CarForm = {
+interface FormData {
   title: string;
   year: string;
   make: string;
@@ -41,16 +14,12 @@ type CarForm = {
   owner: string;
   insurance: string;
   km: string;
-  price: string;
   remarks: string;
-  images: File[];
-};
+}
 
 export default function CarPasteGenerate() {
   const [rawInput, setRawInput] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const [form, setForm] = useState<CarForm>({
+  const [form, setForm] = useState<FormData>({
     title: "",
     year: "",
     make: "",
@@ -62,85 +31,70 @@ export default function CarPasteGenerate() {
     owner: "",
     insurance: "",
     km: "",
-    price: "",
     remarks: "",
-    images: [],
   });
 
-  function extract(regex: RegExp) {
+  const extract = (regex: RegExp) => {
     return rawInput.match(regex)?.[1]?.trim() || "";
-  }
+  };
 
   const handleAnalyze = () => {
-    const lines = rawInput
-      .split("\n")
-      .map(l => l.replace(/\*/g, "").trim())
-      .filter(Boolean);
+    const clean = rawInput.replace(/\*/g, "");
 
-    const extractField = (regex: RegExp) =>
-      rawInput.match(regex)?.[1]?.trim() || "";
+    let year =
+      extract(/Year\s*[:-]?\s*(\d{4})/i) ||
+      extract(/(\b20\d{2}\b)/) ||
+      "";
 
-    let year = extractField(/Year\s*[:-]\s*(\d{4})/i);
     if (!year) {
-      const shortYear = rawInput.match(/\b\d{1,2}\/(\d{2})\b/);
-      if (shortYear) year = "20" + shortYear[1];
+      const shortYear = extract(/\/(\d{2})/);
+      if (shortYear) year = "20" + shortYear;
     }
 
-    const make = extractField(/Make\s*[:-]\s*(.*)/i);
-    const model = extractField(/Model\s*[:-]\s*(.*)/i);
-    const version = extractField(/Version\s*[:-]\s*(.*)/i);
-    const fuel = extractField(/Fuel\s*[:-]\s*(.*)/i);
-    const colour = extractField(/Colour\s*[:-]\s*(.*)/i);
-    const owner = extractField(/Owner\s*[:-]\s*(.*)/i);
-    const insurance = extractField(/Insurance\s*[:-]\s*(.*)/i);
+    const make = extract(/Make\s*[:-]?\s*(.*)/i);
+    const model = extract(/Model\s*[:-]?\s*(.*)/i);
+    const version = extract(/Version\s*[:-]?\s*(.*)/i);
+    const transmission =
+      extract(/Transmission\s*[:-]?\s*(.*)/i) || "Manual";
+    const fuel = extract(/Fuel\s*[:-]?\s*(.*)/i);
+    const colour = extract(/Colour\s*[:-]?\s*(.*)/i);
+    const owner = extract(/Owner\s*[:-]?\s*(.*)/i);
+    const insurance = extract(/Insurance\s*[:-]?\s*(.*)/i);
+    const km = extract(/K\/?m\.?\s*[:-]?\s*([\d,]+)/i).replace(/,/g, "");
 
-    let transmission =
-      extractField(/Transmission\s*[:-]\s*(.*)/i) || "Manual";
-
-    const kmRaw = extractField(/K\/?m\s*[:-]\s*(.*)/i);
-    const priceRaw = extractField(/Price\s*[:-]\s*(.*)/i);
-
-    const km = kmRaw
-      .replace(/Genuine/gi, "")
-      .replace(/[,]/g, "")
-      .replace(/\s/g, "");
-
-    const price = priceRaw
-      .replace(/[,\/\-]/g, "")
-      .replace(/\s/g, "");
-
-    // 🎯 TITLE FORMAT
     const title = `${make} ${model} ${version} ${transmission} (${year})`
       .replace(/\s+/g, " ")
       .trim();
 
-    // 🎯 REMOVE USED LINES → REMARKS
     const usedKeywords = [
-      "Reg",
-      "Year",
-      "Make",
-      "Model",
-      "Version",
-      "Transmission",
-      "Fuel",
-      "Colour",
-      "Owner",
-      "Insurance",
-      "K/m",
-      "KM",
-      "Price",
+      "year",
+      "make",
+      "model",
+      "version",
+      "fuel",
+      "colour",
+      "owner",
+      "insurance",
+      "km",
+      "k/m",
+      "transmission",
     ];
 
-    const remarksLines = lines.filter(
-      line => !usedKeywords.some(keyword =>
-        line.toLowerCase().includes(keyword.toLowerCase())
+    const lines = clean
+      .split("\n")
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
+
+    const remarks = lines
+      .filter(
+        (line) =>
+          !usedKeywords.some((k) =>
+            line.toLowerCase().includes(k)
+          )
       )
-    );
+      .join("\n");
 
-    const remarks = remarksLines.join("\n");
-
-    setForm(prev => ({
-      ...prev,
+    setForm({
       title,
       year,
       make,
@@ -152,157 +106,62 @@ export default function CarPasteGenerate() {
       owner,
       insurance,
       km,
-      price,
-      remarks
-    }));
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files ? Array.from(e.target.files).slice(0, 10) : [];
-    setForm(prev => ({
-      ...prev,
-      images: files
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    // your existing submit logic here
-
-    setLoading(false);
+      remarks,
+    });
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 p-6">
 
-      {/* PREVIEW FIRST */}
-      <div className="rounded-xl p-5 
-                bg-muted 
-                text-foreground 
-                border border-border
-                space-y-2">
-        <h3 className="text-lg font-semibold text-foreground">
+      {/* Preview */}
+      <div className="rounded-xl border p-5 bg-muted/30 text-sm space-y-2">
+        <h2 className="text-lg font-semibold">
           {form.title || "Vehicle Preview"}
-        </h3>
-        <p>• {form.km} KM Driven</p>
-        <p>• {form.owner} Owner</p>
-        <p>• {form.colour} Colour</p>
-        <p>• Insurance: {form.insurance}</p>
-        <p>• Transmission: {form.transmission}</p>
-        <p>• Fuel: {form.fuel}</p>
+        </h2>
+
+        {form.km && <p>• {form.km} KM Driven</p>}
+        {form.owner && <p>• {form.owner} Owner</p>}
+        {form.colour && <p>• {form.colour} Colour</p>}
+        {form.insurance && <p>• Insurance: {form.insurance}</p>}
+        {form.transmission && <p>• Transmission: {form.transmission}</p>}
+        {form.fuel && <p>• Fuel: {form.fuel}</p>}
         {form.remarks && (
-          <div className="mt-2">
-            <div className="font-semibold">Remarks:</div>
-            <pre className="whitespace-pre-wrap text-xs mt-1">{form.remarks}</pre>
+          <div className="pt-2 whitespace-pre-line text-muted-foreground">
+            {form.remarks}
           </div>
         )}
       </div>
 
-      {/* PASTE BOX */}
-      <div>
-        <textarea
-          value={rawInput}
-          onChange={(e) => setRawInput(e.target.value)}
-          placeholder="Paste WhatsApp vehicle message..."
-          className="w-full min-h-[160px] rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 p-4 text-sm leading-relaxed resize-none transition-colors"
-        />
-        <button
-          type="button"
-          onClick={handleAnalyze}
-          className="mt-3 px-5 py-2 rounded-lg font-semibold 
-                     bg-blue-600 text-white 
-                     hover:bg-blue-700 
-                     transition-all duration-200"
-        >
-          Analyze & Fill Details
-        </button>
-      </div>
+      {/* Paste Box */}
+      <textarea
+        value={rawInput}
+        onChange={(e) => setRawInput(e.target.value)}
+        placeholder="Paste full WhatsApp vehicle message here..."
+        className="w-full min-h-[200px] rounded-lg border p-4 bg-background"
+      />
 
-      {/* IMAGE UPLOAD BELOW */}
-      <div>
-        <Label>Upload Images (max 10)</Label>
-        <input type="file" multiple accept="image/*" onChange={handleImageChange}/>
-      </div>
+      {/* Button */}
+      <button
+        onClick={handleAnalyze}
+        className="px-6 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
+      >
+        Analyze & Fill Details
+      </button>
 
-      {/* FINAL FORM FIELDS (optional, can be expanded as needed) */}
-      {/* ...existing code... */}
+      {/* Structured Fields */}
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        {Object.entries(form).map(([key, value]) =>
+          key !== "title" && key !== "remarks" ? (
+            <input
+              key={key}
+              value={value}
+              readOnly
+              placeholder={key}
+              className="rounded border p-2 bg-background"
+            />
+          ) : null
+        )}
+      </div>
     </div>
-  const handleAnalyze = () => {
-    const lines = rawInput
-      .split("\n")
-      .map(l => l.replace(/\*/g, "").trim())
-      .filter(Boolean);
-
-    const extractField = (regex: RegExp) =>
-      rawInput.match(regex)?.[1]?.trim() || "";
-
-    let year = extractField(/Year\s*[:-]\s*(\d{4})/i);
-    if (!year) {
-      const shortYear = rawInput.match(/\b\d{1,2}\/(\d{2})\b/);
-      if (shortYear) year = "20" + shortYear[1];
-    }
-
-    const make = extractField(/Make\s*[:-]\s*(.*)/i);
-    const model = extractField(/Model\s*[:-]\s*(.*)/i);
-    const version = extractField(/Version\s*[:-]\s*(.*)/i);
-    const fuel = extractField(/Fuel\s*[:-]\s*(.*)/i);
-    const colour = extractField(/Colour\s*[:-]\s*(.*)/i);
-    const owner = extractField(/Owner\s*[:-]\s*(.*)/i);
-    const insurance = extractField(/Insurance\s*[:-]\s*(.*)/i);
-
-    let transmission =
-      extractField(/Transmission\s*[:-]\s*(.*)/i) || "Manual";
-
-    const kmRaw = extractField(/K\/?m\s*[:-]\s*(.*)/i);
-    const priceRaw = extractField(/Price\s*[:-]\s*(.*)/i);
-
-    const cleanedKm = kmRaw
-      .replace(/Genuine/gi, "")
-      .replace(/[,]/g, "")
-      .replace(/\s/g, "");
-
-    const cleanedPrice = priceRaw
-      .replace(/[,\/\-]/g, "")
-      .replace(/\s/g, "");
-
-    const remarksLines = lines.filter(
-      line => ![
-        "Reg",
-        "Year",
-        "Make",
-        "Model",
-        "Version",
-        "Transmission",
-        "Fuel",
-        "Colour",
-        "Owner",
-        "Insurance",
-        "K/m",
-        "KM",
-        "Price",
-      ].some(keyword =>
-        line.toLowerCase().includes(keyword.toLowerCase())
-      )
-    );
-
-    const remarks = remarksLines.join("\n");
-
-    setForm(prev => ({
-      ...prev,
-      title: `${make} ${model} ${version} ${transmission} (${year})`.trim(),
-      year,
-      make,
-      model,
-      version,
-      fuel,
-      colour,
-      owner,
-      insurance,
-      transmission,
-      km: cleanedKm,
-      price: cleanedPrice,
-      remarks,
-    }));
-  };
+  );
+}
