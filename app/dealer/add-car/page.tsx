@@ -3,13 +3,10 @@
 import CarPasteGenerate from "./CarPasteGenerate";
 
 export default function AddCarPage() {
-  return <CarPasteGenerate />;
-  "use client";
-
-  export default function AddCarPage() {
-    return (
-      <div className="p-6 max-w-5xl mx-auto">
+  return (
+    <div className="p-6 max-w-5xl mx-auto">
+      <CarPasteGenerate />
+    </div>
+  );
+}
         <CarPasteGenerate />
-      </div>
-    );
-  }
