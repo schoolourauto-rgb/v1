@@ -188,7 +188,12 @@ export default function CarPasteGenerate() {
               </p>
             </div>
             <div className="text-xl font-semibold text-green-400">
-              ₹ {parsedData.remarks.match(/[\d,]+/)?.[0] || ""}
+              {/* Strict price extraction for preview badge */}
+              {(() => {
+                const cleanText = rawText.replace(/\*/g, "");
+                const priceMatch = cleanText.match(/price\s*[:\-]?\s*₹?\s*([\d,]+)/i);
+                return priceMatch ? `₹ ${priceMatch[1]}` : "";
+              })()}
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4 text-sm text-zinc-300">
