@@ -19,6 +19,14 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const carData = JSON.parse(formData.get("data") as string);
+    // Backend price validation and conversion
+    const priceNumber = Number(carData.price);
+    if (isNaN(priceNumber) || priceNumber <= 0) {
+      return NextResponse.json(
+        { error: "Invalid price format" },
+        { status: 400 }
+      );
+    }
     const files = formData.getAll("images") as File[];
 
     const imageUrls: string[] = [];
@@ -41,6 +49,7 @@ export async function POST(req: NextRequest) {
     const { error } = await supabase.from("cars").insert([
       {
         ...carData,
+        price: priceNumber,
         images: imageUrls,
         created_at: new Date().toISOString(),
       },

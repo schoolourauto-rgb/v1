@@ -14,6 +14,7 @@ interface CarData {
   owner: string;
   insurance: string;
   km: string;
+  price: string;
   remarks: string;
 }
 
@@ -25,6 +26,16 @@ export default function CarPasteGenerate() {
 
   const extract = (regex: RegExp, text: string) =>
     text.match(regex)?.[1]?.trim() || "";
+
+  // Clean price utility
+  function cleanPrice(value: string) {
+    if (!value) return "";
+    return value
+      .replace(/,/g, "")
+      .replace(/\/-/g, "")
+      .replace(/[^\d]/g, "")
+      .trim();
+  }
 
   const parseCarText = (text: string): CarData => {
     const clean = text.replace(/\*/g, "");
@@ -50,6 +61,14 @@ export default function CarPasteGenerate() {
     const insurance = extract(/Insurance\s*[:-]?\s*(.*)/i, text);
     const km = extract(/K\/?m\.?\s*[:-]?\s*([\d,]+)/i, text).replace(/,/g, "");
 
+    // Price extraction (strict)
+    let priceRaw = "";
+    const priceMatch = clean.match(/price\s*[:\-]?\s*₹?\s*([\d,]+)(?:\/-)?/i);
+    if (priceMatch) {
+      priceRaw = priceMatch[1];
+    }
+    const price = cleanPrice(priceRaw);
+
     const title = `${make} ${model} ${version} ${transmission} (${year})`
       .replace(/\s+/g, " ")
       .trim();
@@ -66,6 +85,7 @@ export default function CarPasteGenerate() {
       "km",
       "k/m",
       "transmission",
+      "price",
     ];
 
     const lines = clean
@@ -94,6 +114,7 @@ export default function CarPasteGenerate() {
       owner,
       insurance,
       km,
+      price,
       remarks,
     };
   };
@@ -123,6 +144,12 @@ export default function CarPasteGenerate() {
 
   const handlePostCar = async () => {
     if (!parsedData) return;
+
+    // Extra frontend price validation
+    if (!parsedData.price || Number(parsedData.price) <= 0) {
+      alert("Please enter valid price");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("data", JSON.stringify(parsedData));
@@ -188,12 +215,8 @@ export default function CarPasteGenerate() {
               </p>
             </div>
             <div className="text-xl font-semibold text-green-400">
-              {/* Strict price extraction for preview badge */}
-              {(() => {
-                const cleanText = rawText.replace(/\*/g, "");
-                const priceMatch = cleanText.match(/price\s*[:\-]?\s*₹?\s*([\d,]+)/i);
-                return priceMatch ? `₹ ${priceMatch[1]}` : "";
-              })()}
+              {/* Show formatted price if available */}
+              {parsedData.price ? `₹${Number(parsedData.price).toLocaleString('en-IN')}` : ""}
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4 text-sm text-zinc-300">
