@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import CarPreviewModal from "@/components/dealer/CarPreviewModal";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { MessageCircle } from "lucide-react";
 import Link from "next/link";
@@ -38,7 +38,7 @@ export default function DealerDashboard() {
     description: "",
   });
   const [onboardingLoading, setOnboardingLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  const router = useRouter();
   const [cars, setCars] = useState<Car[]>([]);
   const [leads] = useState([]); // Placeholder for leads
   // Placeholder car image
@@ -79,8 +79,8 @@ export default function DealerDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button onClick={() => setModalOpen(true)}>
-              + Add New Car
+            <Button onClick={() => router.push("/dealer/add-car")}> 
+              Add New Car
             </Button>
 
             <Link
@@ -121,8 +121,8 @@ export default function DealerDashboard() {
                   <h3 className="text-lg font-medium">Start growing your dealership</h3>
                   <p className="text-muted-foreground mt-2">Add your first listing to reach verified buyers.</p>
                   <div className="mt-6 flex justify-center">
-                    <Button onClick={() => setModalOpen(true)}>
-                      + Add Car
+                    <Button onClick={() => router.push("/dealer/add-car")}> 
+                      Add Car
                     </Button>
                   </div>
                 </div>
@@ -225,12 +225,7 @@ export default function DealerDashboard() {
         <div className="mt-10 text-center text-xs text-muted-foreground">
           Powered by OurAuto. For support, contact admin@ourauto.com
         </div>
-        {modalOpen && (
-          <CarPreviewModal
-            onClose={() => setModalOpen(false)}
-            onPublish={handlePublishCar}
-          />
-        )}
+        {/* Modal removed: Add Car now uses dedicated page */}
       </div>
     </div>
   );

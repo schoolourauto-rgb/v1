@@ -8,7 +8,7 @@ export default function AddCarPage() {
 
   export default function AddCarPage() {
     return (
-      <div className="p-6">
+      <div className="p-6 max-w-5xl mx-auto">
         <CarPasteGenerate />
       </div>
     );
