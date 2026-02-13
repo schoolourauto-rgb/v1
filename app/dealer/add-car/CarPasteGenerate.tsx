@@ -1,4 +1,27 @@
 "use client";
+function formatIndianPrice(value: string) {
+  const num = Number(value);
+  if (isNaN(num)) return value;
+  return num.toLocaleString("en-IN");
+}
+function generateDescription(form: {
+  year: string;
+  make: string;
+  model: string;
+  version: string;
+  fuel: string;
+  transmission?: string;
+  km: string;
+  owner: string;
+  colour: string;
+  insurance: string;
+}) {
+  const transmission = form.transmission?.trim() || "Manual";
+  const cleanKm = form.km
+    ?.replace(/[,]/g, "")
+    ?.replace(/\s/g, "");
+  return `${form.make} ${form.model} ${form.version} ${transmission} (${form.year})\n\n• ${cleanKm} KM Driven\n• ${form.owner} Owner\n• ${form.colour} Colour\n• Insurance: ${form.insurance}\n• Transmission: ${transmission}\n• Fuel: ${form.fuel}\n\nWell maintained vehicle. Genuine mileage. Contact for more details.`;
+}
 
 import { useState } from "react";
 import { Input } from "@/components/ui/Input";
@@ -65,14 +88,15 @@ export default function CarPasteGenerate() {
     const colour = extract(/Colour\s*[:-]\s*(.*)/i);
     const owner = extract(/Owner\s*[:-]\s*(.*)/i);
     const insurance = extract(/Insurance\s*[:-]\s*(.*)/i);
-    const transmission =
-      extract(/Transmission\s*[:-]\s*(.*)/i) || "Manual";
+    const transmissionRaw = extract(/Transmission\s*[:-]\s*(.*)/i);
+    const transmission = transmissionRaw || "Manual";
 
     const kmRaw = extract(/K\/?m\.?\s*[:-]\s*(.*)/i);
     const priceRaw = extract(/Price\s*[:-]\s*(.*)/i);
 
     const cleanedKm = kmRaw
       .replace(/Genuine/gi, "")
+      .replace(/km/gi, "")
       .replace(/[,]/g, "")
       .replace(/\s/g, "");
 
@@ -80,16 +104,22 @@ export default function CarPasteGenerate() {
       .replace(/[,\/\-]/g, "")
       .replace(/\s/g, "");
 
-    let title = `${year} ${make} ${model} ${version} ${fuel}`
+    const description = generateDescription({
+      year,
+      make,
+      model,
+      version,
+      fuel,
+      transmission,
+      km: cleanedKm,
+      owner,
+      colour,
+      insurance
+    });
+
+    const title = `${year} ${make} ${model} ${version} ${fuel} ${transmission}`
       .replace(/\s+/g, " ")
       .trim();
-
-    if (!title) {
-      title = normalized
-        .split("\n")
-        .map(l => l.trim())
-        .filter(Boolean)[0] || "";
-    }
 
     setForm(prev => ({
       ...prev,
@@ -99,13 +129,13 @@ export default function CarPasteGenerate() {
       model,
       version,
       fuel,
+      transmission,
       colour,
       owner,
       insurance,
-      transmission,
       km: cleanedKm,
-      price: cleanedPrice,
-      description: rawInput
+      price: formatIndianPrice(cleanedPrice),
+      description
     }));
   };
 
