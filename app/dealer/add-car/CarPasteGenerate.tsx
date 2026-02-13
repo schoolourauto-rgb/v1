@@ -13,7 +13,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-
+import React from "react";
 type CarForm = {
   title: string;
   make: string;
@@ -30,188 +30,6 @@ type CarForm = {
   description: string;
   images: File[];
 };
-
-type ParsedField = {
-  value: string;
-  confidence: "high" | "medium" | "low";
-};
-
-type ParsedResult = {
-  year: ParsedField;
-  make: ParsedField;
-  model: ParsedField;
-  version: ParsedField;
-  fuel: ParsedField;
-  transmission: ParsedField;
-  price: ParsedField;
-  km: ParsedField;
-  owner: ParsedField;
-  insurance: ParsedField;
-  colour: ParsedField;
-};
-
-
-// --- Pro WhatsApp Message Parser ---
-function parseVehicleMessage(message: string) {
-  // Helper to extract value by label
-  const get = (label: string) => {
-    const match = message.match(new RegExp(`\\*\\*${label}:\\*\\*\\s*([^\n]*)`, "i"));
-    return match ? match[1].trim() : "";
-  };
-
-  // Clean price/km
-  const cleanNumber = (val: string) => val.replace(/[^\d]/g, "");
-
-  // Transmission is not in the WhatsApp format, so leave blank
-  return {
-    regNo: get("Reg\\. No"),
-    year: get("Year"),
-    make: get("Make"),
-    model: get("Model"),
-    version: get("Version"),
-    fuel: get("Fuel"),
-    colour: get("Colour"),
-    owner: get("Owner"),
-    insurance: get("Insurance"),
-    km: cleanNumber(get("KM")),
-    price: cleanNumber(get("Price")),
-    title:
-      (message.match(/### 🏷 Auto Generated Title[\s\S]*?```([^`]*)```/) || [,""])[1].trim() || "",
-    transmission: "",
-    description: message,
-  };
-}
-
-function smartParse(raw: string): ParsedResult {
-  const text = raw.toLowerCase().replace(/[₹,]/g, "");
-
-  const extract = (regex: RegExp, confidence: ParsedField["confidence"] = "high"): ParsedField => {
-    const match = text.match(regex);
-    if (!match) return { value: "", confidence: "low" };
-    return { value: match[1].trim(), confidence };
-  };
-
-  const year = extract(/\b(20\d{2})\b/);
-
-  const priceRaw = extract(/price\s*[:-]?\s*([\w\.,₹ ]+)/i);
-  const price: ParsedField = {
-    value: normalizePrice(priceRaw.value || priceRaw),
-    confidence: priceRaw.value ? "high" : "low",
-  };
-
-  const km = extract(/(\d{4,6})\s?(km|kms|driven)/i, "medium");
-
-  const owner = extract(/(1st|2nd|3rd|\d+)\s?owner/i, "medium");
-
-  const fuelTypes = ["diesel", "petrol", "cng", "electric"];
-  const fuelValue = fuelTypes.find(f => text.includes(f)) || "";
-  const fuel: ParsedField = {
-    value: fuelValue,
-    confidence: fuelValue ? "high" : "low",
-  };
-
-  const transmissionTypes = ["automatic", "manual"];
-  const transmissionValue = transmissionTypes.find(t => text.includes(t)) || "";
-  const transmission: ParsedField = {
-    value: transmissionValue,
-    confidence: transmissionValue ? "medium" : "low",
-  };
-
-  const colour = extract(/colour\s*[:-]?\s*(\w+)/i, "medium");
-  const insurance = extract(/insurance\s*[:-]?\s*(.*)/i, "medium");
-
-  // --- Advanced Make/Model/Version Detection ---
-  let detectedMake: ParsedField = { value: "", confidence: "low" };
-  let detectedModel: ParsedField = { value: "", confidence: "low" };
-  let detectedVersion: ParsedField = { value: "", confidence: "low" };
-
-  for (const brand in CAR_DATABASE) {
-    if (text.includes(brand)) {
-      detectedMake = { value: brand, confidence: "high" };
-      const models = CAR_DATABASE[brand];
-      for (const model of models) {
-        if (similarity(text, model) > 0.7) {
-          detectedModel = { value: model, confidence: "high" };
-          break;
-        }
-      }
-      break;
-    }
-  }
-
-  if (detectedModel.value) {
-    const words = text.split(" ");
-    const modelIndex = words.findIndex(w => similarity(w, detectedModel.value) > 0.7);
-    if (modelIndex !== -1 && words[modelIndex + 1]) {
-      detectedVersion = {
-        value: words[modelIndex + 1].toUpperCase(),
-        confidence: "medium",
-      };
-    }
-  }
-
-  return {
-    year,
-    make: detectedMake,
-    model: detectedModel,
-    version: detectedVersion,
-    fuel,
-    transmission,
-    price,
-    km,
-    owner,
-    insurance,
-    colour,
-  };
-}
-
-const confidenceColor = {
-  high: "bg-green-100 text-green-700",
-  medium: "bg-yellow-100 text-yellow-700",
-  low: "bg-gray-100 text-gray-500",
-};
-
-
-export default function CarPasteGenerate() {
-  const [rawInput, setRawInput] = useState("");
-  const [form, setForm] = useState<CarForm>({
-    title: "",
-    make: "",
-    model: "",
-    version: "",
-    year: "",
-    fuel: "",
-    transmission: "",
-    price: "",
-    km: "",
-    owner: "",
-    insurance: "",
-    colour: "",
-    description: "",
-    images: [],
-  });
-  const [loading, setLoading] = useState(false);
-
-  // --- Handler for WhatsApp Paste Parse ---
-  const handleParseAndAutofill = () => {
-    const parsed = parseVehicleMessage(rawInput);
-    setForm(prev => ({
-      ...prev,
-      title: parsed.title,
-      make: parsed.make,
-      model: parsed.model,
-      version: parsed.version,
-      year: parsed.year,
-      fuel: parsed.fuel,
-      transmission: parsed.transmission,
-      price: parsed.price,
-      km: parsed.km,
-      owner: parsed.owner,
-      insurance: parsed.insurance,
-      colour: parsed.colour,
-      description: parsed.description,
-    }));
-  };
 
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -284,71 +102,114 @@ export default function CarPasteGenerate() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">
-          Paste Full Vehicle Message
-        </label>
+    <React.Fragment>
+      {/* --- Smart Paste Vehicle Details Section --- */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold mb-2">Smart Paste Vehicle Details</h2>
         <textarea
-          name="full_message"
           value={rawInput}
-          onChange={e => setRawInput(e.target.value)}
-          placeholder="Ahiya full WhatsApp vehicle details paste karo..."
-          className="w-full min-h-[120px] rounded-lg border border-gray-300 bg-white p-3 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-vertical"
+          onChange={(e) => setRawInput(e.target.value)}
+          placeholder="Paste full WhatsApp vehicle message here..."
+          className="w-full min-h-[150px] rounded-lg border border-border bg-background p-3 text-base resize-none"
         />
-        <Button type="button" className="mt-2" onClick={handleParseAndAutofill}>
-          Parse & Autofill
+        <button
+          type="button"
+          onClick={() => {
+            // --- Senior-level strong parser ---
+            const extract = (label: string, regex: RegExp) => {
+              return rawInput.match(regex)?.[1]?.trim() || "";
+            };
+            const year = extract("Year", /Year\s*[:-]\s*(\d{4})/i);
+            const make = extract("Make", /Make\s*[:-]\s*(.*)/i);
+            const model = extract("Model", /Model\s*[:-]\s*(.*)/i);
+            const version = extract("Version", /Version\s*[:-]\s*(.*)/i);
+            const fuel = extract("Fuel", /Fuel\s*[:-]\s*(.*)/i);
+            const colour = extract("Colour", /Colour\s*[:-]\s*(.*)/i);
+            const owner = extract("Owner", /Owner\s*[:-]\s*(.*)/i);
+            const insurance = extract("Insurance", /Insurance\s*[:-]\s*(.*)/i);
+            let km = extract("KM", /K\/?m\s*[:-]\s*(.*)/i);
+            let price = extract("Price", /Price\s*[:-]\s*(.*)/i);
+            // Clean price: remove commas, /-, spaces
+            let cleanedPrice = price.replace(/[,\/-]/g, "").replace(/\s/g, "");
+            // Clean km: remove text like 'Genuine', commas, spaces
+            let cleanedKm = km.replace(/Genuine/gi, "").replace(/[,]/g, "").replace(/\s/g, "");
+            // Title generation
+            let title = `${year} ${make} ${model} ${version} ${fuel}`.replace(/\s+/g, " ").trim();
+            // Fallback: if title is blank, use first non-empty line
+            if (!title || title === "") {
+              const lines = rawInput.split("\n").map(l => l.trim()).filter(l => l);
+              title = lines[0] || "";
+            }
+            setForm(prev => ({
+              ...prev,
+              title,
+              year,
+              make,
+              model,
+              version,
+              fuel,
+              colour,
+              owner,
+              insurance,
+              km: cleanedKm,
+              price: cleanedPrice,
+              description: rawInput
+            }));
+          }}
+          className="mt-3 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:opacity-90"
+        >
+          Analyze & Fill Details
+        </button>
+      </div>
+      {/* --- Existing Form Section --- */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Card className="p-4 space-y-2">
+          <Input value={form.title} placeholder="Title" readOnly className="mb-2" />
+          <div className="grid grid-cols-2 gap-2">
+            <Input value={form.year} placeholder="Year" readOnly />
+            <Input value={form.make} placeholder="Make" readOnly />
+            <Input value={form.model} placeholder="Model" readOnly />
+            <Input value={form.version} placeholder="Version" readOnly />
+            <Input value={form.fuel} placeholder="Fuel" readOnly />
+            <Input value={form.colour} placeholder="Colour" readOnly />
+            <Input value={form.owner} placeholder="Owner" readOnly />
+            <Input value={form.insurance} placeholder="Insurance" readOnly />
+            <Input value={form.km} placeholder="KM" readOnly />
+            <Input value={form.price} placeholder="Price" readOnly />
+          </div>
+          <Input value={form.description} placeholder="Description" readOnly className="mt-2" />
+        </Card>
+        <div>
+          <Label>Upload Images (max 10)</Label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+          <div className="flex gap-2 mt-2">
+            {form.images.map((file, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={URL.createObjectURL(file)}
+                  className="w-20 h-20 object-cover rounded"
+                  alt="preview"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute top-0 right-0 bg-red-500 text-white px-1 rounded"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        <Button type="submit" disabled={loading}>
+          {loading ? "Submitting..." : "Add Car"}
         </Button>
-      </div>
-
-      <Card className="p-4 space-y-2">
-        <Input value={form.title} placeholder="Title" readOnly className="mb-2" />
-        <div className="grid grid-cols-2 gap-2">
-          <Input value={form.year} placeholder="Year" readOnly />
-          <Input value={form.make} placeholder="Make" readOnly />
-          <Input value={form.model} placeholder="Model" readOnly />
-          <Input value={form.version} placeholder="Version" readOnly />
-          <Input value={form.fuel} placeholder="Fuel" readOnly />
-          <Input value={form.colour} placeholder="Colour" readOnly />
-          <Input value={form.owner} placeholder="Owner" readOnly />
-          <Input value={form.insurance} placeholder="Insurance" readOnly />
-          <Input value={form.km} placeholder="KM" readOnly />
-          <Input value={form.price} placeholder="Price" readOnly />
-        </div>
-        <Input value={form.description} placeholder="Description" readOnly className="mt-2" />
-      </Card>
-
-      <div>
-        <Label>Upload Images (max 10)</Label>
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleImageChange}
-        />
-        <div className="flex gap-2 mt-2">
-          {form.images.map((file, index) => (
-            <div key={index} className="relative">
-              <img
-                src={URL.createObjectURL(file)}
-                className="w-20 h-20 object-cover rounded"
-                alt="preview"
-              />
-              <button
-                type="button"
-                onClick={() => removeImage(index)}
-                className="absolute top-0 right-0 bg-red-500 text-white px-1 rounded"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <Button type="submit" disabled={loading}>
-        {loading ? "Submitting..." : "Add Car"}
-      </Button>
-    </form>
+      </form>
+    </React.Fragment>
   );
 }
