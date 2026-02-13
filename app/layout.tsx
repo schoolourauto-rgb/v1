@@ -25,7 +25,7 @@ export const metadata = {
 };
 
 import Header from "@/components/layout/Header";
-import { ThemeProvider } from "@/components/theme-provider";
+import ThemeProviderClient from "./ThemeProviderClient";
 import LocationPopup from "@/components/LocationPopup";
 import InstallAppPopup from "@/components/InstallAppPopup";
 import "./globals.css";
@@ -44,12 +44,12 @@ export default function RootLayout({
         <meta name="theme-color" content="#C9A227" />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased transition-colors duration-300">
-        <ThemeProvider>
+        <ThemeProviderClient>
           <Header />
           <LocationPopup />
           <InstallAppPopup />
           {children}
-        </ThemeProvider>
+        </ThemeProviderClient>
       </body>
     </html>
   );
