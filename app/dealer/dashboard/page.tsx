@@ -63,7 +63,6 @@ export default function DealerDashboard() {
       status: "active",
     };
     setCars((prev) => [...prev, formattedCar]);
-    setModalOpen(false);
   };
 
   // ...existing code...
