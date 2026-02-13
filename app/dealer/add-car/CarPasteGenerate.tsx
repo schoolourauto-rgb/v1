@@ -121,21 +121,28 @@ export default function CarPasteGenerate() {
 
   const handleDragLeave = () => setDragActive(false);
 
+  const handlePostCar = async () => {
+    if (!parsedData) return;
+
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(parsedData));
+    images.forEach((img) => {
+      formData.append("images", img);
+    });
+
+    const res = await fetch("/api/dealer/cars", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.ok) {
+      alert("Car posted successfully!");
+      window.location.href = "/dealer/listings";
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-6">
-      {/* Preview */}
-      {parsedData && (
-        <div className="rounded-xl border p-5 bg-muted/30 text-sm space-y-2">
-          <h2 className="text-lg font-semibold">
-            {parsedData.title || "Vehicle Preview"}
-          </h2>
-          {parsedData.km && <p>• {parsedData.km} KM Driven</p>}
-          {parsedData.owner && <p>• {parsedData.owner} Owner</p>}
-          {parsedData.colour && <p>• {parsedData.colour} Colour</p>}
-          {parsedData.fuel && <p>• Fuel: {parsedData.fuel}</p>}
-        </div>
-      )}
-
       {/* Paste Box */}
       <textarea
         value={rawText}
@@ -167,6 +174,56 @@ export default function CarPasteGenerate() {
           onChange={handleImageUpload}
         />
       </div>
+
+      {/* Premium Preview */}
+      {parsedData && (
+        <div className="rounded-2xl border border-zinc-700 bg-gradient-to-br from-zinc-900 to-zinc-800 p-6 shadow-2xl space-y-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-yellow-400">
+                {parsedData.make} {parsedData.model}
+              </h2>
+              <p className="text-zinc-400">
+                {parsedData.version} • {parsedData.year}
+              </p>
+            </div>
+            <div className="text-xl font-semibold text-green-400">
+              ₹ {parsedData.remarks.match(/[\d,]+/)?.[0] || ""}
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4 text-sm text-zinc-300">
+            <div>🚗 {parsedData.transmission}</div>
+            <div>⛽ {parsedData.fuel}</div>
+            <div>🎨 {parsedData.colour}</div>
+            <div>👤 {parsedData.owner} Owner</div>
+            <div>🛡 {parsedData.insurance}</div>
+            <div>📍 {parsedData.km} KM</div>
+          </div>
+          {images.length > 0 && (
+            <div className="grid grid-cols-4 gap-2">
+              {images.map((img, i) => (
+                <img
+                  key={i}
+                  src={URL.createObjectURL(img)}
+                  className="h-24 w-full object-cover rounded-xl"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Always-visible Post Button */}
+      <button
+        onClick={handlePostCar}
+        disabled={!parsedData}
+        className={`w-full mt-4 px-6 py-3 rounded-xl font-semibold transition
+        ${parsedData 
+          ? "bg-yellow-400 text-black hover:bg-yellow-500"
+          : "bg-gray-600 text-gray-400 cursor-not-allowed"}`}
+      >
+        🚘 Post Car Listing
+      </button>
     </div>
   );
 }
