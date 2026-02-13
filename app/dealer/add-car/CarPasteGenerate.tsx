@@ -16,6 +16,7 @@ type CarForm = {
   colour: string;
   owner: string;
   insurance: string;
+  transmission: string;
   km: string;
   price: string;
   description: string;
@@ -36,6 +37,7 @@ export default function CarPasteGenerate() {
     colour: "",
     owner: "",
     insurance: "",
+    transmission: "",
     km: "",
     price: "",
     description: "",
@@ -47,6 +49,14 @@ export default function CarPasteGenerate() {
   }
 
   const handleAnalyze = () => {
+    // 🔹 Normalize text (remove emojis + bold markers)
+    const normalized = rawInput
+      .replace(/\*/g, "")
+      .replace(/🗓|🏭|🚘|⛽|🎨|👤|📃|🎰|💵|💳|🕹️/g, "");
+
+    const extract = (regex: RegExp) =>
+      normalized.match(regex)?.[1]?.trim() || "";
+
     const year = extract(/Year\s*[:-]\s*(\d{4})/i);
     const make = extract(/Make\s*[:-]\s*(.*)/i);
     const model = extract(/Model\s*[:-]\s*(.*)/i);
@@ -55,7 +65,10 @@ export default function CarPasteGenerate() {
     const colour = extract(/Colour\s*[:-]\s*(.*)/i);
     const owner = extract(/Owner\s*[:-]\s*(.*)/i);
     const insurance = extract(/Insurance\s*[:-]\s*(.*)/i);
-    const kmRaw = extract(/K\/?m\s*[:-]\s*(.*)/i);
+    const transmission =
+      extract(/Transmission\s*[:-]\s*(.*)/i) || "Manual";
+
+    const kmRaw = extract(/K\/?m\.?\s*[:-]\s*(.*)/i);
     const priceRaw = extract(/Price\s*[:-]\s*(.*)/i);
 
     const cleanedKm = kmRaw
@@ -72,11 +85,10 @@ export default function CarPasteGenerate() {
       .trim();
 
     if (!title) {
-      const firstLine = rawInput
+      title = normalized
         .split("\n")
         .map(l => l.trim())
         .filter(Boolean)[0] || "";
-      title = firstLine;
     }
 
     setForm(prev => ({
@@ -90,6 +102,7 @@ export default function CarPasteGenerate() {
       colour,
       owner,
       insurance,
+      transmission,
       km: cleanedKm,
       price: cleanedPrice,
       description: rawInput
@@ -151,6 +164,7 @@ export default function CarPasteGenerate() {
           <Input value={form.colour} placeholder="Colour" readOnly />
           <Input value={form.owner} placeholder="Owner" readOnly />
           <Input value={form.insurance} placeholder="Insurance" readOnly />
+          <Input value={form.transmission} placeholder="Transmission" readOnly />
           <Input value={form.km} placeholder="KM" readOnly />
           <Input value={form.price} placeholder="Price" readOnly />
           <Input value={form.description} placeholder="Description" readOnly />
