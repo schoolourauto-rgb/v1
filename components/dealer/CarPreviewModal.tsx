@@ -81,6 +81,8 @@ const CarPreviewModal: React.FC<CarPreviewModalProps> = ({ onClose, onPublish })
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.price) return;
+    // If supabase usage is added here in the future, ensure null guard:
+    // if (!supabase) { /* handle error or fallback */ return; }
     onPublish({
       title: form.title.trim(),
       price: Number(form.price),

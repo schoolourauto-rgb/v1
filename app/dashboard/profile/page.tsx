@@ -8,6 +8,13 @@ import { useRouter } from "next/navigation"
 export default function DealerProfilePage() {
   const supabase = createClient()
   const router = useRouter()
+  if (!supabase) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        Database not configured
+      </div>
+    )
+  }
 
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -18,6 +25,11 @@ export default function DealerProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true)
+      if (!supabase) {
+        setError("Database not configured.")
+        setLoading(false)
+        return
+      }
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         router.push("/login")
@@ -41,6 +53,11 @@ export default function DealerProfilePage() {
     setError(null)
     setSuccess(false)
     try {
+      if (!supabase) {
+        setError("Database not configured.")
+        setSaving(false)
+        return
+      }
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         setError("User not authenticated.")

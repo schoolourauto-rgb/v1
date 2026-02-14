@@ -50,6 +50,12 @@ export async function POST(req: Request) {
   }
 
   const supabase = createClient();
+  if (!supabase) {
+    return NextResponse.json(
+      { success: false, error: "Supabase client not configured. Check environment variables." },
+      { status: 500 }
+    );
+  }
 
   // Duplicate Reg.No block
   if (parsed.regNo) {

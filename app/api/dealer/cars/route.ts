@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 
 
 cloudinary.config({
@@ -10,12 +10,17 @@ cloudinary.config({
 });
 
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function POST(req: NextRequest) {
+  const supabase = createClient();
+  if (!supabase) {
+    return NextResponse.json({ success: false, error: "Supabase client not configured. Check environment variables." }, { status: 500 });
+  }
+
+export async function POST(req: NextRequest) {
+  if (!supabase) {
+    return NextResponse.json({ success: false, error: "Supabase client not configured. Check environment variables." }, { status: 500 });
+  }
   try {
     const formData = await req.formData();
     const carData = JSON.parse(formData.get("data") as string);

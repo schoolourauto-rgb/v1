@@ -1,3 +1,14 @@
+// --- Added for strict production typing ---
+export interface Lead {
+  id: string;
+  car_id: string;
+  seller_id: string;
+  buyer_name: string;
+  buyer_email?: string;
+  buyer_phone: string;
+  buyer_message?: string;
+  created_at: string;
+}
 export type Database = {
   public: {
     Tables: {
@@ -42,24 +53,39 @@ export type Database = {
       }
       cars: {
         Row: {
-          id: string
-          dealer_id: string
-          name: string
-          brand: string
-          model: string
-          year: number
-          price: number
-          mileage: number
-          fuel_type: string
-          transmission: string
-          color?: string
-          description?: string
-          status: 'draft' | 'active' | 'sold'
-          created_at: string
-          updated_at: string
-        }
-        Insert: Omit<Database['public']['Tables']['cars']['Row'], 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Database['public']['Tables']['cars']['Insert']>
+          id: string;
+          dealer_id: string;
+          regNo: string;
+          year: number | null;
+          make: string;
+          model: string;
+          version: string;
+          fuel: string;
+          color: string;
+          owner: string;
+          insurance: string;
+          mileage: number | null;
+          price: number;
+          images: string[];
+          status: 'draft' | 'active' | 'sold';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          regNo: string;
+          year: number | null;
+          make: string;
+          model: string;
+          version: string;
+          fuel: string;
+          color: string;
+          owner: string;
+          insurance: string;
+          mileage: number | null;
+          price: number;
+          images: string[];
+        };
+        Update: Partial<Database['public']['Tables']['cars']['Insert']>;
       }
       car_images: {
         Row: {
@@ -70,6 +96,11 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['car_images']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['car_images']['Insert']>
+      },
+      leads: {
+        Row: Lead;
+        Insert: Lead;
+        Update: Partial<Lead>;
       }
     }
   }

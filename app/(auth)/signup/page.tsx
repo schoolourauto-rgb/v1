@@ -31,6 +31,12 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
+    if (!supabase) {
+      setError('Supabase client not configured. Check environment variables.')
+      setLoading(false)
+      return
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,

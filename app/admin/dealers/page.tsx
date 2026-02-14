@@ -2,13 +2,19 @@
 import { createClient } from "@/lib/supabase/server";
 import { Dealer } from "@/types";
 
+
 export default async function AdminDealersPage() {
   const supabase = createClient();
-  const { data } = await supabase
-    .from("dealers")
-    .select("id, user_id, dealership_name, phone, location, verified, created_at, referral_code, referred_by")
-    .order("created_at", { ascending: false });
-  const dealers: Dealer[] = data ?? [];
+  let dealers: Dealer[] = [];
+  if (!supabase) {
+    // Optionally log or handle missing supabase client
+  } else {
+    const { data } = await supabase
+      .from("dealers")
+      .select("id, user_id, dealership_name, phone, location, verified, created_at, referral_code, referred_by")
+      .order("created_at", { ascending: false });
+    dealers = data ?? [];
+  }
 
   return (
     <div className="p-6">

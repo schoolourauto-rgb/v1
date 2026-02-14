@@ -40,14 +40,19 @@ function parseSlug(slug?: string) {
 export default async function LocationLandingPage({ params }: any) {
   const awaitedParams = await params;
   const { brand, city, category } = parseSlug(awaitedParams?.slug);
+
   const supabase = createClient();
-
-  let query = supabase.from('cars').select('*');
-  if (brand) query = query.eq('brand', brand);
-  if (city) query = query.eq('city', city);
-  if (category) query = query.eq('category', category);
-
-  const { data: cars } = await query;
+  let cars: any[] = [];
+  if (!supabase) {
+    // Optionally log or handle missing supabase client
+  } else {
+    let query = supabase.from('cars').select('*');
+    if (brand) query = query.eq('brand', brand);
+    if (city) query = query.eq('city', city);
+    if (category) query = query.eq('category', category);
+    const { data } = await query;
+    cars = data || [];
+  }
 
   // Dynamic meta title
   const title = brand

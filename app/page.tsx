@@ -43,6 +43,9 @@ export const runtime = "edge";
 
 export default async function Page() {
   const supabase = createClient();
+  if (!supabase) {
+    return <div className="p-8 text-red-600">Supabase client not configured. Check environment variables.</div>;
+  }
 
   // Fetch mesh data from materialized views
   const [
