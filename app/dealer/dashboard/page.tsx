@@ -8,7 +8,7 @@ interface Car {
   id: string;
   title: string;
   price: number;
-  status: "active" | "sold" | "draft" | "rejected";
+  is_active?: boolean | null;
 }
 
 export default async function DealerDashboard() {
@@ -29,9 +29,9 @@ export default async function DealerDashboard() {
   // Fetch cars
   const { data: cars } = await supabase
     .from("cars")
-    .select("id, title, price, status")
+    .select("id, title, price, is_active")
     .eq("dealer_id", dealer.id)
-    .eq("status", "active")
+    .eq("is_active", true)
     .order("created_at", { ascending: false });
 
   return (
@@ -45,9 +45,9 @@ export default async function DealerDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button asChild>
-              <Link href="/dealer/add-car">Add New Car</Link>
-            </Button>
+            <Link href="/dealer/add-car">
+              <Button>Add New Car</Button>
+            </Link>
             <Link
               href="/dealer/leads"
               className="flex items-center justify-center w-10 h-10 rounded-xl border border-border bg-card hover:bg-muted transition"
@@ -83,9 +83,9 @@ export default async function DealerDashboard() {
                   <h3 className="text-lg font-medium">Start growing your dealership</h3>
                   <p className="text-muted-foreground mt-2">Add your first listing to reach verified buyers.</p>
                   <div className="mt-6 flex justify-center">
-                    <Button asChild>
-                      <Link href="/dealer/add-car">Add Car</Link>
-                    </Button>
+                    <Link href="/dealer/add-car">
+                      <Button>Add Car</Button>
+                    </Link>
                   </div>
                 </div>
               ) : (
@@ -98,8 +98,8 @@ export default async function DealerDashboard() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-medium text-base">{car.title}</span>
-                          <span className={`px-2 py-0.5 rounded text-xs font-semibold ${car.status === "active" ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
-                            {car.status === "active" ? "Active" : car.status}
+                          <span className={`px-2 py-0.5 rounded text-xs font-semibold ${car.is_active ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
+                            {car.is_active ? "Active" : "Inactive"}
                           </span>
                         </div>
                         <div className="text-muted-foreground text-sm mb-2">₹{car.price}</div>

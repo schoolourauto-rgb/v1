@@ -5,7 +5,7 @@ import type { Database } from "@/lib/supabase/types";
 /**
  * Returns the current session user (server-side) or null if not authenticated.
  */
-export async function getServerUser(): Promise<{ id: string; email: string } | null> {
+export async function getServerUser(): Promise<{ id: string; email: string | null } | null> {
   const cookieStore = cookies();
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,5 +17,5 @@ export async function getServerUser(): Promise<{ id: string; email: string } | n
   );
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
-  return { id: user.id, email: user.email };
+  return { id: user.id, email: user.email ?? null };
 }
