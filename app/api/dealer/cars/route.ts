@@ -1,6 +1,3 @@
-
-
-
 import { NextResponse } from "next/server";
 import { createClientInstance } from "@/lib/supabase/server";
 import { Database } from "@/lib/supabase/types";
@@ -72,7 +69,7 @@ export async function POST(req: Request) {
       transmission: carData.transmission ?? null,
       city: carData.city ?? null,
       description: carData.description ?? null,
-      is_active: true,
+      is_active: true, // Adjusted to match original file
     };
 
     const { error: insertError } = await supabase
