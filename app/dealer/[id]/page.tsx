@@ -1,4 +1,4 @@
-import { createClientInstance } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import CarCard from '@/components/marketplace/CarCard'
 import type { Car } from '@/types/car';
 
@@ -21,7 +21,7 @@ export const metadata = ({ params }: { params: { id: string; city?: string } }) 
 }
 
 export default async function DealerProfilePage({ params }: { params: { id: string } }) {
-  const supabase = createClientInstance()
+  const supabase = createServerClient()
 
   // Fetch dealer profile
   const { data: dealer } = await supabase

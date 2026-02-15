@@ -1,22 +1,26 @@
 import { NextResponse } from "next/server";
-import { createClientInstance } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { Database } from "@/lib/supabase/types";
 
 export async function POST(req: Request) {
   try {
-    const supabase = createClientInstance();
+      const supabase = createServerClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Supabase client not configured. Check environment variables." },
+        { status: 500 }
+      );
+    }
 
     // 1️⃣ Get authenticated user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
+    const userRes = await supabase.auth.getUser();
+    if (userRes.error || !userRes.data?.user) {
       return NextResponse.json(
         { error: "Not authenticated" },
         { status: 401 }
       );
     }
+    const user = userRes.data.user;
 
     // 2️⃣ Find dealer
     const { data: dealer, error: dealerError } = await supabase
@@ -86,6 +90,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
 
   } catch (error) {
+    console.error("API /dealer/cars error", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

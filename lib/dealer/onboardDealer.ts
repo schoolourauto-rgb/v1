@@ -1,4 +1,4 @@
-import { createClientInstance } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import type { Dealer } from "@/types/index";
 
 /**
@@ -6,29 +6,44 @@ import type { Dealer } from "@/types/index";
  * Returns the dealer row (existing or newly created).
  */
 export async function onboardDealer(user_id: string): Promise<Dealer | null> {
-  const supabase = createClientInstance();
-  // Check for existing dealer
-  const { data: dealer, error } = await supabase
-    .from("dealers")
-    .select("id, user_id, verified, dealership_name, phone, location, created_at")
-    .eq("user_id", user_id)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  if (dealer) return dealer as Dealer;
-  // Insert new dealer
-  const { data: inserted, error: insertError } = await supabase
-    .from("dealers")
-    .insert([
-      {
-        user_id,
-        verified: false,
-        dealership_name: "",
-        phone: "",
-        location: "",
-      },
-    ])
-    .select("id, user_id, verified, dealership_name, phone, location, created_at")
-    .maybeSingle();
-  if (insertError) throw new Error(insertError.message);
-  return inserted as Dealer;
+  try {
+    const supabase = createServerClient();
+    if (!supabase) {
+      console.error("Supabase client unavailable in onboardDealer");
+      return null;
+    }
+    // Check for existing dealer
+    const { data: dealer, error } = await supabase
+      .from("dealers")
+      .select("id, user_id, verified, dealership_name, phone, location, created_at")
+      .eq("user_id", user_id)
+      .maybeSingle();
+    if (error) {
+      console.error("onboardDealer fetch error", error);
+      return null;
+    }
+    if (dealer) return dealer as Dealer;
+    // Insert new dealer
+    const { data: inserted, error: insertError } = await supabase
+      .from("dealers")
+      .insert([
+        {
+          user_id,
+          verified: false,
+          dealership_name: "",
+          phone: "",
+          location: "",
+        },
+      ])
+      .select("id, user_id, verified, dealership_name, phone, location, created_at")
+      .maybeSingle();
+    if (insertError) {
+      console.error("onboardDealer insert error", insertError);
+      return null;
+    }
+    return inserted as Dealer;
+  } catch (err) {
+    console.error("onboardDealer exception", err);
+    return null;
+  }
 }

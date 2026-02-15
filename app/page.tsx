@@ -29,7 +29,7 @@ function generateVehicleJsonLd(cars: Car[]) {
 }
 
 import HeroSection from "@/components/marketplace/HeroSection";
-import { createClientInstance } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import BrandGrid from "@/components/seo/BrandGrid";
 import CityGrid from "@/components/seo/CityGrid";
@@ -42,7 +42,7 @@ export const revalidate = 60;
 export const runtime = "edge";
 
 export default async function Page() {
-  const supabase = createClientInstance();
+  const supabase = createServerClient();
   if (!supabase) {
     throw new Error("Supabase client not configured. Check environment variables.");
   }

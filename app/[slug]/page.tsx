@@ -1,4 +1,4 @@
-import { createClientInstance } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import CarCard from '@/components/marketplace/CarCard'
 
 function parseSlug(slug?: string) {
@@ -47,7 +47,7 @@ interface LocationLandingPageProps {
 export default async function LocationLandingPage({ params }: LocationLandingPageProps) {
   const { brand, city, category } = parseSlug(params?.slug);
 
-  const supabase = createClientInstance();
+  const supabase = createServerClient();
   let cars: Car[] = [];
   if (supabase) {
     let query = supabase

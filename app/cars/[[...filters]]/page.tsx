@@ -1,5 +1,5 @@
 
-import { createClientInstance } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import CarCard from "@/components/marketplace/CarCard";
 import Link from "next/link";
@@ -40,8 +40,12 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
     redirect(`/cars/${normalizedSegments.join("/")}`);
   }
 
+
   // Query setup
-  const supabase = createClientInstance();
+  const supabase = createServerClient();
+  if (!supabase) {
+    return <div className="p-8 text-center text-red-500">Error: Supabase client not configured. Please check environment variables.</div>;
+  }
   let query = supabase
     .from("cars")
     .select(`
@@ -70,7 +74,7 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
   const { data, count, error } = await query;
   if (error) {
     console.error(error);
-    return <div>Error loading cars.</div>;
+    return <div className="p-8 text-center text-red-500">Error loading cars.</div>;
   }
 
   // Total pages calculation (server-side)

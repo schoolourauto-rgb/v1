@@ -1,12 +1,9 @@
 // ...existing code...
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createServerClient();
   if (!supabase) {
     return NextResponse.json({ error: "Supabase client not configured. Check environment variables." }, { status: 500 });
   }
@@ -56,10 +53,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "reCAPTCHA verification failed", details: verifyData }, { status: 400 });
   }
 
-  // Extract other fields
-  const brand = formData.get("brand");
-  const model = formData.get("model");
-  const price = formData.get("price");
+  // Strictly extract and validate required fields
+  const brandRaw = formData.get("brand");
+  const modelRaw = formData.get("model");
+  const priceRaw = formData.get("price");
   const fuel_type = formData.get("fuel_type");
   const imageFiles = formData.getAll("images");
   const imageUrls: string[] = [];
@@ -72,6 +69,28 @@ export async function POST(req: Request) {
   const useFeatured = formData.get("featured") === "on";
   let carFeatured = false;
 
+  if (
+    typeof brandRaw !== "string" ||
+    typeof modelRaw !== "string" ||
+    typeof priceRaw !== "string"
+  ) {
+    return NextResponse.json(
+      { error: "Invalid form data" },
+      { status: 400 }
+    );
+  }
+
+  const brand = brandRaw.trim();
+  const model = modelRaw.trim();
+  const price = Number(priceRaw);
+
+  if (!brand || !model || isNaN(price)) {
+    return NextResponse.json(
+      { error: "Missing or invalid required fields" },
+      { status: 400 }
+    );
+  }
+
   // let carFeatured = false;
   if (useFeatured) {
     // Validate wallet and decrement credit
@@ -83,31 +102,42 @@ export async function POST(req: Request) {
     if (walletError || !wallet) {
       return NextResponse.json({ error: "Wallet not found" }, { status: 400 });
     }
-    if (wallet.featured_credits < 1) {
-      return NextResponse.json({ error: "Not enough featured credits" }, { status: 400 });
+    const credits = wallet.featured_credits ?? 0;
+    if (credits < 1) {
+      return NextResponse.json(
+        { error: "Not enough featured credits" },
+        { status: 400 }
+      );
     }
     // Decrement credit
     await supabase
       .from("dealer_wallet")
-      .update({ featured_credits: wallet.featured_credits - 1 })
+      .update({ featured_credits: credits - 1 })
       .eq("dealer_id", dealer.id);
     carFeatured = true;
   }
 
   // Insert car
+  // Strictly align with Database["public"]["Tables"]["cars"]["Insert"]
+  const payload: import("@/lib/supabase/types").Database["public"]["Tables"]["cars"]["Insert"] = {
+    dealer_id: dealer.id,
+    title: `${brand} ${model}`.trim(),
+    brand,
+    model,
+    year: 0, // TODO: extract and validate year from formData as number
+    price,
+    fuel_type: typeof fuel_type === "string" ? fuel_type : null,
+    transmission: null,
+    city_id: null,
+    description: null,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    km_driven: null,
+    // add other optional fields as needed
+  };
   const { data: insertedCar, error } = await supabase
     .from("cars")
-    .insert([
-      {
-        dealer_id: dealer.id,
-        brand,
-        model,
-        fuel_type: fuel_type ?? null,
-        price,
-        featured: carFeatured,
-        created_at: new Date().toISOString(),
-      },
-    ])
+    .insert([payload])
     .select()
     .single();
   if (error) {

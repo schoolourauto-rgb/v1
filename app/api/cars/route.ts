@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { parseCarMessage } from "@/lib/carParser";
-import { createClientInstance } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/types";
 type CarInsert = Database["public"]["Tables"]["cars"]["Insert"];
 
@@ -55,35 +55,46 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const supabase = createClientInstance();
-
-  const payload: CarInsert = {
-    dealer_id: null,
-    title: `${parsed.make} ${parsed.model} ${parsed.year ?? ""}`.trim(),
-    brand: parsed.make,
-    model: parsed.model,
-    year: parsed.year ?? 0,
-    price: parsed.price ?? 0,
-    km_driven: parsed.km ?? null,
-    fuel_type: parsed.fuel ?? null,
-    transmission: null,
-    city_id: null,
-    description: null,
-    is_active: true,
-  };
-
-  const { data: car, error } = await supabase
-    .from("cars")
-    .insert([payload])
-    .select()
-    .single();
-
-  if (error) {
+  let supabase = null;
+  try {
+    supabase = createServerClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: "Supabase client not configured. Check environment variables." },
+        { status: 500 }
+      );
+    }
+    const payload: CarInsert = {
+      dealer_id: null,
+      title: `${parsed.make} ${parsed.model} ${parsed.year ?? ""}`.trim(),
+      brand: parsed.make,
+      model: parsed.model,
+      year: parsed.year ?? 0,
+      price: parsed.price ?? 0,
+      km_driven: parsed.km ?? null,
+      fuel_type: parsed.fuel ?? null,
+      transmission: null,
+      city_id: null,
+      description: null,
+      is_active: true,
+    };
+    const { data: car, error } = await supabase
+      .from("cars")
+      .insert([payload])
+      .select()
+      .single();
+    if (error) {
+      return NextResponse.json(
+        { success: false, errors: [error.message] },
+        { status: 500 }
+      );
+    }
+    return NextResponse.json({ success: true, car });
+  } catch (err) {
+    console.error("API /cars error", err);
     return NextResponse.json(
-      { success: false, errors: [error.message] },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
-
-  return NextResponse.json({ success: true, car });
 }
