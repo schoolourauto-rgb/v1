@@ -1,10 +1,10 @@
 
-import { createClient } from "@/lib/supabase/server";
+import { createClientInstance } from "@/lib/supabase/server";
 import { Dealer } from "@/types";
 
 
 export default async function AdminDealersPage() {
-  const supabase = createClient();
+  const supabase = createClientInstance();
   let dealers: Dealer[] = [];
   if (!supabase) {
     // Optionally log or handle missing supabase client

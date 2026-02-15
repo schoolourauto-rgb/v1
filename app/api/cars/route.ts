@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server";
-import { parseCarMessage } from "@/lib/carParser";
-import { createClient } from "@/lib/supabase/client";
 
-export async function POST(req: Request) {
+import { NextRequest, NextResponse } from "next/server";
+import { parseCarMessage } from "@/lib/carParser";
+import { createClientInstance } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/types";
+type CarInsert = Database["public"]["Tables"]["cars"]["Insert"];
+
+export async function POST(req: NextRequest) {
 
   const { message, token } = await req.json();
+
 
   if (!token) {
     return NextResponse.json(
@@ -12,6 +16,15 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+
+  const secret = process.env.RECAPTCHA_SECRET_KEY;
+  if (!secret) {
+    return NextResponse.json(
+      { success: false, error: "Server configuration error" },
+      { status: 500 }
+    );
+  }
+
 
   // Google reCAPTCHA verification
   const verifyRes = await fetch(
@@ -21,7 +34,7 @@ export async function POST(req: Request) {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
+      body: `secret=${secret}&response=${token}`,
     }
   );
   const verifyData = await verifyRes.json();
@@ -42,60 +55,35 @@ export async function POST(req: Request) {
     );
   }
 
-  if (parsed.errors.length > 0) {
-    return NextResponse.json(
-      { success: false, errors: parsed.errors },
-      { status: 400 }
-    );
-  }
+  const supabase = createClientInstance();
 
-  const supabase = createClient();
-  if (!supabase) {
-    return NextResponse.json(
-      { success: false, error: "Supabase client not configured. Check environment variables." },
-      { status: 500 }
-    );
-  }
-
-  // Duplicate Reg.No block
-  if (parsed.regNo) {
-    const { data: existing, error: findError } = await supabase
-      .from('cars')
-      .select('id')
-      .eq('regNo', parsed.regNo)
-      .maybeSingle();
-    if (findError) {
-      return NextResponse.json({ success: false, error: findError.message }, { status: 500 });
-    }
-    if (existing) {
-      return NextResponse.json(
-        { success: false, error: "Car with this Reg.No already exists" },
-        { status: 400 }
-      );
-    }
-  }
+  const payload: CarInsert = {
+    dealer_id: null,
+    title: `${parsed.make} ${parsed.model} ${parsed.year ?? ""}`.trim(),
+    brand: parsed.make,
+    model: parsed.model,
+    year: parsed.year ?? 0,
+    price: parsed.price ?? 0,
+    km_driven: parsed.km ?? null,
+    fuel_type: parsed.fuel ?? null,
+    transmission: null,
+    city_id: null,
+    description: null,
+    is_active: true,
+  };
 
   const { data: car, error } = await supabase
-    .from('cars')
-    .insert({
-      regNo: parsed.regNo,
-      year: parsed.year,
-      make: parsed.make,
-      model: parsed.model,
-      version: parsed.version,
-      fuel: parsed.fuel,
-      color: parsed.color,
-      owner: parsed.owner,
-      insurance: parsed.insurance,
-      mileage: parsed.km,
-      price: parsed.price,
-      images: parsed.images,
-    })
+    .from("cars")
+    .insert([payload])
     .select()
     .single();
 
   if (error) {
-    return NextResponse.json({ success: false, errors: [error.message] }, { status: 500 });
+    return NextResponse.json(
+      { success: false, errors: [error.message] },
+      { status: 500 }
+    );
   }
+
   return NextResponse.json({ success: true, car });
 }

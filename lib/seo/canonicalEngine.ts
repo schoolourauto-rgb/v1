@@ -103,7 +103,7 @@ export function getClusterType(filters: ParsedFilters): ClusterType {
   if (filters.brand && filters.model) return "brand_model";
   if (filters.brand) return "brand";
   if (filters.city) return "city";
-  if (filters.budget || filters.maxPrice) return "budget";
+  if (filters.maxPrice) return "budget";
   if (filters.fuel) return "fuel";
   if (filters.transmission) return "transmission";
   return "deep";

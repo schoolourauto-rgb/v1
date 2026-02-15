@@ -39,7 +39,7 @@ export default function HeroSectionClient({ listings }: Props) {
   const [year, setYear] = useState("");
   const [price, setPrice] = useState("");
   const [sort, setSort] = useState("newest");
-  const [filtered, setFiltered] = useState<Car[]>(listings);
+    const [filtered, setFiltered] = useState<Car[]>(listings); // Keep filtered state based on listings
 
   // Debounced search
   const handleSearch = useCallback(

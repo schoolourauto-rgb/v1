@@ -50,28 +50,29 @@ export async function POST(req: Request) {
   const verifyData = await verifyRes.json();
 
   // Defensive logging in dev only
-  if (process.env.NODE_ENV === "development") {
-    console.log("reCAPTCHA verify result", verifyData);
-  }
+  // Logging removed for production
 
   if (!verifyData.success) {
     return NextResponse.json({ error: "reCAPTCHA verification failed", details: verifyData }, { status: 400 });
   }
 
   // Extract other fields
-  const title = formData.get("title");
   const brand = formData.get("brand");
-
   const model = formData.get("model");
-  const year = formData.get("year");
   const price = formData.get("price");
   const fuel_type = formData.get("fuel_type");
-  const transmission = formData.get("transmission");
-  const mileage = formData.get("mileage");
-  const images = formData.get("images");
+  const imageFiles = formData.getAll("images");
+  const imageUrls: string[] = [];
+  for (const file of imageFiles) {
+    if (file instanceof File) {
+      // Replace with actual upload logic
+      imageUrls.push(file.name); // Temporary placeholder
+    }
+  }
   const useFeatured = formData.get("featured") === "on";
-
   let carFeatured = false;
+
+  // let carFeatured = false;
   if (useFeatured) {
     // Validate wallet and decrement credit
     const { data: wallet, error: walletError } = await supabase
@@ -94,30 +95,39 @@ export async function POST(req: Request) {
   }
 
   // Insert car
-
-  const { error } = await supabase.from("cars").insert([
-    {
-      dealer_id: dealer.id,
-      title,
-      brand,
-      model,
-      year,
-      price,
-      fuel_type,
-      transmission,
-      mileage,
-      images,
-      featured: carFeatured,
-    },
-  ]);
+  const { data: insertedCar, error } = await supabase
+    .from("cars")
+    .insert([
+      {
+        dealer_id: dealer.id,
+        brand,
+        model,
+        fuel_type: fuel_type ?? null,
+        price,
+        featured: carFeatured,
+        created_at: new Date().toISOString(),
+      },
+    ])
+    .select()
+    .single();
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  // Insert images into car_images table
+  if (insertedCar && imageUrls.length > 0) {
+    await supabase.from("car_images").insert(
+      imageUrls.map((url) => ({
+        car_id: insertedCar.id,
+        image_url: url,
+      }))
+    );
   }
 
   // Call handle_first_car_publish RPC (fail-safe)
   try {
     await supabase.rpc("handle_first_car_publish", { p_dealer: dealer.id });
-  } catch (e) {
+  } catch {
     // fail-safe: ignore error
   }
 

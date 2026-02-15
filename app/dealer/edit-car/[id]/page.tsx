@@ -1,23 +1,14 @@
 'use client'
 
+
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
-interface Car {
-  id: string
-  name: string
-  brand: string
-  model: string
-  year: number
-  price: number
-  mileage: number
-  fuel_type: string
-  transmission: string
-  color?: string
-  description?: string
-}
+import { Database } from '@/lib/supabase/types'
+
+type Car = Database['public']['Tables']['cars']['Row']
 
 export default function EditCarPage() {
   const supabase = createClient()
@@ -36,7 +27,6 @@ export default function EditCarPage() {
     fuel_type: '',
     transmission: '',
     description: '',
-    color: '',
   })
 
   const [loading, setLoading] = useState(true)
@@ -55,26 +45,25 @@ export default function EditCarPage() {
         return
       }
 
-      const { data: carData } = await supabase
+      const { data: carData, error: fetchError } = await supabase
         .from('cars')
         .select('*')
         .eq('id', carId)
         .eq('dealer_id', user.id)
-        .single()
+        .single<Car>()
 
       if (carData) {
         setCar(carData)
         setForm({
-          title: carData.name,
-          brand: carData.brand,
-          model: carData.model,
-          year: carData.year.toString(),
-          price: carData.price.toString(),
-          km_driven: carData.mileage.toString(),
-          fuel_type: carData.fuel_type,
-          transmission: carData.transmission,
+          title: carData.title || '',
+          brand: carData.brand || '',
+          model: carData.model || '',
+          year: carData.year?.toString() || '',
+          price: carData.price?.toString() || '',
+          km_driven: carData.km_driven?.toString() || '',
+          fuel_type: carData.fuel_type || '',
+          transmission: carData.transmission || '',
           description: carData.description || '',
-          color: carData.color || '',
         })
       }
 
@@ -98,16 +87,15 @@ export default function EditCarPage() {
       const { error: updateError } = await supabase
         .from('cars')
         .update({
-          name: form.title,
+          title: form.title,
           brand: form.brand,
           model: form.model,
           year: Number(form.year),
           price: Number(form.price),
-          mileage: Number(form.km_driven),
+          km_driven: Number(form.km_driven),
           fuel_type: form.fuel_type,
           transmission: form.transmission,
           description: form.description,
-          color: form.color,
         })
         .eq('id', carId)
 
@@ -170,7 +158,7 @@ export default function EditCarPage() {
 
   return (
     <div className="bg-background text-foreground min-h-screen">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="mb-8">
           <Link href="/dealer/dashboard" className="text-yellow-500 hover:underline mb-4 inline-block text-sm">
             ← Back to Dashboard
@@ -179,7 +167,7 @@ export default function EditCarPage() {
           <p className="text-muted-foreground">Update your car listing</p>
         </div>
 
-        <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm space-y-6">
+        <div className="bg-card text-card-foreground border border-border p-4 sm:p-8 rounded-xl shadow-sm space-y-6">
           {error && (
             <div className="bg-danger/10 border border-danger/40 text-danger rounded-2xl p-4 text-sm">
               ⚠️ {error}
@@ -192,13 +180,13 @@ export default function EditCarPage() {
 
             <input
               placeholder="Car Title"
-              className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+              className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200 text-base sm:text-lg"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               disabled={saving}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input
                 placeholder="Brand"
                 className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
@@ -215,7 +203,7 @@ export default function EditCarPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input
                 type="number"
                 placeholder="Year"
@@ -224,16 +212,9 @@ export default function EditCarPage() {
                 onChange={(e) => setForm({ ...form, year: e.target.value })}
                 disabled={saving}
               />
-              <input
-                placeholder="Color"
-                className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
-                value={form.color}
-                onChange={(e) => setForm({ ...form, color: e.target.value })}
-                disabled={saving}
-              />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input
                 type="number"
                 placeholder="Price (₹)"
@@ -252,7 +233,7 @@ export default function EditCarPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input
                 placeholder="Fuel Type"
                 className="p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
@@ -271,7 +252,7 @@ export default function EditCarPage() {
 
             <textarea
               placeholder="Description"
-              className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200 h-24"
+              className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200 h-24 text-base sm:text-lg"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               disabled={saving}

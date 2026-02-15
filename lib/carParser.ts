@@ -5,7 +5,6 @@ export interface ParsedCar {
   model: string;
   version: string;
   fuel: string;
-  color: string;
   owner: string;
   insurance: string;
   km: number | null;
@@ -21,9 +20,10 @@ export function parseCarMessage(text: string): ParsedCar {
     return text.match(regex)?.[1]?.trim() || "";
   };
 
-  // Bulletproof price extraction: handles emoji, stars, formatting
+  // Strict price extraction: only match 'Price' label, never Reg.No
   function extractPrice(text: string): string {
-    const match = text.match(/price[^0-9]*([\d,]+)/i);
+    // Only match 'Price' at start of line or after newline, not Reg.No
+    const match = text.match(/(?:^|\n)\s*Price[^0-9]*([\d,]+)/i);
     if (!match) return "";
     return match[1].replace(/,/g, "");
   }
@@ -82,10 +82,7 @@ export function parseCarMessage(text: string): ParsedCar {
   else if (/cng/i.test(text)) fuel = "CNG";
   else if (/ev|electric/i.test(text)) fuel = "EV";
 
-  // Colour parsing
-  let color = get("Colour");
-  color = color.replace(/[^a-zA-Z\s]/g, "").trim();
-  if (color) color = color.charAt(0).toUpperCase() + color.slice(1).toLowerCase();
+  // No color field in DB, skip color parsing
 
   // Make + Model parsing
   let make = get("Make");
@@ -110,10 +107,9 @@ export function parseCarMessage(text: string): ParsedCar {
   const kmRaw = get("K/m");
   const km = cleanKM(kmRaw);
 
-  // Price (bulletproof extraction)
+  // Price (strict extraction)
   const priceStr = extractPrice(text);
   const price = priceStr ? Number(priceStr) : null;
-  console.log("Parsed price:", price);
 
   // Error validation
   const errors: string[] = [];
@@ -126,7 +122,6 @@ export function parseCarMessage(text: string): ParsedCar {
     model,
     version,
     fuel,
-    color,
     owner,
     insurance,
     km,

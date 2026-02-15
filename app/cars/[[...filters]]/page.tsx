@@ -1,5 +1,5 @@
 
-import { createClient } from "@/lib/supabase/server";
+import { createClientInstance } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import CarCard from "@/components/marketplace/CarCard";
 import Link from "next/link";
@@ -15,10 +15,13 @@ export const runtime = "edge";
 
 import { type Metadata, type ResolvingMetadata } from 'next';
 
-export default async function CarsPage({ params, searchParams }: {
+interface CarsPageProps {
   params: { filters?: string[] };
   searchParams?: { [key: string]: string | string[] | undefined };
-}) {
+}
+
+export default async function CarsPage({ params, searchParams }: CarsPageProps) {
+  // Filter normalization
   const rawFilters = params.filters ?? [];
   const parsedFilters = parseFilters(rawFilters);
   const normalizedSegments = normalizeFilters(parsedFilters);
@@ -26,103 +29,68 @@ export default async function CarsPage({ params, searchParams }: {
     redirect(`/cars/${normalizedSegments.join("/")}`);
   }
 
-  const supabase = createClient();
+  // Pagination setup
+  const page = Number(searchParams?.page ?? 1);
+  const PAGE_SIZE = 12;
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+
+  // Canonical redirect for ?page=1
+  if (page === 1 && searchParams?.page) {
+    redirect(`/cars/${normalizedSegments.join("/")}`);
+  }
+
+  // Query setup
+  const supabase = createClientInstance();
   let query = supabase
     .from("cars")
     .select(`
       id,
-      name,
+      title,
       brand,
       model,
       year,
       price,
       fuel_type,
       transmission,
-      location,
+      city,
       car_images(image_url)
     `, { count: "exact" })
-    .eq("status", "active");
+    .eq("status", "active")
+    .range(from, to);
 
   if (parsedFilters.brand) query = query.ilike("brand", parsedFilters.brand);
   if (parsedFilters.model) query = query.ilike("model", parsedFilters.model);
-  if (parsedFilters.city) query = query.ilike("location", parsedFilters.city);
+  if (parsedFilters.city) query = query.ilike("city", parsedFilters.city);
   if (parsedFilters.maxPrice) query = query.lte("price", parsedFilters.maxPrice);
   if (parsedFilters.fuel) query = query.ilike("fuel_type", parsedFilters.fuel);
   if (parsedFilters.transmission) query = query.ilike("transmission", parsedFilters.transmission);
   if (parsedFilters.year) query = query.eq("year", parsedFilters.year);
 
-  const { data, count } = await query.order("created_at", { ascending: false });
+  const { data, count, error } = await query;
+  if (error) {
+    console.error(error);
+    return <div>Error loading cars.</div>;
+  }
 
-
-  // Cluster evaluation for canonical, index, sitemap, etc.
-  const filterDepth = Object.values(parsedFilters).filter(Boolean).length;
-  const clusterType = getClusterType(parsedFilters);
-  const currentPath = `/cars/${rawFilters.join("/")}`;
-  const strongestParentPath = getStrongestParentPath(parsedFilters);
-  const canonicalData = evaluateCluster({
-    inventory: count ?? 0,
-    depth: filterDepth,
-    clusterType,
-    strongestParentPath,
-    currentPath,
-  });
+  // Total pages calculation (server-side)
+  const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
 
   const listings: Car[] =
-    (data || []).map((row: any) => ({
+    (data ?? []).map((row: any) => ({
       id: row.id,
-      title: row.name,
+      title: row.title,
       make: row.brand,
       model: row.model,
       year: row.year,
       fuel: row.fuel_type,
       price: row.price,
-      image: row.car_images?.[0]?.image_url ?? "/logo.png",
-      location: row.location ?? "Unknown",
+      image: (row.car_images as { image_url: string }[] | undefined)?.[0]?.image_url ?? "/logo.png",
+      location: row.city ?? "Unknown",
       transmission: row.transmission,
     }));
 
   const jsonLd = buildJsonLd(listings, parsedFilters);
-
-  // Brand mesh: only show if brand is present and no model/city/budget/fuel/transmission filter is active
-  const showBrandMesh =
-    !!parsedFilters.brand &&
-    !parsedFilters.model &&
-    !parsedFilters.city &&
-    !parsedFilters.maxPrice &&
-    !parsedFilters.fuel &&
-    !parsedFilters.transmission;
-
-  let brandCities: { city: string; listing_count: number }[] = [], brandModels: { model: string; listing_count: number }[] = [], budgets: { budget: string; listing_count: number }[] = [], fuels: { fuel: string; listing_count: number }[] = [];
-  if (showBrandMesh && parsedFilters.brand) {
-    const [brandCitiesRes, brandModelsRes, budgetsRes, fuelsRes] = await Promise.all([
-      supabase
-        .from("seo_brand_city_counts")
-        .select("city, listing_count")
-        .eq("brand", parsedFilters.brand)
-        .order("listing_count", { ascending: false })
-        .limit(8),
-      supabase
-        .from("seo_brand_model_counts")
-        .select("model, listing_count")
-        .eq("brand", parsedFilters.brand)
-        .order("listing_count", { ascending: false })
-        .limit(8),
-      supabase
-        .from("seo_budget_counts")
-        .select("budget, listing_count")
-        .order("listing_count", { ascending: false })
-        .limit(6),
-      supabase
-        .from("seo_fuel_counts")
-        .select("fuel, listing_count")
-        .order("listing_count", { ascending: false })
-        .limit(4),
-    ]);
-    brandCities = (brandCitiesRes.data as { city: string; listing_count: number }[] ?? []).filter((c) => c.listing_count >= 3);
-    brandModels = (brandModelsRes.data as { model: string; listing_count: number }[] ?? []).filter((m) => m.listing_count >= 3);
-    budgets = (budgetsRes.data as { budget: string; listing_count: number }[] ?? []).filter((b) => b.listing_count >= 3);
-    fuels = (fuelsRes.data as { fuel: string; listing_count: number }[] ?? []).filter((f) => f.listing_count >= 3);
-  }
 
   function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -146,36 +114,7 @@ export default async function CarsPage({ params, searchParams }: {
     !parsedFilters.fuel &&
     !parsedFilters.transmission;
 
-  let cityBrands: { brand: string; listing_count: number }[] = [], cityBudgets: { budget: string; listing_count: number }[] = [], cityFuels: { fuel: string; listing_count: number }[] = [], cityTransmissions: { transmission: string; listing_count: number }[] = [];
-  if (showCityMesh && parsedFilters.city) {
-    const [cityBrandsRes, cityBudgetsRes, cityFuelsRes, cityTransRes] = await Promise.all([
-      supabase
-        .from("seo_city_brand_counts")
-        .select("brand, listing_count")
-        .eq("city", parsedFilters.city)
-        .order("listing_count", { ascending: false })
-        .limit(8),
-      supabase
-        .from("seo_budget_counts")
-        .select("budget, listing_count")
-        .order("listing_count", { ascending: false })
-        .limit(6),
-      supabase
-        .from("seo_fuel_counts")
-        .select("fuel, listing_count")
-        .order("listing_count", { ascending: false })
-        .limit(4),
-      supabase
-        .from("seo_transmission_counts")
-        .select("transmission, listing_count")
-        .order("listing_count", { ascending: false })
-        .limit(3),
-    ]);
-    cityBrands = (cityBrandsRes.data as { brand: string; listing_count: number }[] ?? []).filter((b) => b.listing_count >= 3);
-    cityBudgets = (cityBudgetsRes.data as { budget: string; listing_count: number }[] ?? []).filter((b) => b.listing_count >= 3);
-    cityFuels = (cityFuelsRes.data as { fuel: string; listing_count: number }[] ?? []).filter((f) => f.listing_count >= 3);
-    cityTransmissions = (cityTransRes.data as { transmission: string; listing_count: number }[] ?? []).filter((t) => t.listing_count >= 3);
-  }
+  // No city mesh: all city mesh views do not exist in types
 
   return (
     <>
@@ -204,79 +143,18 @@ export default async function CarsPage({ params, searchParams }: {
         )}
       </div>
 
-      {showBrandMesh && (
-        <div className="max-w-5xl mx-auto px-4 py-10 space-y-10">
-          {/* ...existing brand mesh code... */}
-        </div>
-      )}
+      {/* Pagination controls */}
+      <div className="flex justify-center gap-4 mt-10">
+        {page > 1 && (
+          <Link href={`/cars/${normalizedSegments.join("/")}${page - 1 === 1 ? "" : `?page=${page - 1}`}`}>Previous</Link>
+        )}
+        <span className="px-4">Page {page} of {totalPages}</span>
+        {page < totalPages && (
+          <Link href={`/cars/${normalizedSegments.join("/")}?page=${page + 1}`}>Next</Link>
+        )}
+      </div>
 
-      {showCityMesh && (
-        <div className="max-w-5xl mx-auto px-4 py-10 space-y-10">
-          {/* Section A: Top Brands in City */}
-          {cityBrands.length > 0 && (
-            <section>
-              <h2 className="text-xl font-bold mb-3">Top Brands in {capitalize(parsedFilters.city!)}</h2>
-              <ul className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {cityBrands.map((b) => (
-                  <li key={b.brand}>
-                    <Link href={`/cars/${b.brand}/city/${parsedFilters.city}`}>
-                      {capitalize(b.brand)} Cars in {capitalize(parsedFilters.city!)} ({b.listing_count})
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {/* Section B: Budget in City */}
-          {cityBudgets.length > 0 && (
-            <section>
-              <h2 className="text-xl font-bold mb-3">Cars by Budget in {capitalize(parsedFilters.city!)}</h2>
-              <ul className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {cityBudgets.map((b) => (
-                  <li key={b.budget}>
-                    <Link href={`/cars/city/${parsedFilters.city}/budget/${b.budget}`}>
-                      Cars {formatBudget(b.budget)} in {capitalize(parsedFilters.city!)} ({b.listing_count})
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {/* Section C: Fuel in City */}
-          {cityFuels.length > 0 && (
-            <section>
-              <h2 className="text-xl font-bold mb-3">Cars by Fuel in {capitalize(parsedFilters.city!)}</h2>
-              <ul className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {cityFuels.map((f) => (
-                  <li key={f.fuel}>
-                    <Link href={`/cars/city/${parsedFilters.city}/${f.fuel}`}>
-                      {capitalize(f.fuel)} Cars in {capitalize(parsedFilters.city!)} ({f.listing_count})
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {/* Section D: Transmission in City */}
-          {cityTransmissions.length > 0 && (
-            <section>
-              <h2 className="text-xl font-bold mb-3">Cars by Transmission in {capitalize(parsedFilters.city!)}</h2>
-              <ul className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {cityTransmissions.map((t) => (
-                  <li key={t.transmission}>
-                    <Link href={`/cars/city/${parsedFilters.city}/${t.transmission}`}>
-                      {capitalize(t.transmission)} Cars in {capitalize(parsedFilters.city!)} ({t.listing_count})
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </div>
-      )}
+      {/* showCityMesh removed: all city mesh views do not exist */}
     </>
   );
 }

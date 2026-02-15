@@ -1,16 +1,23 @@
 export const dynamic = "force-dynamic"
-import { createClient } from "@/lib/supabase/server";
-
+import { createClientInstance } from "@/lib/supabase/server";
+import type { Car } from '@/types/car';
 
 export default async function AdminCarsPage() {
-  const supabase = createClient();
+  const supabase = createClientInstance();
   if (!supabase) {
     throw new Error("Supabase client not initialized");
   }
-  const { data: cars } = await supabase
+  const { data, error } = await supabase
     .from("cars")
     .select("id, title, brand, model, year, price, dealer_id")
     .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    throw new Error("Failed to fetch cars");
+  }
+
+  const cars = data ?? [];
 
   return (
     <div className="p-6">
@@ -24,11 +31,10 @@ export default async function AdminCarsPage() {
             <th>Year</th>
             <th>Price</th>
             <th>Dealer</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {cars?.map((car: any) => (
+          {cars.map((car) => (
             <tr key={car.id}>
               <td>{car.title}</td>
               <td>{car.brand}</td>
@@ -36,9 +42,6 @@ export default async function AdminCarsPage() {
               <td>{car.year}</td>
               <td>₹{car.price}</td>
               <td>{car.dealer_id}</td>
-              <td>
-                {/* Delete action will be implemented here */}
-              </td>
             </tr>
           ))}
         </tbody>

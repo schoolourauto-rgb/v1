@@ -8,14 +8,15 @@ interface RelatedSearchBlockProps {
   price?: number;
 }
 
+
 export default function RelatedSearchBlock({ brand, city, fuel, transmission, price }: RelatedSearchBlockProps) {
-  const links = [
-    brand && { label: `More ${capitalize(brand)} Cars`, href: `/cars/${encodeURIComponent(brand.toLowerCase())}` },
-    city && { label: `More Cars in ${capitalize(city)}`, href: `/cars/city/${encodeURIComponent(city.toLowerCase())}` },
-    fuel && { label: `More ${capitalize(fuel)} Cars`, href: `/cars/${fuel.toLowerCase()}` },
-    transmission && { label: `More ${capitalize(transmission)} Cars`, href: `/cars/${transmission.toLowerCase()}` },
-    price && { label: `Cars Under ₹${price.toLocaleString()}`, href: `/cars/budget/under-${price / 100000}-lakh` },
-  ].filter(Boolean);
+  const links: { label: string; href: string }[] = [
+    brand ? { label: `More ${capitalize(brand)} Cars`, href: `/cars/${encodeURIComponent(brand.toLowerCase())}` } : undefined,
+    city ? { label: `More Cars in ${capitalize(city)}`, href: `/cars/city/${encodeURIComponent(city.toLowerCase())}` } : undefined,
+    fuel ? { label: `More ${capitalize(fuel)} Cars`, href: `/cars/${fuel.toLowerCase()}` } : undefined,
+    transmission ? { label: `More ${capitalize(transmission)} Cars`, href: `/cars/${transmission.toLowerCase()}` } : undefined,
+    price ? { label: `Cars Under ₹${price.toLocaleString()}`, href: `/cars/budget/under-${price / 100000}-lakh` } : undefined,
+  ].filter((l): l is { label: string; href: string } => !!l);
 
   return (
     <section className="my-8">

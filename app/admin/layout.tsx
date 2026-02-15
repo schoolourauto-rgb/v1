@@ -1,9 +1,9 @@
 export const dynamic = "force-dynamic"
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClientInstance } from "@/lib/supabase/server";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createClient();
+  const supabase = createClientInstance();
   if (!supabase) {
     redirect("/login");
     return null;
@@ -22,14 +22,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .select("role")
     .eq("id", session.user.id)
     .single();
-  const typedProfile: any = profile;
+  // Removed unused and unsafe any type
 
-  if (error || !typedProfile) {
+
+  if (error || !profile) {
     redirect("/");
     return null;
   }
 
-  if (typedProfile.role !== "admin") {
+  if (profile.role !== "admin") {
     redirect("/");
     return null;
   }

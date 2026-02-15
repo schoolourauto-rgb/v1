@@ -4,8 +4,9 @@ import { useState } from "react";
 import { parseCarMessage } from "@/lib/carParser";
 import { Button } from "@/components/ui/Button";
 
+import type { Car } from '@/types/car';
 interface ChatInputProps {
-  onParse: (parsedCar: any) => void;
+  onParse: (parsedCar: Partial<Car>) => void;
 }
 
 export default function ChatInput({ onParse }: ChatInputProps) {
@@ -15,7 +16,12 @@ export default function ChatInput({ onParse }: ChatInputProps) {
   const handlePaste = () => {
     const parsed = parseCarMessage(input);
     if (parsed && parsed.regNo) {
-      onParse(parsed);
+      onParse({
+        ...parsed,
+        year: parsed.year ?? undefined,
+        price: parsed.price ?? undefined,
+        km: parsed.km ?? undefined,
+      });
     }
   };
 

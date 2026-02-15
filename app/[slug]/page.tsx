@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClientInstance } from '@/lib/supabase/server'
 import CarCard from '@/components/marketplace/CarCard'
 
 function parseSlug(slug?: string) {
@@ -37,21 +37,53 @@ function parseSlug(slug?: string) {
   return { brand, city, category };
 }
 
-export default async function LocationLandingPage({ params }: any) {
-  const awaitedParams = await params;
-  const { brand, city, category } = parseSlug(awaitedParams?.slug);
+// import type { Database } from '@/lib/supabase/types';
+import type { Car } from '@/types/car';
 
-  const supabase = createClient();
-  let cars: any[] = [];
-  if (!supabase) {
-    // Optionally log or handle missing supabase client
-  } else {
-    let query = supabase.from('cars').select('*');
+interface LocationLandingPageProps {
+  params: { slug?: string };
+}
+
+export default async function LocationLandingPage({ params }: LocationLandingPageProps) {
+  const { brand, city, category } = parseSlug(params?.slug);
+
+  const supabase = createClientInstance();
+  let cars: Car[] = [];
+  if (supabase) {
+    let query = supabase
+      .from('cars')
+      .select(`
+        id,
+        title,
+        brand,
+        model,
+        fuel_type,
+        price,
+        year,
+        city,
+        transmission,
+        car_images (
+          image_url
+        )
+      `);
     if (brand) query = query.eq('brand', brand);
     if (city) query = query.eq('city', city);
     if (category) query = query.eq('category', category);
-    const { data } = await query;
-    cars = data || [];
+    const { data, error } = await query;
+    if (!error && data) {
+      cars = data.map((car) => ({
+        id: car.id,
+        title: car.title,
+        make: car.brand,
+        model: car.model,
+        fuel: car.fuel_type ?? '',
+        price: car.price,
+        year: car.year,
+        image: car.car_images?.[0]?.image_url ?? '/logo.png',
+        location: car.city ?? '',
+        transmission: car.transmission ?? '',
+      }));
+    }
   }
 
   // Dynamic meta title
@@ -66,12 +98,12 @@ export default async function LocationLandingPage({ params }: any) {
       <h1 className="text-3xl font-bold mb-8 text-center">{title}</h1>
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {cars && cars.length > 0 ? (
-          cars.map((car: any) => (
+          cars.map((car) => (
             <CarCard
               key={car.id}
               id={car.id}
-              image={car.car_images?.[0]?.image_url || '/logo.png'}
-              title={car.name}
+              image={car.image}
+              title={car.title}
               year={car.year}
               price={car.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })}
               location={car.location || city}

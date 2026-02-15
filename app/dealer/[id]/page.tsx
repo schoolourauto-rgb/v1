@@ -1,7 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClientInstance } from '@/lib/supabase/server'
 import CarCard from '@/components/marketplace/CarCard'
+import type { Car } from '@/types/car';
 
-export const metadata = ({ params }: any) => {
+export const metadata = ({ params }: { params: { id: string; city?: string } }) => {
   return {
     title: `${params?.id ? params.id : 'Dealer'} – ${params?.city ? params.city : ''} | OurAuto`,
     openGraph: {
@@ -19,8 +20,8 @@ export const metadata = ({ params }: any) => {
   }
 }
 
-export default async function DealerProfilePage({ params }: any) {
-  const supabase = createClient()
+export default async function DealerProfilePage({ params }: { params: { id: string } }) {
+  const supabase = createClientInstance()
 
   // Fetch dealer profile
   const { data: dealer } = await supabase
@@ -30,10 +31,39 @@ export default async function DealerProfilePage({ params }: any) {
     .single()
 
   // Fetch dealer's cars
-  const { data: cars } = await supabase
+  const { data, error } = await supabase
     .from('cars')
-    .select('*')
+    .select(`
+      id,
+      title,
+      brand,
+      model,
+      year,
+      price,
+      fuel_type,
+      city,
+      transmission,
+      car_images(image_url)
+    `)
     .eq('dealer_id', params.id)
+
+  if (error) {
+    console.error(error)
+  }
+
+  const cars: Car[] =
+    data?.map((row) => ({
+      id: row.id,
+      title: row.title,
+      make: row.brand,
+      model: row.model,
+      year: row.year,
+      fuel: row.fuel_type ?? '',
+      price: row.price,
+      image: row.car_images?.[0]?.image_url ?? '/logo.png',
+      location: row.city ?? dealer?.city ?? 'N/A',
+      transmission: row.transmission ?? '',
+    })) ?? []
 
   if (!dealer) {
     return (
@@ -83,16 +113,16 @@ export default async function DealerProfilePage({ params }: any) {
         <div>
           <h2 className="text-2xl font-semibold mb-6">Cars Listed by {dealer.business_name}</h2>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {cars && cars.length > 0 ? (
-              cars.map((car: any) => (
+            {cars.length > 0 ? (
+              cars.map((car) => (
                 <CarCard
                   key={car.id}
                   id={car.id}
-                  image={car.car_images?.[0]?.image_url || '/logo.png'}
-                  title={car.name}
+                  image={car.image}
+                  title={car.title}
                   year={car.year}
                   price={car.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })}
-                  location={car.location || dealer.city || 'N/A'}
+                  location={car.location}
                 />
               ))
             ) : (

@@ -1,7 +1,9 @@
 
-import { createClient } from "@/lib/supabase/server";
+import { createClientInstance } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
+import { mapCarRowToCar } from "@/lib/mappers/carMapper";
 import { buildMetadata } from "@/lib/seo/metadataBuilder";
+import CarCard from "@/components/marketplace/CarCard";
 
 export const revalidate = 60;
 export const runtime = "edge";
@@ -11,20 +13,26 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const supabase = createClient();
+  const supabase = createClientInstance();
   const { data } = await supabase
     .from("cars")
     .select(`
       id,
-      name,
+      title,
       brand,
       model,
       year,
       price,
       fuel_type,
       transmission,
-      location,
-      car_images(image_url)
+      city,
+      car_images(image_url),
+      city_id,
+      created_at,
+      dealer_id,
+      description,
+      is_active,
+      km_driven
     `)
     .eq("id", params.id)
     .single();
@@ -35,24 +43,24 @@ export async function generateMetadata({ params }: PageProps) {
     brand: data.brand,
     model: data.model,
     year: data.year,
-    city: data.location,
+    city: data.city ?? undefined,
   });
 }
 
 export default async function CarDetailPage({ params }: PageProps) {
-  const supabase = createClient();
+  const supabase = createClientInstance();
   const { data } = await supabase
     .from("cars")
     .select(`
       id,
-      name,
+      title,
       brand,
       model,
       year,
       price,
       fuel_type,
       transmission,
-      location,
+      city,
       car_images(image_url)
     `)
     .eq("id", params.id)
@@ -62,17 +70,32 @@ export default async function CarDetailPage({ params }: PageProps) {
     return <div className="text-center py-20">Car not found.</div>;
   }
 
-  const car: Car = {
+  // Use the centralized mapper for Car
+  // Use the strict-safe mapper
+  // Use the strict-safe mapper, then patch image/location for UI
+  // Destructure only the fields needed for CarRow
+  const carRow = {
     id: data.id,
-    title: data.name,
-    make: data.brand,
+    title: data.title,
+    brand: data.brand,
     model: data.model,
     year: data.year,
-    fuel: data.fuel_type,
     price: data.price,
-    image: data.car_images?.[0]?.image_url ?? "/logo.png",
-    location: data.location ?? "Unknown",
+    fuel_type: data.fuel_type,
     transmission: data.transmission,
+    city: data.city,
+    city_id: null,
+    created_at: null,
+    dealer_id: null,
+    description: null,
+    is_active: null,
+    km_driven: null,
+  };
+  let car: Car = mapCarRowToCar(carRow);
+  car = {
+    ...car,
+    image: data.car_images?.[0]?.image_url ?? "/logo.png",
+    location: data.city ?? "Unknown",
   };
 
   // JSON-LD for individual car
@@ -159,25 +182,30 @@ export default async function CarDetailPage({ params }: PageProps) {
 
   // --- Render ---
   let meshLinks = [];
-  if (brandCount?.listing_count >= 3) {
+  const brandListingCount = Number(brandCount?.listing_count ?? 0);
+  const brandModelListingCount = Number(brandModelCount?.listing_count ?? 0);
+  const brandModelCityListingCount = Number(brandModelCityCount?.listing_count ?? 0);
+  const cityListingCount = Number(cityCount?.listing_count ?? 0);
+
+  if (brandListingCount >= 3) {
     meshLinks.push({
       href: `/cars/${brand}`,
       label: `More ${capitalize(brand)} Cars`,
     });
   }
-  if (brandModelCount?.listing_count >= 3) {
+  if (brandModelListingCount >= 3) {
     meshLinks.push({
       href: `/cars/${brand}/${model}`,
       label: `${capitalize(brand)} ${capitalize(model)} Cars`,
     });
   }
-  if (brandModelCityCount?.listing_count >= 3) {
+  if (brandModelCityListingCount >= 3) {
     meshLinks.push({
       href: `/cars/${brand}/${model}/city/${city}`,
       label: `${capitalize(brand)} ${capitalize(model)} in ${capitalize(city)}`,
     });
   }
-  if (cityCount?.listing_count >= 3) {
+  if (cityListingCount >= 3) {
     meshLinks.push({
       href: `/cars/city/${city}`,
       label: `More Cars in ${capitalize(city)}`,

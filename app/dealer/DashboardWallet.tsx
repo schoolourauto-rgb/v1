@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import type { DealerWallet, Dealer } from "@/types/dealer";
 
 export default function DashboardWallet({ dealerId }: { dealerId: string }) {
-  const [wallet, setWallet] = useState<any>(null);
-  const [dealer, setDealer] = useState<any>(null);
+  const [wallet, setWallet] = useState<DealerWallet | null>(null);
+  const [dealer, setDealer] = useState<Dealer | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,16 +13,36 @@ export default function DashboardWallet({ dealerId }: { dealerId: string }) {
       const supabase = createClient();
       const { data: walletData } = await supabase
         .from("dealer_wallet")
-        .select("featured_credits, total_reward_credits")
+        .select("featured_credits")
         .eq("dealer_id", dealerId)
         .maybeSingle();
-      setWallet(walletData);
+      if (walletData) {
+        setWallet({
+          featured_credits: walletData.featured_credits ?? 0,
+        });
+      } else {
+        setWallet(null);
+      }
       const { data: dealerData } = await supabase
         .from("dealers")
-        .select("referral_code, id, (referrals:dealers!dealers_referred_by_fkey(id)).id")
+        .select(`
+          id,
+          referral_code,
+          referrals:dealers!dealers_referred_by_fkey (
+            id
+          )
+        `)
         .eq("id", dealerId)
         .maybeSingle();
-      setDealer(dealerData);
+      if (dealerData) {
+        setDealer({
+          id: dealerData.id,
+          referral_code: dealerData.referral_code ?? "",
+          referrals: dealerData.referrals ?? [],
+        });
+      } else {
+        setDealer(null);
+      }
       setLoading(false);
     }
     fetchWallet();
@@ -42,10 +63,6 @@ export default function DashboardWallet({ dealerId }: { dealerId: string }) {
         <div className="flex flex-col items-center">
           <span className="text-lg font-semibold text-white">Referrals</span>
           <span className="text-xl font-bold text-yellow-300">{dealer.referrals?.length || 0}</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <span className="text-lg font-semibold text-white">Reward Credits Earned</span>
-          <span className="text-xl font-bold text-yellow-300">{wallet.total_reward_credits}</span>
         </div>
       </div>
     </div>

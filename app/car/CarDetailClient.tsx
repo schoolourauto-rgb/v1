@@ -26,7 +26,7 @@ export default function CarDetail({ car, user }: CarDetailProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
         {/* Gallery */}
         <div>
-          <h1 className="text-3xl font-bold mb-4">{car.name}</h1>
+          <h1 className="text-3xl font-bold mb-4">{car.title}</h1>
           {selected && (
             <img
               src={selected}
@@ -65,7 +65,7 @@ export default function CarDetail({ car, user }: CarDetailProps) {
             {dealerMobile && (
               <a
                 href={`https://wa.me/91${dealerMobile}?text=${encodeURIComponent(
-                  `I'm interested in ${car.name}`
+                  `I'm interested in ${car.title}`
                 )}`}
                 target="_blank"
                 rel="noreferrer"
@@ -78,7 +78,9 @@ export default function CarDetail({ car, user }: CarDetailProps) {
           {/* Lead Form */}
           <div className="bg-card rounded-xl p-6">
             <h3 className="text-lg font-semibold mb-2">Contact Seller</h3>
-            <LeadForm carId={car.id} sellerId={car.dealer_id} />
+            {car.id && car.dealer_id && (
+              <LeadForm carId={car.id} sellerId={car.dealer_id} />
+            )}
           </div>
         </div>
       </div>

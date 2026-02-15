@@ -29,7 +29,7 @@ function generateVehicleJsonLd(cars: Car[]) {
 }
 
 import HeroSection from "@/components/marketplace/HeroSection";
-import { createClient } from "@/lib/supabase/server";
+import { createClientInstance } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import BrandGrid from "@/components/seo/BrandGrid";
 import CityGrid from "@/components/seo/CityGrid";
@@ -42,18 +42,15 @@ export const revalidate = 60;
 export const runtime = "edge";
 
 export default async function Page() {
-  const supabase = createClient();
+  const supabase = createClientInstance();
   if (!supabase) {
-    return <div className="p-8 text-red-600">Supabase client not configured. Check environment variables.</div>;
+    throw new Error("Supabase client not configured. Check environment variables.");
   }
 
   // Fetch mesh data from materialized views
   const [
     { data: brands },
     { data: cities },
-    { data: budgets },
-    { data: fuels },
-    { data: transmissions },
     { data: cars, error },
   ] = await Promise.all([
     supabase
@@ -67,35 +64,20 @@ export default async function Page() {
       .order("listing_count", { ascending: false })
       .limit(10),
     supabase
-      .from("seo_budget_counts")
-      .select("budget, listing_count")
-      .order("listing_count", { ascending: false })
-      .limit(6),
-    supabase
-      .from("seo_fuel_counts")
-      .select("fuel, listing_count")
-      .order("listing_count", { ascending: false })
-      .limit(5),
-    supabase
-      .from("seo_transmission_counts")
-      .select("transmission, listing_count")
-      .order("listing_count", { ascending: false })
-      .limit(3),
-    supabase
       .from("cars")
       .select(`
         id,
-        name,
+        title,
         brand,
         model,
         year,
         price,
         fuel_type,
         transmission,
-        location,
+        city,
         car_images(image_url)
       `)
-      .eq("status", "active")
+      .eq("is_active", true)
       .order("created_at", { ascending: false }),
   ]);
 
@@ -106,14 +88,14 @@ export default async function Page() {
   } else if (cars) {
     listings = (cars as any[]).map((row) => ({
       id: row.id,
-      title: row.name,
+      title: row.title,
       make: row.brand,
       model: row.model,
       year: row.year,
       fuel: row.fuel_type,
       price: row.price,
       image: row.car_images?.[0]?.image_url ?? "/logo.png",
-      location: row.location ?? "Unknown",
+      location: row.city ?? "Unknown",
       transmission: row.transmission,
     }));
   }
@@ -135,13 +117,10 @@ export default async function Page() {
 
       <HeroSection listings={listings} />
 
-      {/* Hierarchical mesh: Brand > City > Budget > Fuel > Transmission */}
+      {/* Hierarchical mesh: Brand > City */}
       <div className="max-w-7xl mx-auto px-4 py-10">
-        <BrandGrid brands={(brands ?? []).filter((b) => b.listing_count >= 3)} />
-        <CityGrid cities={(cities ?? []).filter((c) => c.listing_count >= 3)} />
-        <BudgetGrid budgets={(budgets ?? []).filter((b) => b.listing_count >= 3)} />
-        <FuelGrid fuels={(fuels ?? []).filter((f) => f.listing_count >= 3)} />
-        <TransmissionGrid transmissions={(transmissions ?? []).filter((t) => t.listing_count >= 3)} />
+        <BrandGrid brands={(brands ?? []).filter((b) => b.listing_count && b.brand).map((b) => b.brand!)} />
+        <CityGrid cities={(cities ?? []).filter((c) => c.listing_count && c.city).map((c) => c.city!)} />
       </div>
     </>
   );

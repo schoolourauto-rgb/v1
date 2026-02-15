@@ -19,12 +19,12 @@ export function normalizeFilters(filters: ParsedFilters): string[] {
     if (value) {
       if (key === "city") {
         segments.push("city");
-        segments.push(hyphenize(value));
+        segments.push(hyphenize(String(value)));
       } else if (key === "budget") {
         segments.push("budget");
-        segments.push(hyphenize(value.toString()));
+        segments.push(hyphenize(String(value)));
       } else {
-        segments.push(hyphenize(value.toString()));
+        segments.push(hyphenize(String(value)));
       }
     }
   }

@@ -7,13 +7,13 @@ import Link from 'next/link'
 
 interface Car {
   id: string
-  name: string
+  title: string
   brand: string
   year: number
   price: number
-  location: string
-  status: string
-  created_at: string
+  city?: string | null
+  is_active?: boolean | null
+  created_at?: string | null
   car_images?: Array<{ image_url?: string }>
 }
 
@@ -21,8 +21,8 @@ export default async function MarketplacePage({ searchParams }: { searchParams?:
   const supabase = createClient()
   let query = supabase
     .from('cars')
-    .select('id, name, brand, year, price, location, status, created_at, featured, car_images(image_url)')
-    .eq('status', 'active')
+    .select('id, title, brand, year, price, city, is_active, created_at, car_images(image_url)')
+    .eq('is_active', true)
 
   // Filters from URL
   let params: any = {}
@@ -31,7 +31,7 @@ export default async function MarketplacePage({ searchParams }: { searchParams?:
   }
   const { brand, city, min, max, sort } = params || {}
   if (brand) query = query.eq('brand', brand)
-  if (city) query = query.eq('location', city)
+  if (city) query = query.eq('city', city)
   if (min) query = query.gte('price', Number(min))
   if (max) query = query.lte('price', Number(max))
 
@@ -120,10 +120,10 @@ export default async function MarketplacePage({ searchParams }: { searchParams?:
                   key={car.id}
                   id={car.id}
                   image={car.car_images?.[0]?.image_url || "/logo.png"}
-                  title={car.name}
+                  title={car.title}
                   year={car.year}
                   price={formatPrice(car.price)}
-                  location={car.location}
+                  location={car.city || ""}
                 />
               ))}
             </div>
