@@ -21,7 +21,7 @@ export const metadata = ({ params }: { params: { id: string; city?: string } }) 
 }
 
 export default async function DealerProfilePage({ params }: { params: { id: string } }) {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
 
   // Fetch dealer profile
   const { data: dealer } = await supabase

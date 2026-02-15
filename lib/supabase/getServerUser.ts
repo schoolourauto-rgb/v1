@@ -1,11 +1,11 @@
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 
 /**
  * Returns the current session user (server-side) or null if not authenticated.
  */
 export async function getServerUser(): Promise<{ id: string; email: string | null } | null> {
   try {
-    const supabase = await createServerSupabase();
+    const supabase = await createServerClient();
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) {
       console.error("getServerUser auth error", error);

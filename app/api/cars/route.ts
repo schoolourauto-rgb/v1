@@ -57,13 +57,7 @@ export async function POST(req: NextRequest) {
 
   let supabase = null;
   try {
-    supabase = createServerClient();
-    if (!supabase) {
-      return NextResponse.json(
-        { success: false, error: "Supabase client not configured. Check environment variables." },
-        { status: 500 }
-      );
-    }
+    supabase = await createServerClient();
     const payload: CarInsert = {
       dealer_id: null,
       title: `${parsed.make} ${parsed.model} ${parsed.year ?? ""}`.trim(),

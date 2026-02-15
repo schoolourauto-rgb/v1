@@ -3,8 +3,8 @@ import { createServerClient } from "@/lib/supabase/server";
 import { Database } from "@/lib/supabase/types";
 
 export async function POST(req: Request) {
-  try {
-      const supabase = createServerClient();
+    try {
+      const supabase = await createServerClient();
 
     // 1️⃣ Get authenticated user
     const userRes = await supabase.auth.getUser();

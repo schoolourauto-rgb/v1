@@ -1,11 +1,15 @@
 
-
-import { createClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
+import { createClient } from "@supabase/supabase-js"
 import type { Database } from "./types"
 
-export async function createServerSupabase() {
-  const cookieStore = await cookies();
+export async function createServerClient() {
+  const cookieStore = await cookies()
+
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ")
 
   return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,11 +17,9 @@ export async function createServerSupabase() {
     {
       global: {
         headers: {
-          Authorization: `Bearer ${
-            cookieStore.get("sb-access-token")?.value ?? ""
-          }`,
+          Cookie: cookieHeader,
         },
       },
     }
-  );
+  )
 }

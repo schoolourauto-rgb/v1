@@ -1,5 +1,5 @@
 
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import CarCard from "@/components/marketplace/CarCard";
 import Link from "next/link";
@@ -41,11 +41,7 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
   }
 
 
-  // Query setup
-  const supabase = await createServerSupabase();
-  if (!supabase) {
-    return <div className="p-8 text-center text-red-500">Error: Supabase client not configured. Please check environment variables.</div>;
-  }
+  const supabase = await createServerClient();
   let query = supabase
     .from("cars")
     .select(`
@@ -70,7 +66,6 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
   if (parsedFilters.fuel) query = query.ilike("fuel_type", parsedFilters.fuel);
   if (parsedFilters.transmission) query = query.ilike("transmission", parsedFilters.transmission);
   if (parsedFilters.year) query = query.eq("year", parsedFilters.year);
-
   const { data, count, error } = await query;
   if (error) {
     console.error(error);

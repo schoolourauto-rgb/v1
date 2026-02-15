@@ -1,4 +1,4 @@
-import { createServerSupabase } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import CarCard from '@/components/marketplace/CarCard'
 
 function parseSlug(slug?: string) {
@@ -47,9 +47,8 @@ interface LocationLandingPageProps {
 export default async function LocationLandingPage({ params }: LocationLandingPageProps) {
   const { brand, city, category } = parseSlug(params?.slug);
 
-  const supabase = await createServerSupabase();
+    const supabase = await createServerClient();
   let cars: Car[] = [];
-  if (supabase) {
     let query = supabase
       .from('cars')
       .select(`
@@ -84,7 +83,7 @@ export default async function LocationLandingPage({ params }: LocationLandingPag
         transmission: car.transmission ?? '',
       }));
     }
-  }
+    // Removed unnecessary check for supabase
 
   // Dynamic meta title
   const title = brand

@@ -42,10 +42,7 @@ export const revalidate = 60;
 export const runtime = "edge";
 
 export default async function Page() {
-  const supabase = createServerClient();
-  if (!supabase) {
-    throw new Error("Supabase client not configured. Check environment variables.");
-  }
+  const supabase = await createServerClient();
 
   // Fetch mesh data from materialized views
   const [
