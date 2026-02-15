@@ -20,7 +20,6 @@ export default function ChatInput({ onParse }: ChatInputProps) {
         ...parsed,
         year: parsed.year ?? undefined,
         price: parsed.price ?? undefined,
-        km: parsed.km ?? undefined,
       });
     }
   };

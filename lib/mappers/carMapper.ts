@@ -9,13 +9,13 @@ export function mapCarRowToCar(data: CarRow): Car {
   return {
     id: data.id ?? "",
     title: data.title ?? "",
-    make: data.brand ?? "",
+    brand: data.brand ?? "",
+    dealer_id: data.dealer_id ?? "",
     model: data.model ?? "",
     year: data.year ?? 0,
-    fuel: data.fuel_type ?? "",
+    fuel_type: data.fuel_type ?? "",
     price: data.price ?? 0,
-    image: "",
-    location: "",
     transmission: data.transmission ?? "",
+    city: data.city ?? "",
   };
 }

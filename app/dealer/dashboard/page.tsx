@@ -1,7 +1,7 @@
 
 export const dynamic = "force-dynamic"
 
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClientTyped } from "@/lib/supabase/server";
 import { getServerUser } from "@/lib/supabase/getServerUser";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
@@ -18,7 +18,7 @@ export default async function DealerDashboard() {
   if (!user) {
     return <div className="p-8">User not found.</div>;
   }
-  const supabase = await createServerClient();
+  const supabase = await createServerClientTyped();
   // Fetch dealer
   const { data: dealer } = await supabase
     .from("dealers")

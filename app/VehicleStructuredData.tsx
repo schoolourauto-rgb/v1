@@ -5,22 +5,22 @@ export function VehicleStructuredData({ listings }: { listings: Car[] }) {
   const vehicles = listings.map((car) => ({
     "@type": "Vehicle",
     "name": car.title,
-    "brand": car.make,
+    "brand": car.brand,
     "model": car.model,
     "vehicleModelDate": car.year,
-    "fuelType": car.fuel,
+    "fuelType": car.fuel_type,
     "offers": {
       "@type": "Offer",
       "price": car.price,
       "priceCurrency": "INR",
       "availability": "https://schema.org/InStock"
     },
-    "image": car.image,
+    "image": (car as any).image || (car as any).car_images?.[0]?.image_url || '/logo.png',
     "url": `https://ourauto.in/car/${car.id}`,
     "vehicleTransmission": car.transmission,
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": car.location
+      "addressLocality": (car as any).location || (car as any).city || 'Unknown'
     }
   }));
 

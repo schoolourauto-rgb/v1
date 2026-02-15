@@ -1,4 +1,4 @@
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClientTyped } from "@/lib/supabase/server";
 import type { Dealer } from "@/types/index";
 
 /**
@@ -7,7 +7,7 @@ import type { Dealer } from "@/types/index";
  */
 export async function onboardDealer(user_id: string): Promise<Dealer | null> {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createServerClientTyped();
     // Check for existing dealer
     const { data: dealer, error } = await supabase
       .from("dealers")

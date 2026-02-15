@@ -11,11 +11,11 @@ function generateVehicleJsonLd(cars: Car[]) {
         name: car.title,
         brand: {
           "@type": "Brand",
-          name: car.make,
+          name: car.brand,
         },
         model: car.model,
         vehicleModelDate: car.year,
-        fuelType: car.fuel,
+        fuelType: car.fuel_type,
         vehicleTransmission: car.transmission,
         offers: {
           "@type": "Offer",
@@ -29,7 +29,7 @@ function generateVehicleJsonLd(cars: Car[]) {
 }
 
 import HeroSection from "@/components/marketplace/HeroSection";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClientTyped } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import BrandGrid from "@/components/seo/BrandGrid";
 import CityGrid from "@/components/seo/CityGrid";
@@ -42,7 +42,7 @@ export const revalidate = 60;
 export const runtime = "edge";
 
 export default async function Page() {
-  const supabase = await createServerClient();
+  const supabase = await createServerClientTyped();
 
   // Fetch mesh data from materialized views
   const [
@@ -86,14 +86,16 @@ export default async function Page() {
     listings = (cars as any[]).map((row) => ({
       id: row.id,
       title: row.title,
-      make: row.brand,
+      brand: row.brand,
+      dealer_id: row.dealer_id ?? '',
       model: row.model,
       year: row.year,
-      fuel: row.fuel_type,
+      fuel_type: row.fuel_type,
       price: row.price,
+      transmission: row.transmission,
+      city: row.city ?? '',
       image: row.car_images?.[0]?.image_url ?? "/logo.png",
       location: row.city ?? "Unknown",
-      transmission: row.transmission,
     }));
   }
 

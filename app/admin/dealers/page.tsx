@@ -1,10 +1,10 @@
 
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClientTyped } from "@/lib/supabase/server";
 import { Dealer } from "@/types";
 
 
 export default async function AdminDealersPage() {
-  const supabase = await createServerClient();
+  const supabase = await createServerClientTyped();
   let dealers: Dealer[] = [];
   const { data } = await supabase
     .from("dealers")

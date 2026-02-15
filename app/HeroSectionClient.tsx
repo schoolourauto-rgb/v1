@@ -46,10 +46,10 @@ export default function HeroSectionClient({ listings }: Props) {
     debounce((q: string, f: string, t: string, y: string, p: string, s: string) => {
       let result = listings.filter((car) => {
         const matchesQuery =
-          `${car.make} ${car.model} ${car.year} ${car.fuel} ${car.transmission}`
+          `${car.brand} ${car.model} ${car.year} ${car.fuel_type} ${car.transmission}`
             .toLowerCase()
             .includes(q.toLowerCase());
-        const matchesFuel = !f || car.fuel === f;
+        const matchesFuel = !f || car.fuel_type === f;
         const matchesTransmission = !t || car.transmission === t;
         const matchesYear = !y || car.year === Number(y);
         const matchesPrice =
@@ -184,37 +184,41 @@ export default function HeroSectionClient({ listings }: Props) {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 animate-fadeInUp">
-            {filtered.map((car) => (
-              <div
-                key={car.id}
-                className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300 shadow-lg group focus-within:ring-2 focus-within:ring-yellow-400"
-                tabIndex={0}
-                aria-label={`View details for ${car.title}`}
-              >
-                <Image
-                  src={car.image}
-                  alt={car.title}
-                  width={400}
-                  height={200}
-                  className="h-48 w-full object-cover group-hover:scale-105 transition duration-500 bg-zinc-200"
-                  priority
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/logo.png";
-                  }}
-                />
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-1 truncate" title={car.title}>{car.title}</h3>
-                  <p className="text-white/60 text-sm mb-1">
-                    {car.year} • {car.fuel} • {car.transmission}
-                  </p>
-                  <p className="text-white/80 text-base mb-1">{car.location}</p>
-                  <p className="mt-2 font-bold text-white text-lg">
-                    ₹ {car.price.toLocaleString("en-IN")}
-                  </p>
+            {filtered.map((car) => {
+              const image = (car as any).image || (car as any).car_images?.[0]?.image_url || '/logo.png';
+              const location = (car as any).location || (car as any).city || 'Unknown';
+              return (
+                <div
+                  key={car.id}
+                  className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300 shadow-lg group focus-within:ring-2 focus-within:ring-yellow-400"
+                  tabIndex={0}
+                  aria-label={`View details for ${car.title}`}
+                >
+                  <Image
+                    src={image}
+                    alt={car.title}
+                    width={400}
+                    height={200}
+                    className="h-48 w-full object-cover group-hover:scale-105 transition duration-500 bg-zinc-200"
+                    priority
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/logo.png";
+                    }}
+                  />
+                  <div className="p-4">
+                    <h3 className="font-semibold text-lg mb-1 truncate" title={car.title}>{car.title}</h3>
+                    <p className="text-white/60 text-sm mb-1">
+                      {car.year} • {car.fuel_type} • {car.transmission}
+                    </p>
+                    <p className="text-white/80 text-base mb-1">{location}</p>
+                    <p className="mt-2 font-bold text-white text-lg">
+                      ₹ {car.price.toLocaleString("en-IN")}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

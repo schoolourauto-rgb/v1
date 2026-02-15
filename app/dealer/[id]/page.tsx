@@ -1,27 +1,26 @@
-import { createServerClient } from '@/lib/supabase/server'
+import { createServerClientTyped } from '@/lib/supabase/server'
 import CarCard from '@/components/marketplace/CarCard'
-import type { Car } from '@/types/car';
+import type { Car as CarType } from '@/types/car';
+import { Metadata } from 'next';
 
-export const metadata = ({ params }: { params: { id: string; city?: string } }) => {
-  return {
-    title: `${params?.id ? params.id : 'Dealer'} – ${params?.city ? params.city : ''} | OurAuto`,
-    openGraph: {
-      title: `${params?.id ? params.id : 'Dealer'} | OurAuto`,
-      description: 'View dealer profile and cars on OurAuto',
-      url: `https://ourauto.in/dealer/${params?.id}`,
-      images: ['/logo.png'],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${params?.id ? params.id : 'Dealer'} | OurAuto`,
-      description: 'View dealer profile and cars on OurAuto',
-      images: ['/logo.png'],
-    },
-  }
-}
+export const metadata: Metadata = {
+  title: 'Dealer | OurAuto',
+  openGraph: {
+    title: 'Dealer | OurAuto',
+    description: 'View dealer profile and cars on OurAuto',
+    url: 'https://ourauto.in/dealer/',
+    images: ['/logo.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Dealer | OurAuto',
+    description: 'View dealer profile and cars on OurAuto',
+    images: ['/logo.png'],
+  },
+};
 
 export default async function DealerProfilePage({ params }: { params: { id: string } }) {
-  const supabase = await createServerClient()
+  const supabase = await createServerClientTyped()
 
   // Fetch dealer profile
   const { data: dealer } = await supabase
@@ -48,22 +47,24 @@ export default async function DealerProfilePage({ params }: { params: { id: stri
     .eq('dealer_id', params.id)
 
   if (error) {
-    console.error(error)
+    console.error('Fetch cars error', error.message)
   }
 
-  const cars: Car[] =
-    data?.map((row) => ({
+  type CarDisplay = CarType & { image: string; location: string };
+  const cars: CarDisplay[] =
+    data?.map((row: any) => ({
       id: row.id,
       title: row.title,
-      make: row.brand,
+      brand: row.brand,
+      dealer_id: row.dealer_id ?? params.id,
       model: row.model,
       year: row.year,
       fuel: row.fuel_type ?? '',
       price: row.price,
+      transmission: row.transmission ?? '',
       image: row.car_images?.[0]?.image_url ?? '/logo.png',
       location: row.city ?? dealer?.city ?? 'N/A',
-      transmission: row.transmission ?? '',
-    })) ?? []
+    })) ?? [];
 
   if (!dealer) {
     return (

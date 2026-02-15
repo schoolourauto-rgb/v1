@@ -1,5 +1,5 @@
 
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClientTyped } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import CarCard from "@/components/marketplace/CarCard";
 import Link from "next/link";
@@ -41,7 +41,7 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
   }
 
 
-  const supabase = await createServerClient();
+  const supabase = await createServerClientTyped();
   let query = supabase
     .from("cars")
     .select(`
@@ -75,18 +75,20 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
   // Total pages calculation (server-side)
   const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
 
-  const listings: Car[] =
+  const listings: (Car & { image: string; location: string })[] =
     (data ?? []).map((row: any) => ({
       id: row.id,
       title: row.title,
-      make: row.brand,
+      brand: row.brand,
+      dealer_id: row.dealer_id ?? '',
       model: row.model,
       year: row.year,
       fuel: row.fuel_type,
       price: row.price,
+      transmission: row.transmission,
+      city: row.city ?? '',
       image: (row.car_images as { image_url: string }[] | undefined)?.[0]?.image_url ?? "/logo.png",
       location: row.city ?? "Unknown",
-      transmission: row.transmission,
     }));
 
   const jsonLd = buildJsonLd(listings, parsedFilters);

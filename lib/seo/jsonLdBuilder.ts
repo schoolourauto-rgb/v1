@@ -14,11 +14,11 @@ export function buildJsonLd(listings: Car[], filters: ParsedFilters) {
         name: car.title,
         brand: {
           "@type": "Brand",
-          name: car.make,
+          name: car.brand,
         },
         model: car.model,
         vehicleModelDate: car.year,
-        fuelType: car.fuel,
+        fuelType: car.fuel_type,
         vehicleTransmission: car.transmission,
         offers: {
           "@type": "Offer",

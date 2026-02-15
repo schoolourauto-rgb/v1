@@ -1,58 +1,55 @@
+
 import { NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClientTyped } from "@/lib/supabase/server";
 import { Database } from "@/lib/supabase/types";
+import { CarSchema } from "./carSchema";
 
 export async function POST(req: Request) {
     try {
-      const supabase = await createServerClient();
+      const supabase = await createServerClientTyped();
 
-    // 1️⃣ Get authenticated user
-    const userRes = await supabase.auth.getUser();
-    if (userRes.error || !userRes.data?.user) {
+      // 1️⃣ Get authenticated user
+      const userRes = await supabase.auth.getUser();
+      if (userRes.error || !userRes.data?.user) {
+        console.warn("AUTH FAIL /dealer/cars POST", userRes.error);
+        return NextResponse.json(
+          { error: "Not authenticated" },
+          { status: 401 }
+        );
+      }
+      const user = userRes.data.user;
+
+      // 2️⃣ Find dealer
+      const { data: dealer, error: dealerError } = await supabase
+        .from("dealers")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (dealerError || !dealer) {
+        console.warn("DEALER NOT FOUND /dealer/cars POST", dealerError);
+        return NextResponse.json(
+          { error: "Dealer not found" },
+          { status: 403 }
+        );
+      }
+
+
+    // 3️⃣ Parse and validate request body (JSON only)
+    const rawData = await req.json();
+    const parseResult = CarSchema.safeParse({
+      ...rawData,
+      year: Number(rawData.year),
+      price: Number(rawData.price),
+    });
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 }
-      );
-    }
-    const user = userRes.data.user;
-
-    // 2️⃣ Find dealer
-    const { data: dealer, error: dealerError } = await supabase
-      .from("dealers")
-      .select("id")
-      .eq("user_id", user.id)
-      .single();
-
-    if (dealerError || !dealer) {
-      return NextResponse.json(
-        { error: "Dealer not found" },
-        { status: 403 }
-      );
-    }
-
-    // 3️⃣ Parse request body (JSON only)
-    const carData = await req.json();
-
-    if (
-      !carData.title ||
-      !carData.brand ||
-      !carData.model ||
-      !carData.year ||
-      !carData.price
-    ) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Validation failed", details: parseResult.error.flatten() },
         { status: 400 }
       );
     }
-
-    const priceNumber = Number(carData.price);
-    if (isNaN(priceNumber) || priceNumber <= 0) {
-      return NextResponse.json(
-        { error: "Invalid price" },
-        { status: 400 }
-      );
-    }
+    const carData = parseResult.data;
+    const priceNumber = carData.price;
 
     type CarInsert = Database["public"]["Tables"]["cars"]["Insert"];
 
@@ -75,6 +72,8 @@ export async function POST(req: Request) {
       .insert(payload);
 
     if (insertError) {
+      // Log RLS or insert errors
+      console.error("INSERT FAIL /dealer/cars POST", insertError);
       return NextResponse.json(
         { error: insertError.message },
         { status: 500 }

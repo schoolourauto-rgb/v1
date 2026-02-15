@@ -2,7 +2,7 @@
 
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
-import { createServerClient } from "@/lib/supabase/server"
+import { createServerClientTyped } from "@/lib/supabase/server"
 
 interface PageProps {
 	params: { id: string }
@@ -14,7 +14,7 @@ export async function generateMetadata(
 	{ params }: PageProps
 ): Promise<Metadata> {
 	try {
-		const supabase = await createServerClient()
+		const supabase = await createServerClientTyped()
 
 		const { data } = await supabase
 			.from("cars")
@@ -38,7 +38,7 @@ export default async function CarDetailPage(
 	{ params }: PageProps
 ) {
 	try {
-		const supabase = await createServerClient()
+		const supabase = await createServerClientTyped()
 
 		const { data, error } = await supabase
 			.from("cars")
