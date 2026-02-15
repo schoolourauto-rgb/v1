@@ -5,12 +5,6 @@ import { Database } from "@/lib/supabase/types";
 export async function POST(req: Request) {
   try {
       const supabase = createServerClient();
-    if (!supabase) {
-      return NextResponse.json(
-        { error: "Supabase client not configured. Check environment variables." },
-        { status: 500 }
-      );
-    }
 
     // 1️⃣ Get authenticated user
     const userRes = await supabase.auth.getUser();

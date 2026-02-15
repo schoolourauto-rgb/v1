@@ -1,6 +1,6 @@
 
 
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import CarCard from '@/components/marketplace/CarCard'
 import ListingCardSkeleton from '@/components/marketplace/ListingCardSkeleton'
 import Link from 'next/link'
@@ -18,7 +18,7 @@ interface Car {
 }
 
 export default async function MarketplacePage({ searchParams }: { searchParams?: Promise<any> }) {
-  const supabase = createClient()
+  // supabase singleton imported above
   let query = supabase
     .from('cars')
     .select('id, title, brand, year, price, city, is_active, created_at, car_images(image_url)')

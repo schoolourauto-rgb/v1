@@ -1,5 +1,5 @@
 
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerSupabase } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import CarCard from "@/components/marketplace/CarCard";
 import Link from "next/link";
@@ -42,7 +42,7 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
 
 
   // Query setup
-  const supabase = createServerClient();
+  const supabase = await createServerSupabase();
   if (!supabase) {
     return <div className="p-8 text-center text-red-500">Error: Supabase client not configured. Please check environment variables.</div>;
   }

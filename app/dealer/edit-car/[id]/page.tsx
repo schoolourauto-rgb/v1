@@ -4,14 +4,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 
 import { Database } from '@/lib/supabase/types'
 
 type Car = Database['public']['Tables']['cars']['Row']
 
 export default function EditCarPage() {
-  const supabase = createClient()
+  // supabase singleton imported above
   const router = useRouter()
   const params = useParams()
   const carId = params.id as string

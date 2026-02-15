@@ -2,19 +2,12 @@
 export const dynamic = "force-dynamic"
 
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { supabase } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
 export default function DealerProfilePage() {
-  const supabase = createClient()
+  // supabase singleton imported above
   const router = useRouter()
-  if (!supabase) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        Database not configured
-      </div>
-    )
-  }
 
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)

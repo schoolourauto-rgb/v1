@@ -4,10 +4,6 @@ import { createServerClient } from "@/lib/supabase/server";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = createServerClient();
-  if (!supabase) {
-    redirect("/login");
-    return null;
-  }
   const {
     data: { session },
   } = await supabase.auth.getSession();

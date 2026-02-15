@@ -1,9 +1,9 @@
 export const dynamic = "force-dynamic"
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerSupabase } from "@/lib/supabase/server";
 import type { Car } from '@/types/car';
 
 export default async function AdminCarsPage() {
-  const supabase = createServerClient();
+  const supabase = await createServerSupabase();
   if (!supabase) {
     throw new Error("Supabase client not initialized");
   }

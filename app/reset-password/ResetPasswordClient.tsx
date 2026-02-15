@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { supabase } from "@/lib/supabase/client"
 
 export default function ResetPasswordClient() {
   const [password, setPassword] = useState("")
@@ -10,7 +10,7 @@ export default function ResetPasswordClient() {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const supabase = createClient()
+  // supabase singleton imported above
 
   const handleReset = async () => {
     setLoading(true)

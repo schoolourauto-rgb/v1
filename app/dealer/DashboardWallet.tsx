@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { supabase } from "@/lib/supabase/client";
 import type { DealerWallet, Dealer } from "@/types/dealer";
 
 export default function DashboardWallet({ dealerId }: { dealerId: string }) {
@@ -10,7 +10,7 @@ export default function DashboardWallet({ dealerId }: { dealerId: string }) {
 
   useEffect(() => {
     async function fetchWallet() {
-      const supabase = createClient();
+      // supabase singleton imported above
       const { data: walletData } = await supabase
         .from("dealer_wallet")
         .select("featured_credits")

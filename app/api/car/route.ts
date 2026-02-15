@@ -4,9 +4,6 @@ import { createServerClient } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
   const supabase = createServerClient();
-  if (!supabase) {
-    return NextResponse.json({ error: "Supabase client not configured. Check environment variables." }, { status: 500 });
-  }
 
   // Session check
   const {

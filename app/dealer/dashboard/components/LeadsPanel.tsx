@@ -1,45 +1,96 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/Button";
+"use client"
 
-interface Chat {
-  id: string;
-  buyer_name: string;
-  car_title: string;
-  last_message: string;
-  last_time: string;
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/Button"
+import { supabase } from "@/lib/supabase/client"
+
+type Lead = {
+  id: string
+  name: string
+  phone: string
+  message: string | null
+  created_at: string
 }
 
-interface Message {
-  id: string;
-  sender: string;
-  message: string;
-  created_at: string;
-}
+export default function LeadsPanel() {
+  // ✅ ONE supabase instance only
+  // supabase singleton imported above
 
-export default function LeadsPanel({ dealerId }: { dealerId: string }) {
-  const [chats, setChats] = useState<any[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const fetchLeads = async () => {
+      try {
+        setLoading(true)
+
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser()
+
+        if (userError || !user) {
+          throw new Error("User not authenticated")
+        }
+
+        const { data, error } = await supabase
+          .from("leads")
+          .select("*")
+          .order("created_at", { ascending: false })
+
+        if (error) throw error
+
+        if (isMounted) {
+          setLeads((data || []).map((lead: any) => ({
+            ...lead,
+            message: lead.message ?? ""
+          })));
+        }
+      } catch (err: any) {
+        if (isMounted) {
+          setError(err.message)
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    fetchLeads()
+
+    return () => {
+      isMounted = false
+    }
+  }, [supabase])
+
+  // ...existing code...
   const [selectedChat, setSelectedChat] = useState<any | null>(null);
+  const [chats, setChats] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
   const [loadingChats, setLoadingChats] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
   const [user, setUser] = useState<any>(null);
+  // Create the Supabase client ONCE per component
+  // ...existing code...
 
   useEffect(() => {
     // Fetch user info (simulate or replace with actual auth logic)
     async function fetchUser() {
       // Replace with actual user fetch if needed
-      const supabase = (await import("@/lib/supabase/client")).createClient();
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     }
     fetchUser();
-  }, []);
+  }, [supabase]);
   useEffect(() => {
     async function fetchChats() {
       setLoadingChats(true);
-      const supabase = (await import("@/lib/supabase/client")).createClient();
       if (!user) return;
       const { data: chats, error } = await supabase
         .from("chats")
@@ -60,13 +111,12 @@ export default function LeadsPanel({ dealerId }: { dealerId: string }) {
       setLoadingChats(false);
     }
     if (user) fetchChats();
-  }, [user]);
+  }, [user, supabase]);
 
   useEffect(() => {
     async function fetchMessages() {
       if (!selectedChat) return;
       setLoadingMessages(true);
-      const supabase = (await import("@/lib/supabase/client")).createClient();
       const { data: messages, error } = await supabase
         .from("messages")
         .select("*")
@@ -80,38 +130,31 @@ export default function LeadsPanel({ dealerId }: { dealerId: string }) {
     // Realtime subscription
     if (!selectedChat) return;
     let channel: any;
-    (async () => {
-      const supabase = (await import("@/lib/supabase/client")).createClient();
-      channel = supabase
-        .channel("messages")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "messages",
-            filter: `chat_id=eq.${selectedChat.id}`
-          },
-          payload => {
-            setMessages(prev => [...prev, payload.new]);
-          }
-        )
-        .subscribe();
-    })();
+    channel = supabase
+      .channel("messages")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `chat_id=eq.${selectedChat.id}`
+        },
+        payload => {
+          setMessages(prev => [...prev, payload.new]);
+        }
+      )
+      .subscribe();
     return () => {
       if (channel) {
-        (async () => {
-          const supabase = (await import("@/lib/supabase/client")).createClient();
-          supabase.removeChannel(channel);
-        })();
+        supabase.removeChannel(channel);
       }
     };
-  }, [selectedChat]);
+  }, [selectedChat, supabase]);
 
   async function sendMessage() {
     if (!input.trim() || !selectedChat || !user) return;
     setSending(true);
-    const supabase = (await import("@/lib/supabase/client")).createClient();
     await supabase.from("messages").insert({
       chat_id: selectedChat.id,
       sender_id: user.id,

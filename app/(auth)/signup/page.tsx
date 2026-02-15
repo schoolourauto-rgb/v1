@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 export default function SignupPage() {
-  const supabase = createClient()
+  // supabase singleton imported above
   const router = useRouter()
 
   const [form, setForm] = useState({
