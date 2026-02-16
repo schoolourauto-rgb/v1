@@ -16,9 +16,18 @@ export async function POST(req: NextRequest) {
       referral_code: referralCodeInput,
       location,
     } = body;
-    if (!user_id || !business_name || !owner_name || !phone || !email) {
-      console.error('Signup API error: Missing required fields.', body);
-      return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
+    if (
+      !business_name?.trim() ||
+      !owner_name?.trim() ||
+      !phone?.trim() ||
+      !email?.trim() ||
+      !user_id?.trim()
+    ) {
+      console.error('Signup API error: Business Name, Name, Mobile, Email and Password are required.', body);
+      return NextResponse.json(
+        { error: 'Business Name, Name, Mobile, Email and Password are required.' },
+        { status: 400 }
+      );
     }
     const supabase = await createClient();
     // 1. Handle referral code (if provided)
