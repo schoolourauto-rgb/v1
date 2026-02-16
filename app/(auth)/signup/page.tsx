@@ -32,6 +32,9 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
+    // Console log: before validation
+    console.log("[Signup] Before validation", form);
+
     // Validation
     const businessName = form.business_name.trim();
     const ownerName = form.owner_name.trim();
@@ -41,10 +44,11 @@ export default function SignupPage() {
     const location = form.location.trim();
     const referralCodeInput = form.referral_code.trim().toUpperCase();
 
-    // Debug: log validation values
-    console.log("Validation values:", { businessName, ownerName, phone, email, password, location });
+    // Console log: after validation values
+    console.log("[Signup] After validation values", { businessName, ownerName, phone, email, password, location });
 
     if (!businessName || !ownerName || !phone || !email || !password || !location) {
+      console.log("[Signup] Validation failed: missing required fields", { businessName, ownerName, phone, email, password, location });
       setError('Missing required fields');
       setLoading(false);
       return;
@@ -63,7 +67,9 @@ export default function SignupPage() {
       password,
     });
 
-    // Debug: log Supabase auth error
+    // Console log: after auth
+    console.log("[Signup] After Supabase auth", { authData, authError });
+
     if (authError) {
       console.log("Supabase auth error:", authError);
       if (authError.message && authError.message.includes('User already registered')) {
@@ -105,22 +111,36 @@ export default function SignupPage() {
       setLoading(false);
       return;
     }
+    const dealerInsertPayload = {
+      dealership_name: businessName,
+      phone,
+      location,
+      referral_code: newReferralCode,
+      referred_by: referredBy,
+      verified: false,
+    };
+      user_id: userId,
+      name: businessName.trim(),
+      city: location.trim(),
+      phone: phone.trim(),
+      referral_code: newReferralCode,
+      verified: false,
+      featured_ads_credit: 0,
+      hot_deal_credit: 0,
+      total_listings: 0,
+      referral_rewarded: false
+    };
+    // Console log: before dealer insert
+    console.log("[Signup] Before dealer insert", dealerInsertPayload);
     const { data: dealer, error: dealerError } = await supabase
       .from('dealers')
       .insert([
-        {
-          user_id: userId,
-          dealership_name: businessName,
-          phone,
-          location,
-          referral_code: newReferralCode,
-          referred_by: referredBy,
-          verified: false,
-        },
+        dealerInsertPayload,
       ])
       .select('id')
       .maybeSingle();
-    // Debug: log dealer insert error
+    // Console log: after dealer insert
+    console.log("[Signup] After dealer insert", { dealer, dealerError });
     if (dealerError || !dealer) {
       console.log("Dealer insert error:", dealerError);
       setError(dealerError?.message || 'Signup failed: Could not create dealer profile.');

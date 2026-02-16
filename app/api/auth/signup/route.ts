@@ -42,7 +42,6 @@ export async function POST(req: NextRequest) {
     }
     // 3. Insert dealer row
     const { data: dealer, error: dealerError } = await supabase
-      .from('dealers')
       .insert([
         {
           user_id,
@@ -54,6 +53,23 @@ export async function POST(req: NextRequest) {
           referred_by: referredBy,
           location,
           verified: false,
+        },
+      ])
+      .select('id')
+      .maybeSingle();
+      .from('dealers')
+      .insert([
+        {
+          user_id,
+          name: business_name.trim(),
+          city: location.trim(),
+          phone: phone.trim(),
+          referral_code: newReferralCode,
+          verified: false,
+          featured_ads_credit: 0,
+          hot_deal_credit: 0,
+          total_listings: 0,
+          referral_rewarded: false
         },
       ])
       .select('id')
