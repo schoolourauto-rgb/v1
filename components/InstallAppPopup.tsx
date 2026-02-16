@@ -26,7 +26,8 @@ export default function InstallAppPopup({ onComplete }: InstallAppPopupProps) {
 
   // Check if app is already installed
   function isAppInstalled() {
-    return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+    return window.matchMedia('(display-mode: standalone)').matches ||
+      (typeof window !== 'undefined' && 'standalone' in window.navigator && (window.navigator as Navigator & { standalone?: boolean }).standalone === true);
   }
   // Only show if not already shown in this session
   useEffect(() => {

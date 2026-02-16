@@ -15,6 +15,7 @@ export default function SignupPage() {
     owner_name: '',
     mobile: '',
     referral_code: '', // code entered by new dealer (optional)
+    location: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -31,6 +32,21 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
+    // Validation
+    const businessName = form.business_name.trim();
+    const ownerName = form.owner_name.trim();
+    const phone = form.mobile.trim();
+    const email = form.email.trim();
+    const password = form.password.trim();
+    const location = form.location.trim();
+    const referralCodeInput = form.referral_code.trim().toUpperCase();
+
+    if (!businessName || !ownerName || !phone || !email || !password || !location) {
+      setError('Missing required fields');
+      setLoading(false);
+      return;
+    }
+
     const supabase = createClient();
     if (!supabase) {
       setError('Supabase client not configured. Check environment variables.');
@@ -40,8 +56,8 @@ export default function SignupPage() {
 
     // 1. Sign up user
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
+      email,
+      password,
     });
 
     if (authError) {
@@ -56,7 +72,6 @@ export default function SignupPage() {
 
     // 2. Prepare dealer insert
     let referredBy: string | null = null;
-    const referralCodeInput = form.referral_code.trim().toUpperCase();
     if (referralCodeInput) {
       // Check if referral code exists
       const { data: refDealer, error: refError } = await supabase
@@ -90,8 +105,9 @@ export default function SignupPage() {
       .insert([
         {
           user_id: userId,
-          dealership_name: form.business_name,
-          phone: form.mobile,
+          dealership_name: businessName,
+          phone,
+          location,
           referral_code: newReferralCode,
           referred_by: referredBy,
           verified: false,
@@ -142,6 +158,14 @@ export default function SignupPage() {
             className="w-full p-3 bg-white dark:bg-neutral-900 text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400/40 transition-colors duration-200"
             value={form.business_name}
             onChange={(e) => setForm({ ...form, business_name: e.target.value })}
+            disabled={loading}
+          />
+
+          <input
+            placeholder="Location"
+            className="w-full p-3 bg-white dark:bg-neutral-900 text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400/40 transition-colors duration-200"
+            value={form.location}
+            onChange={(e) => setForm({ ...form, location: e.target.value })}
             disabled={loading}
           />
 
