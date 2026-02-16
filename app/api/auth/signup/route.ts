@@ -41,23 +41,23 @@ export async function POST(req: NextRequest) {
       newReferralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
     }
     // 3. Insert dealer row
-    const { data: dealer, error: dealerError } = await supabase
-      .from('dealers')
-      .insert([
-        {
-          user_id,
-          name: business_name.trim(),
-          city: location.trim(),
-          phone: phone.trim(),
-          referral_code: newReferralCode,
-          verified: false,
-          featured_ads_credit: 0,
-          total_listings: 0,
-          referral_rewarded: false
-        },
-      ])
-      .select('id')
-      .single();
+      const { data: dealer, error: dealerError } = await supabase
+        .from('dealers')
+        .insert([
+          {
+            user_id,
+            name: business_name.trim(),
+            city: location.trim(),
+            phone: phone.trim(),
+            referral_code: newReferralCode,
+            verified: false,
+            featured_ads_credit: 0,
+            total_listings: 0,
+            referral_rewarded: false
+          },
+        ])
+        .select('id')
+        .single();
     if (dealerError || !dealer) {
       console.error('Signup API error: Dealer creation failed.', dealerError);
       return NextResponse.json({ error: dealerError?.message || 'Could not create dealer profile.' }, { status: 400 });

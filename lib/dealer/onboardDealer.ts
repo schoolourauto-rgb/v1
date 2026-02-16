@@ -20,24 +20,24 @@ export async function onboardDealer(user_id: string): Promise<Dealer | null> {
     }
     if (dealer) return dealer as Dealer;
     // Insert new dealer
-    const { data: inserted, error: insertError } = await supabase
-      .from("dealers")
-      .insert([
-        {
-          user_id,
-          name: "",
-          city: "",
-          phone: "",
-          referral_code: null,
-          verified: false,
-          featured_ads_credit: 0,
-          hot_deal_credit: 0,
-          total_listings: 0,
-          referral_rewarded: false
-        },
-      ])
-      .select()
-      .single();
+      const { data: inserted, error: insertError } = await supabase
+        .from("dealers")
+        .insert([
+          {
+            user_id,
+            name: "",
+            city: "",
+            phone: "",
+            referral_code: null,
+            verified: false,
+            featured_ads_credit: 0,
+            hot_deal_credit: 0,
+            total_listings: 0,
+            referral_rewarded: false
+          },
+        ])
+        .select()
+        .single();
     if (insertError) {
       console.error("onboardDealer insert error", insertError);
       return null;

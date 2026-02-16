@@ -47,7 +47,25 @@ export default function SignupPage() {
     // Console log: after validation values
     console.log("[Signup] After validation values", { businessName, ownerName, phone, email, password, location });
 
-    if (!businessName || !ownerName || !phone || !email || !password || !location) {
+    // Log each variable individually
+    console.log("[Signup] businessName:", businessName);
+    console.log("[Signup] ownerName:", ownerName);
+    console.log("[Signup] phone:", phone);
+    console.log("[Signup] email:", email);
+    console.log("[Signup] password:", password);
+    console.log("[Signup] location:", location);
+
+    // Nuclear safe validation
+    const isInvalid = [
+      businessName,
+      ownerName,
+      phone,
+      email,
+      password,
+      location
+    ].some((field) => !field || field.trim() === '');
+
+    if (isInvalid) {
       console.log("[Signup] Validation failed: missing required fields", { businessName, ownerName, phone, email, password, location });
       setError('Missing required fields');
       setLoading(false);
