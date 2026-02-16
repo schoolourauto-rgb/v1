@@ -22,9 +22,11 @@ export async function validateJsonRequest<T>(req: Request | NextRequest, schema:
   }
   const result = schema.safeParse(json);
   if (!result.success) {
+    // Log the error details for debugging
+    console.log('Zod validation error:', result.error.flatten());
     return {
       error: true,
-      response: NextResponse.json({ error: "Validation failed", details: result.error.flatten() }, { status: 422 })
+      response: NextResponse.json({ error: result.error.flatten() }, { status: 422 })
     };
   }
   // result.data is always type T here
