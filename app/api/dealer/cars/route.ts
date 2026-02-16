@@ -39,8 +39,8 @@ export async function POST(req: Request) {
       // 3️⃣ Parse and validate request body (FormData for image uploads)
       const formData = await req.formData();
       const dataStr = formData.get("data");
-      let body = {};
-      if (typeof dataStr === "string") {
+      let body: Record<string, any> = {};
+      if (typeof dataStr === "string" && dataStr.length > 0) {
         try {
           body = JSON.parse(dataStr);
         } catch (e) {
@@ -53,41 +53,53 @@ export async function POST(req: Request) {
       if (!body || Object.keys(body).length === 0) {
         return NextResponse.json({ error: "No body" }, { status: 400 });
       }
-      // ...existing code...
-    // ...existing code...
 
-    const parseResult = CarSchema.safeParse({
-      ...rawData,
-      year: Number(rawData.year),
-      price: Number(rawData.price),
-    });
-    if (!parseResult.success) {
-      return NextResponse.json(
-        { error: "Validation failed", details: parseResult.error.flatten() },
-        { status: 400 }
-      );
-    }
-    const carData = parseResult.data;
-    const priceNumber = carData.price;
+      // Extract fields from body (parsed from FormData)
+      const rawData = {
+        title: body.title,
+        brand: body.brand,
+        model: body.model,
+        year: body.year,
+        price: body.price,
+        fuel_type: body.fuel_type,
+        transmission: body.transmission,
+        city: body.city,
+        description: body.description,
+        listingTier: body.listingTier,
+      };
 
-    // --- Dynamic listing tier logic ---
-    const listingTier = rawData.listingTier || "simple";
+      const parseResult = CarSchema.safeParse({
+        ...rawData,
+        year: Number(rawData.year),
+        price: Number(rawData.price),
+      });
+      if (!parseResult.success) {
+        return NextResponse.json(
+          { error: "Validation failed", details: parseResult.error.flatten() },
+          { status: 400 }
+        );
+      }
+      const carData = parseResult.data;
+      const priceNumber = carData.price;
 
-    type CarInsert = Database["public"]["Tables"]["cars"]["Insert"];
+      // --- Dynamic listing tier logic ---
+      const listingTier = rawData.listingTier || "simple";
 
-    const payload: CarInsert = {
-      dealer_id: dealer.id,
-      title: carData.title,
-      brand: carData.brand,
-      model: carData.model,
-      year: Number(carData.year),
-      price: priceNumber,
-      fuel_type: carData.fuel_type ?? null,
-      transmission: carData.transmission ?? null,
-      city: carData.city ?? null,
-      description: carData.description ?? null,
-      is_active: true,
-      // Optionally, you can store tier info if needed for analytics
+      type CarInsert = Database["public"]["Tables"]["cars"]["Insert"];
+
+      const payload: CarInsert = {
+        dealer_id: dealer.id,
+        title: carData.title,
+        brand: carData.brand,
+        model: carData.model,
+        year: Number(carData.year),
+        price: priceNumber,
+        fuel_type: carData.fuel_type ?? null,
+        transmission: carData.transmission ?? null,
+        city: carData.city ?? null,
+        description: carData.description ?? null,
+        is_active: true,
+        // Optionally, you can store tier info if needed for analytics
       // listing_tier: listingTier,
     };
 
