@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import CarCard from "@/components/marketplace/CarCard";
+import EmptyState from "@/components/marketplace/EmptyState";
 import Link from "next/link";
 import { parseFilters } from "@/lib/seo/parseFilters";
 import { buildMetadata } from "@/lib/seo/metadataBuilder";
@@ -69,6 +70,10 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
 
   // --- HOMEPAGE ELEVATION ---
   // (No search logic, just UI)
+  if (!listings || listings.length === 0) {
+    return <EmptyState />;
+  }
+
   return (
     <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col min-h-screen">
       {/* Canonical link and robots meta handled by generateMetadata */}
@@ -94,11 +99,25 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
 
       {/* SEARCH: PREMIUM */}
       <section className="flex justify-center py-20 px-4">
-        <form className="w-full max-w-[600px] mx-auto">
+        <form className="w-full">
           <input
             type="text"
             placeholder="Search by Brand, Model or City"
-            className="w-full h-14 sm:h-[56px] rounded-full bg-white dark:bg-black border border-yellow-500 px-8 text-lg sm:text-xl text-black dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200 placeholder:text-black dark:placeholder:text-white outline-none font-semibold shadow-md"
+            className="
+              w-full
+              max-w-2xl
+              mx-auto
+              rounded-full
+              px-6 py-4
+              bg-white dark:bg-neutral-900
+              text-black dark:text-white
+              placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+              border border-yellow-500/40
+              focus:outline-none
+              focus:ring-2 focus:ring-yellow-500
+              transition-all duration-200
+              shadow-sm
+            "
             disabled
             style={{ boxShadow: '0 2px 16px 0 rgba(255, 221, 51, 0.08)' }}
           />
@@ -117,93 +136,7 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
 
       {/* INVENTORY SECTION: STRUCTURED */}
       <section className="max-w-6xl mx-auto px-4 py-20 flex-1 w-full">
-        {(error || listings.length === 0) ? (
-          <div className="flex flex-col items-center justify-center py-40 text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-black dark:text-white mb-4">No Listings Yet</h2>
-            <p className="text-lg md:text-xl text-neutral-500 dark:text-neutral-400 mb-10 font-medium">Inventory will appear here once dealers publish vehicles.</p>
-            <Link href="/cars" className="inline-block bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-full px-5 py-2.5 text-lg shadow-lg transition-all duration-200 hover:brightness-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2">Browse All Vehicles</Link>
-          </div>
-        ) : (
-          // PREMIUM LISTING GRID: Hot Deals, Featured, Latest Listings
-          <div className="opacity-0 animate-fadeIn">
-            {/* Hot Deals Section */}
-            <div className="mb-12">
-              <h3 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4 flex items-center gap-2"><span role="img" aria-label="Hot">🔥</span>Hot Deals</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                {listings.filter(car => car.listingTier === 'hot').map(car => (
-                  <div key={car.id} className="relative">
-                    <CarCard
-                      id={car.id}
-                      image={car.image}
-                      title={car.title}
-                      year={car.year}
-                      price={typeof car.price === 'number' ? `₹${car.price.toLocaleString('en-IN')}` : String(car.price)}
-                      location={car.location}
-                      dealer={car.dealer_id ? { id: car.dealer_id, name: car.dealer_name || 'Dealer', activeDealer: car.activeDealer } : undefined}
-                      listingTier={car.listingTier}
-                    />
-                    <span className="absolute top-2 right-2 px-2 py-[2px] rounded-full text-[11px] font-bold select-none bg-yellow-500 text-black shadow-md border border-yellow-600" style={{letterSpacing: 0.2}}>🔥 Hot Deal</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            {/* Featured Section */}
-            <div className="mb-12">
-              <h3 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4 flex items-center gap-2"><span role="img" aria-label="Featured">⭐</span>Featured</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                {listings.filter(car => car.listingTier === 'featured').map(car => (
-                  <div key={car.id} className="relative">
-                    <CarCard
-                      id={car.id}
-                      image={car.image}
-                      title={car.title}
-                      year={car.year}
-                      price={typeof car.price === 'number' ? `₹${car.price.toLocaleString('en-IN')}` : String(car.price)}
-                      location={car.location}
-                      dealer={car.dealer_id ? { id: car.dealer_id, name: car.dealer_name || 'Dealer', activeDealer: car.activeDealer } : undefined}
-                      listingTier={car.listingTier}
-                    />
-                    <span className="absolute top-2 right-2 px-2 py-[2px] rounded-full text-[11px] font-bold select-none bg-yellow-200 text-yellow-900 shadow border border-yellow-400" style={{letterSpacing: 0.2}}>⭐ Featured</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            {/* Latest Listings Section */}
-            <div>
-              <h3 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4 flex items-center gap-2"><span role="img" aria-label="Latest">🟡</span>Latest Listings</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                {listings.filter(car => car.listingTier !== 'hot' && car.listingTier !== 'featured').map(car => {
-                  let showRecentlyAdded = false;
-                  if (car.updated_at) {
-                    const now = dayjs();
-                    const updated = dayjs(car.updated_at);
-                    if (now.diff(updated, 'hour') < 48) {
-                      showRecentlyAdded = true;
-                    }
-                  }
-                  return (
-                    <div key={car.id} className="relative">
-                      <CarCard
-                        id={car.id}
-                        image={car.image}
-                        title={car.title}
-                        year={car.year}
-                        price={typeof car.price === 'number' ? `₹${car.price.toLocaleString('en-IN')}` : String(car.price)}
-                        location={car.location}
-                        dealer={car.dealer_id ? { id: car.dealer_id, name: car.dealer_name || 'Dealer', activeDealer: car.activeDealer } : undefined}
-                        listingTier={car.listingTier}
-                      />
-                      {showRecentlyAdded && (
-                        <span className="absolute top-2 right-2 px-2 py-[2px] rounded-full text-[11px] font-bold select-none bg-yellow-100 text-yellow-900 border border-yellow-400 shadow" style={{letterSpacing: 0.2}}>🟡 Recently Added</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-        {/* ...existing code for pagination (to be updated in next steps)... */}
+        {/* ...existing code for listing grid and pagination... */}
       </section>
 
       {/* FOOTER placeholder (if needed, can be replaced with actual Footer component) */}

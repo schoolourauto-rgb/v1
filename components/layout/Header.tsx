@@ -18,7 +18,12 @@ export default function Header() {
   return (
     <header className="border-b border-yellow-500 bg-white dark:bg-black sticky top-0 z-30 transition-colors duration-200">
       <div className="max-w-6xl mx-auto flex items-center justify-between h-16 px-4">
-        <span className="font-semibold tracking-wide text-base select-none text-black dark:text-white">FREE MARKETPLACE</span>
+        <Link
+          href="/"
+          className="font-bold tracking-wide text-black dark:text-white"
+        >
+          FREE MARKETPLACE
+        </Link>
         <div className="flex items-center gap-4">
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
