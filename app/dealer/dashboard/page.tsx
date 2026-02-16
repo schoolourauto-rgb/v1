@@ -8,9 +8,8 @@ import { Button } from "@/components/ui/Button";
 import { ReferralShare } from "@/components/dealer/ReferralShare";
 import Link from "next/link";
 
-import { MomentumLayer } from "@/components/dealer/MomentumLayer";
 
-import SmartSuggestion from "@/components/dealer/SmartSuggestion";
+import DealerDashboardClient from "./DealerDashboardClient";
 
 interface Car {
   id: string;
@@ -69,13 +68,9 @@ export default async function DealerDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
         {/* Momentum Layer: Motivation, Progress, Credits */}
         <div className="w-full mb-8">
-          <MomentumLayer
+          <DealerDashboardClient
             totalListings={totalListings}
             hotDealsUsed={hotDealsUsed}
-            featuredCredits={wallet?.featured_credits ?? 0}
-          />
-          <SmartSuggestion
-            totalListings={totalListings}
             featuredCredits={wallet?.featured_credits ?? 0}
             hotDealsAvailable={availableHotDeals}
           />

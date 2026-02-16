@@ -20,6 +20,8 @@ interface Car {
   activeDealer?: boolean;
 }
 
+export const revalidate = 60; // 1 minute cache for public data
+
 export default async function MarketplacePage({ searchParams }: { searchParams?: Promise<any> }) {
   // create supabase client instance
   const supabase = createClient();
