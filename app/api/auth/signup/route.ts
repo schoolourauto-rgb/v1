@@ -75,9 +75,8 @@ export async function POST(req: NextRequest) {
   }
 
   // 6️⃣ Insert dealer record (mapping snake_case → DB columns)
-  let dealerInsertError = null;
   try {
-    const { error: dealerError } = await supabase
+    const { error: dealerInsertError } = await supabase
       .from('dealers')
       .insert([
         {
@@ -96,21 +95,26 @@ export async function POST(req: NextRequest) {
           referral_rewarded: false,
         },
       ]);
-    if (dealerError) {
-      dealerInsertError = dealerError;
+
+    if (dealerInsertError) {
+      // Rollback auth user
+      try {
+        await supabase.auth.admin.deleteUser(authUser.user.id);
+      } catch {}
+      console.error('Dealer insert error:', dealerInsertError);
+      return NextResponse.json(
+        { error: 'Dealer creation failed' },
+        { status: 500 }
+      );
     }
   } catch (err) {
-    dealerInsertError = err;
-  }
-
-  if (dealerInsertError) {
     // Rollback auth user
     try {
       await supabase.auth.admin.deleteUser(authUser.user.id);
     } catch {}
-    console.error('Dealer insert error:', dealerInsertError);
+    console.error('Unexpected dealer insert error:', err);
     return NextResponse.json(
-      { error: 'Dealer creation failed' },
+      { error: 'Unexpected server error' },
       { status: 500 }
     );
   }
@@ -121,70 +125,3 @@ export async function POST(req: NextRequest) {
     message: 'Account created successfully',
   });
 }
-
-  // Step B: Prepare dealer insert
-  let referredBy: string | null = null;
-  if (referral_code && typeof referral_code === 'string') {
-    const { data: refDealer, error: refError } = await supabase
-      .from('dealers')
-      .select('id')
-      .eq('referral_code', referral_code.trim().toUpperCase())
-      .maybeSingle();
-    if (refDealer && !refError) {
-      referredBy = refDealer.id;
-    }
-  }
-
-  let generatedReferralCode = '';
-  try {
-    generatedReferralCode = await generateReferralCode();
-  } catch {
-    generatedReferralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
-  }
-
-  // Step B: Insert dealer record
-  let dealerInsertError = null;
-  try {
-    const { error: dealerError } = await supabase
-      .from('dealers')
-      .insert([
-        {
-          id: authUser.user.id,
-          user_id: authUser.user.id,
-          name: contact_person.trim(),
-          dealership_name: business_name.trim(),
-          city: location.trim(),
-          phone: phone.trim(),
-          referral_code: generatedReferralCode,
-          referred_by: referredBy,
-          verified: false,
-          featured_ads_credit: 0,
-          hot_deal_credit: 0,
-          total_listings: 0,
-          referral_rewarded: false,
-        },
-      ]);
-    if (dealerError) {
-      dealerInsertError = dealerError;
-    }
-  } catch (err) {
-    dealerInsertError = err;
-  }
-
-  if (dealerInsertError) {
-    // Rollback auth user
-    try {
-      await supabase.auth.admin.deleteUser(authUser.user.id);
-    } catch {}
-    console.error("Dealer insert error:", dealerInsertError);
-    return NextResponse.json(
-      { error: "Dealer creation failed" },
-      { status: 500 }
-    );
-  }
-
-  return NextResponse.json({
-    success: true,
-    message: "Account created successfully"
-  });
-});
