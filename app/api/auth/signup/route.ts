@@ -7,15 +7,13 @@ export async function POST(req: NextRequest) {
     // Log incoming request for debugging
     const body = await req.json();
     console.log('Signup API request body:', body);
-    const {
-      businessName,
-      ownerName,
-      phone,
-      email,
-      password,
-      referralCode,
-      location,
-    } = body;
+    const businessName = body.businessName;
+    const ownerName = body.ownerName || body.name;
+    const phone = body.phone || body.mobile;
+    const email = body.email;
+    const password = body.password;
+    const referralCode = body.referralCode || null;
+    const location = body.location || null;
     if (
       !businessName?.trim() ||
       !ownerName?.trim() ||
