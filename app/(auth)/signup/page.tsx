@@ -41,6 +41,9 @@ export default function SignupPage() {
     const location = form.location.trim();
     const referralCodeInput = form.referral_code.trim().toUpperCase();
 
+    // Debug: log validation values
+    console.log("Validation values:", { businessName, ownerName, phone, email, password, location });
+
     if (!businessName || !ownerName || !phone || !email || !password || !location) {
       setError('Missing required fields');
       setLoading(false);
@@ -60,11 +63,13 @@ export default function SignupPage() {
       password,
     });
 
+    // Debug: log Supabase auth error
     if (authError) {
-      if (authError.message.includes('User already registered')) {
+      console.log("Supabase auth error:", authError);
+      if (authError.message && authError.message.includes('User already registered')) {
         setError('Account already exists. Please login.');
       } else {
-        setError(authError.message);
+        setError(authError.message || 'Signup failed: Unknown auth error.');
       }
       setLoading(false);
       return;
@@ -115,8 +120,10 @@ export default function SignupPage() {
       ])
       .select('id')
       .maybeSingle();
+    // Debug: log dealer insert error
     if (dealerError || !dealer) {
-      setError('Signup failed: Could not create dealer profile.');
+      console.log("Dealer insert error:", dealerError);
+      setError(dealerError?.message || 'Signup failed: Could not create dealer profile.');
       setLoading(false);
       return;
     }
