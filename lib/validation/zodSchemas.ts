@@ -15,12 +15,12 @@ export const CarInsertSchema = z.object({
   // ...add other fields as needed
 });
 
-export const SignupSchema = z.object({
-  business_name: z.string().min(3),
+export const signupSchema = z.object({
+  business_name: z.string().min(2),
   contact_person: z.string().min(2),
-  phone: z.string().regex(/^[0-9]{10}$/),
-  email: z.string().email(),
+  phone: z.string().trim().regex(/^\d{10}$/),
+  email: z.string().trim().email(),
   password: z.string().min(6),
-  location: z.string().min(5),
-  referral_code: z.string().optional(),
-});
+  location: z.string().min(3),
+  referral_code: z.string().optional().nullable(),
+}).passthrough();
