@@ -122,12 +122,41 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
 
       {/* INVENTORY SECTION: STRUCTURED */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20 flex-1 w-full">
-        {/* Listing grid example: */}
+        {/* Listing grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Render CarCard with p-4 sm:p-5, ensure buttons w-full sm:w-auto */}
-          {/* ...existing code for mapping listings... */}
+          {listings.map((car: MarketplaceListing) => (
+            <CarCard
+              key={car.id}
+              id={car.id}
+              image={car.image || "/logo.png"}
+              title={car.title}
+              year={car.year}
+              price={car.price != null ? car.price.toLocaleString() : ""}
+              location={car.city || ""}
+              dealer={car.dealer_id ? { id: car.dealer_id, name: car.dealer_name || 'Dealer', activeDealer: car.activeDealer } : undefined}
+              listingTier={car.listingTier}
+            />
+          ))}
         </div>
-        {/* ...existing code for pagination, ensure buttons w-full sm:w-auto ... */}
+        {/* Pagination controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-12 gap-2">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <Link
+                key={i + 1}
+                href={
+                  i === 0
+                    ? `/cars/${normalizedSegments.join("/")}`
+                    : `/cars/${normalizedSegments.join("/")}?page=${i + 1}`
+                }
+                className={`px-4 py-2 rounded-lg border border-yellow-500 font-semibold transition-colors duration-150 ${page === i + 1 ? 'bg-yellow-500 text-black' : 'bg-transparent text-yellow-500 hover:bg-yellow-500 hover:text-black'}`}
+                aria-current={page === i + 1 ? 'page' : undefined}
+              >
+                {i + 1}
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* FOOTER placeholder (if needed, can be replaced with actual Footer component) */}

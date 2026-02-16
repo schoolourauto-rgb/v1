@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { generateReferralCode } from '@/lib/utils/generateReferralCode';
+import { createClient } from '@/lib/supabase/client';
 
 export default function SignupPage() {
   // create supabase client instance
@@ -124,15 +123,15 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
-      <div className="bg-card text-card-foreground border border-border p-8 rounded-xl shadow-sm w-full max-w-md space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-black dark:text-white px-4">
+      <div className="bg-white dark:bg-neutral-950 text-black dark:text-white border border-gray-200 dark:border-neutral-800 p-8 rounded-xl shadow-sm w-full max-w-md space-y-4 transition-colors">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">Dealer Signup</h1>
-          <p className="text-muted-foreground text-sm">Join OurAuto Marketplace</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Join OurAuto Marketplace</p>
         </div>
 
         {error && (
-          <div className="bg-danger/10 border border-danger/40 text-danger rounded-2xl p-3 text-sm">
+          <div className="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-2xl p-3 text-sm">
             {error}
           </div>
         )}
@@ -140,7 +139,7 @@ export default function SignupPage() {
         <div className="space-y-3">
           <input
             placeholder="Business Name"
-            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+            className="w-full p-3 bg-white dark:bg-neutral-900 text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400/40 transition-colors duration-200"
             value={form.business_name}
             onChange={(e) => setForm({ ...form, business_name: e.target.value })}
             disabled={loading}
@@ -148,7 +147,7 @@ export default function SignupPage() {
 
           <input
             placeholder="Owner Name"
-            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+            className="w-full p-3 bg-white dark:bg-neutral-900 text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400/40 transition-colors duration-200"
             value={form.owner_name}
             onChange={(e) => setForm({ ...form, owner_name: e.target.value })}
             disabled={loading}
@@ -156,7 +155,7 @@ export default function SignupPage() {
 
           <input
             placeholder="Mobile"
-            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+            className="w-full p-3 bg-white dark:bg-neutral-900 text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400/40 transition-colors duration-200"
             value={form.mobile}
             onChange={(e) => setForm({ ...form, mobile: e.target.value })}
             disabled={loading}
@@ -164,18 +163,17 @@ export default function SignupPage() {
 
           <input
             placeholder="Referral Code (optional)"
-            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+            className="w-full p-3 bg-white dark:bg-neutral-900 text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400/40 transition-colors duration-200 uppercase"
             value={form.referral_code}
             onChange={(e) => setForm({ ...form, referral_code: e.target.value })}
             disabled={loading}
             maxLength={8}
-            style={{ textTransform: 'uppercase' }}
           />
 
           <input
             placeholder="Email"
             type="email"
-            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+            className="w-full p-3 bg-white dark:bg-neutral-900 text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400/40 transition-colors duration-200"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             disabled={loading}
@@ -184,7 +182,7 @@ export default function SignupPage() {
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-3 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors duration-200"
+            className="w-full p-3 bg-white dark:bg-neutral-900 text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400/40 transition-colors duration-200"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             disabled={loading}
@@ -194,14 +192,14 @@ export default function SignupPage() {
         <button
           onClick={handleSignup}
           disabled={loading}
-          className="w-full bg-primary hover:opacity-90 text-primary-foreground font-semibold p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-yellow-400 dark:bg-yellow-500 hover:opacity-90 text-black dark:text-neutral-950 font-semibold p-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-400/40 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Creating Account...' : 'Create Account'}
         </button>
 
-        <p className="text-center text-muted-foreground text-sm">
+        <p className="text-center text-gray-600 dark:text-gray-300 text-sm">
           Already have an account?{' '}
-          <a href="/login" className="text-yellow-500 hover:underline">
+          <a href="/login" className="text-yellow-600 dark:text-yellow-400 hover:underline">
             Login
           </a>
         </p>
