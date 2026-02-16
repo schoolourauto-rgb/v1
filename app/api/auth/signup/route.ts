@@ -24,10 +24,11 @@ export async function POST(req: NextRequest) {
   // 3️⃣ Zod validation with detailed error
   const parsed = signupSchema.safeParse(body);
   if (!parsed.success) {
-    console.error('ZOD ERROR:', parsed.error.flatten());
+    console.error("ZOD ERROR FULL:", parsed.error);
+    console.error("ZOD FLATTEN:", parsed.error.flatten());
     return NextResponse.json(
       {
-        error: 'Validation failed',
+        error: "Validation failed",
         details: parsed.error.flatten(),
       },
       { status: 422 }
