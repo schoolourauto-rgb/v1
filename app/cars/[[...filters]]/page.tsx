@@ -1,5 +1,4 @@
-
-import { createServerClientTyped } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import CarCard from "@/components/marketplace/CarCard";
 import Link from "next/link";
@@ -11,7 +10,6 @@ import { evaluateCluster, getClusterType, getStrongestParentPath, getCanonicalPa
 import { redirect } from "next/navigation";
 
 export const revalidate = 60;
-export const runtime = "edge";
 
 import { type Metadata, type ResolvingMetadata } from 'next';
 
@@ -41,21 +39,10 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
   }
 
 
-  const supabase = await createServerClientTyped();
+  const supabase = await createClient();
   let query = supabase
     .from("cars")
-    .select(`
-      id,
-      title,
-      brand,
-      model,
-      year,
-      price,
-      fuel_type,
-      transmission,
-      city,
-      car_images(image_url)
-    `, { count: "exact" })
+    .select("id, title, brand, model, year, price, fuel_type, transmission, city, car_images(image_url)", { count: "exact" })
     .eq("status", "active")
     .range(from, to);
 
@@ -98,10 +85,10 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
   }
   function formatBudget(budget: string) {
     if (budget.startsWith("under-")) {
-      return `Under ₹${budget.replace("under-", "").replace("-lakh", " Lakh")}`;
+      return 'Under ' + '₹' + budget.replace("under-", "").replace("-lakh", " Lakh");
     }
     if (budget.startsWith("above-")) {
-      return `Above ₹${budget.replace("above-", "").replace("-lakh", " Lakh")}`;
+      return 'Above ' + '₹' + budget.replace("above-", "").replace("-lakh", " Lakh");
     }
     return budget;
   }
@@ -137,7 +124,7 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
               image={car.image}
               title={car.title}
               year={car.year}
-              price={typeof car.price === 'number' ? `₹${car.price.toLocaleString('en-IN')}` : car.price}
+              price={typeof car.price === 'number' ? '₹' + car.price.toLocaleString('en-IN') : car.price}
               location={car.location}
             />
           ))
@@ -147,11 +134,11 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
       {/* Pagination controls */}
       <div className="flex justify-center gap-4 mt-10">
         {page > 1 && (
-          <Link href={`/cars/${normalizedSegments.join("/")}${page - 1 === 1 ? "" : `?page=${page - 1}`}`}>Previous</Link>
+          <Link href={"/cars/" + normalizedSegments.join("/") + (page - 1 === 1 ? "" : "?page=" + (page - 1))}>Previous</Link>
         )}
         <span className="px-4">Page {page} of {totalPages}</span>
         {page < totalPages && (
-          <Link href={`/cars/${normalizedSegments.join("/")}?page=${page + 1}`}>Next</Link>
+          <Link href={"/cars/" + normalizedSegments.join("/") + "?page=" + (page + 1)}>Next</Link>
         )}
       </div>
 

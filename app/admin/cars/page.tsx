@@ -1,9 +1,9 @@
 export const dynamic = "force-dynamic"
-import { createServerClientTyped } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import type { Car } from '@/types/car';
 
 export default async function AdminCarsPage() {
-  const supabase = await createServerClientTyped();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("cars")
     .select("id, title, brand, model, year, price, dealer_id")

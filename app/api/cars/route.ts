@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { parseCarMessage } from "@/lib/carParser";
-import { createServerClientTyped } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/types";
 type CarInsert = Database["public"]["Tables"]["cars"]["Insert"];
 
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
   let supabase = null;
   try {
-    supabase = await createServerClientTyped();
+    supabase = await createClient();
     const payload: CarInsert = {
       dealer_id: null,
       title: `${parsed.make} ${parsed.model} ${parsed.year ?? ""}`.trim(),

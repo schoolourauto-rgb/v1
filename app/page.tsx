@@ -29,7 +29,7 @@ function generateVehicleJsonLd(cars: Car[]) {
 }
 
 import HeroSection from "@/components/marketplace/HeroSection";
-import { createServerClientTyped } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
 import BrandGrid from "@/components/seo/BrandGrid";
 import CityGrid from "@/components/seo/CityGrid";
@@ -39,10 +39,9 @@ import TransmissionGrid from "@/components/seo/TransmissionGrid";
 
 // Server Component: Fetch active cars from Supabase and pass to HeroSection
 export const revalidate = 60;
-export const runtime = "edge";
 
-export default async function Page() {
-  const supabase = await createServerClientTyped();
+export default async function HomePage() {
+  const supabase = await createClient();
 
   // Fetch mesh data from materialized views
   const [
@@ -114,7 +113,45 @@ export default async function Page() {
         }}
       />
 
-      <HeroSection listings={listings} />
+      {/* Centered Search Bar */}
+      <div className="w-full flex justify-center items-center py-8 bg-white border-b border-zinc-200">
+        <input
+          type="text"
+          placeholder="Search Inventory by Brand, Model, or City"
+          className="w-full max-w-xl px-6 py-3 rounded-lg border border-zinc-300 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        />
+      </div>
+
+      {/* Trust Strip */}
+      <div className="w-full flex justify-center items-center py-2 bg-zinc-50 border-b border-zinc-200 text-zinc-700 text-sm font-medium">
+        <span className="mx-4">Live Dealer Inventory</span>
+        <span className="mx-4">Direct Dealer Contact</span>
+        <span className="mx-4">Updated Daily</span>
+      </div>
+
+      {/* Inventory Grid */}
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        {listings.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {listings.slice(0, 12).map((car) => (
+              <div key={car.id} className="bg-white border border-zinc-200 rounded-lg p-4">
+                <img src={car.image} alt={car.title} className="w-full h-40 object-cover rounded mb-3" />
+                <div className="font-bold text-lg text-black mb-1">{car.brand} {car.model}</div>
+                <div className="text-zinc-700 text-sm mb-1">{car.year} • {car.fuel_type} • {car.transmission}</div>
+                <div className="text-zinc-900 font-semibold">₹{car.price.toLocaleString()}</div>
+                <div className="text-zinc-500 text-xs mt-1">{car.city}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-zinc-400 py-12">No inventory available.</div>
+        )}
+      </div>
+
+      {/* Minimal Footer */}
+      <footer className="w-full py-6 border-t border-zinc-200 bg-white text-center text-zinc-500 text-sm">
+        Powered by OurAuto
+      </footer>
 
       {/* Hierarchical mesh: Brand > City */}
       <div className="max-w-7xl mx-auto px-4 py-10">

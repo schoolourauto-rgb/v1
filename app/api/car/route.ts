@@ -1,9 +1,9 @@
 // ...existing code...
 import { NextResponse } from "next/server";
-import { createServerClientTyped } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
-  const supabase = await createServerClientTyped();
+  const supabase = await createClient();
 
   // Session check
   const {

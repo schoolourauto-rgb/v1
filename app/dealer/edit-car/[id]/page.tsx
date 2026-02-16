@@ -4,14 +4,15 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 
 import { Database } from '@/lib/supabase/types'
 
 type Car = Database['public']['Tables']['cars']['Row']
 
 export default function EditCarPage() {
-  // supabase singleton imported above
+  // create supabase client instance
+  const supabase = createClient();
   const router = useRouter()
   const params = useParams()
   const carId = params.id as string
@@ -36,6 +37,7 @@ export default function EditCarPage() {
 
   useEffect(() => {
     const fetchCar = async () => {
+      const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser()
@@ -71,7 +73,7 @@ export default function EditCarPage() {
     }
 
     fetchCar()
-  }, [carId, supabase, router])
+  }, [carId, router])
 
   const handleUpdate = async () => {
     setError(null)

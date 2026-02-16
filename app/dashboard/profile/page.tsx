@@ -2,11 +2,12 @@
 export const dynamic = "force-dynamic"
 
 import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
 export default function DealerProfilePage() {
-  // supabase singleton imported above
+  // create supabase client instance
+  const supabase = createClient();
   const router = useRouter()
 
   const [profile, setProfile] = useState<any>(null)
@@ -23,22 +24,23 @@ export default function DealerProfilePage() {
         setLoading(false)
         return
       }
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push("/login")
-        return
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/login");
+        return;
       }
+      const userId = session.user.id;
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .single()
       if (error) setError(error.message)
       setProfile(data)
       setLoading(false)
     }
     fetchProfile()
-  }, [supabase, router])
+  }, [router])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,12 +53,13 @@ export default function DealerProfilePage() {
         setSaving(false)
         return
       }
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        setError("User not authenticated.")
-        setSaving(false)
-        return
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setError("User not authenticated.");
+        setSaving(false);
+        return;
       }
+      const userId = session.user.id;
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -64,7 +67,7 @@ export default function DealerProfilePage() {
           phone: profile.phone,
           location: profile.location,
         })
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
       if (error) {
         setError(error.message)
       } else {

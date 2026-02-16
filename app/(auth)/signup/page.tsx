@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 export default function SignupPage() {
-  // supabase singleton imported above
+  // create supabase client instance
   const router = useRouter()
 
   const [form, setForm] = useState({
@@ -31,6 +31,7 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
+    const supabase = createClient();
     if (!supabase) {
       setError('Supabase client not configured. Check environment variables.')
       setLoading(false)

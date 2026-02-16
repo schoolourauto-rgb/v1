@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { supabase } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 
 export default function ResetPasswordClient() {
   const [password, setPassword] = useState("")
@@ -10,11 +10,12 @@ export default function ResetPasswordClient() {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  // supabase singleton imported above
+  // create supabase client instance
 
   const handleReset = async () => {
     setLoading(true)
 
+    const supabase = createClient();
     const { error } = await supabase.auth.updateUser({
       password,
     })

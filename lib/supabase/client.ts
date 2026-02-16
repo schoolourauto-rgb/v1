@@ -1,19 +1,10 @@
 
 
-import { createClient } from "@supabase/supabase-js"
-import type { Database } from "./types"
+import { createBrowserClient } from '@supabase/ssr';
 
-const globalForSupabase = globalThis as unknown as {
-  supabase: ReturnType<typeof createClient<Database>> | undefined
-}
-
-export const supabase =
-  globalForSupabase.supabase ??
-  createClient<Database>(
+export function createClient() {
+  return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-
-if (process.env.NODE_ENV !== "production") {
-  globalForSupabase.supabase = supabase
+  );
 }

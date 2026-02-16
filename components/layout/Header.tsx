@@ -21,28 +21,13 @@ export default function Header() {
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
-        {/* Logo */}
-        <Link href="/" className="text-xl font-bold">
-          OurAuto
-        </Link>
-
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-6">
-          <Link href="/about" className="hover:text-primary transition-colors">
-            About
-          </Link>
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg hover:bg-muted transition"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+        <div className="text-2xl font-extrabold tracking-wide text-black">FREE MARKETPLACE</div>
+        <div className="flex items-center gap-6">
           <Link
             href="/login"
             className="bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:opacity-90 transition"
           >
-            Login
+            Dealer Login
           </Link>
         </div>
 

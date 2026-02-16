@@ -1,12 +1,12 @@
 
 import { NextResponse } from "next/server";
-import { createServerClientTyped } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { Database } from "@/lib/supabase/types";
 import { CarSchema } from "./carSchema";
 
 export async function POST(req: Request) {
     try {
-      const supabase = await createServerClientTyped();
+      const supabase = await createClient();
 
       // 1️⃣ Get authenticated user
       const userRes = await supabase.auth.getUser();

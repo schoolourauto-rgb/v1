@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/Button"
-import { supabase } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client"
 
 type Lead = {
   id: string
@@ -13,8 +13,8 @@ type Lead = {
 }
 
 export default function LeadsPanel() {
-  // ✅ ONE supabase instance only
-  // supabase singleton imported above
+  // create supabase client instance
+  const supabase = createClient();
 
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,19 +22,15 @@ export default function LeadsPanel() {
 
   useEffect(() => {
     let isMounted = true
-
     const fetchLeads = async () => {
       try {
         setLoading(true)
 
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser()
-
-        if (userError || !user) {
-          throw new Error("User not authenticated")
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !session) {
+          throw new Error("User not authenticated");
         }
+        const userId = session.user.id;
 
         const { data, error } = await supabase
           .from("leads")
@@ -65,7 +61,7 @@ export default function LeadsPanel() {
     return () => {
       isMounted = false
     }
-  }, [supabase])
+  }, [])
 
   // ...existing code...
   const [selectedChat, setSelectedChat] = useState<any | null>(null);
@@ -80,14 +76,13 @@ export default function LeadsPanel() {
   // ...existing code...
 
   useEffect(() => {
-    // Fetch user info (simulate or replace with actual auth logic)
-    async function fetchUser() {
-      // Replace with actual user fetch if needed
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+    // Fetch session info (SSR-safe)
+    async function fetchSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
     }
-    fetchUser();
-  }, [supabase]);
+    fetchSession();
+  }, []);
   useEffect(() => {
     async function fetchChats() {
       setLoadingChats(true);
@@ -111,7 +106,7 @@ export default function LeadsPanel() {
       setLoadingChats(false);
     }
     if (user) fetchChats();
-  }, [user, supabase]);
+  }, [user]);
 
   useEffect(() => {
     async function fetchMessages() {
@@ -150,7 +145,7 @@ export default function LeadsPanel() {
         supabase.removeChannel(channel);
       }
     };
-  }, [selectedChat, supabase]);
+  }, [selectedChat]);
 
   async function sendMessage() {
     if (!input.trim() || !selectedChat || !user) return;
