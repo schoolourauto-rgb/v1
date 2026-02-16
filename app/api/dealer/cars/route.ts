@@ -36,22 +36,25 @@ export async function POST(req: Request) {
 
 
 
-    // 3️⃣ Parse and validate request body (JSON only)
-    let rawData: any;
-    try {
-      // Support both JSON and multipart/form-data
-      const contentType = req.headers.get("content-type") || "";
-      if (contentType.includes("application/json")) {
-        rawData = await req.json();
-      } else if (contentType.includes("multipart/form-data")) {
-        const formData = await req.formData();
-        rawData = JSON.parse(formData.get("data") as string);
-      } else {
-        return NextResponse.json({ error: "Unsupported content type" }, { status: 400 });
+      // 3️⃣ Parse and validate request body (FormData for image uploads)
+      const formData = await req.formData();
+      const dataStr = formData.get("data");
+      let body = {};
+      if (typeof dataStr === "string") {
+        try {
+          body = JSON.parse(dataStr);
+        } catch (e) {
+          return NextResponse.json({ error: "Invalid JSON in FormData" }, { status: 400 });
+        }
       }
-    } catch (e) {
-      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
-    }
+      // Images
+      const images = formData.getAll("images");
+      console.log("FORM DATA RECEIVED:", { body, images });
+      if (!body || Object.keys(body).length === 0) {
+        return NextResponse.json({ error: "No body" }, { status: 400 });
+      }
+      // ...existing code...
+    // ...existing code...
 
     const parseResult = CarSchema.safeParse({
       ...rawData,

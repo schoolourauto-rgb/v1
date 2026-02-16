@@ -4,26 +4,29 @@ import { generateReferralCode } from '@/lib/utils/generateReferralCode';
 
 export async function POST(req: NextRequest) {
   try {
-    // Log incoming request for debugging
     const body = await req.json();
-    console.log('Signup API request body:', body);
-    const businessName = body.businessName;
-    const ownerName = body.ownerName || body.name;
-    const phone = body.phone || body.mobile;
-    const email = body.email;
-    const password = body.password;
-    const referralCode = body.referralCode || null;
-    const location = body.location || null;
-    if (
-      !businessName?.trim() ||
-      !ownerName?.trim() ||
-      !phone?.trim() ||
-      !email?.trim() ||
-      !password?.trim()
-    ) {
-      console.error('Signup API error: Business Name, Name, Mobile, Email and Password are required.', body);
-      return NextResponse.json(
-        { error: 'Business Name, Name, Mobile, Email and Password are required.' },
+
+    console.log("BODY RECEIVED:", body);
+
+    const businessName = body.businessName?.trim();
+    const ownerName = (body.ownerName || body.name)?.trim();
+    const phone = (body.phone || body.mobile)?.trim();
+    const email = body.email?.trim();
+    const password = body.password?.trim();
+    const referralCode = body.referralCode?.trim() || null;
+    const location = body.location?.trim() || null;
+
+    if (!businessName || !ownerName || !phone || !email || !password) {
+      console.log("Validation failed:", {
+        businessName,
+        ownerName,
+        phone,
+        email,
+        password
+      });
+
+      return Response.json(
+        { error: "Business Name, Name, Mobile, Email and Password are required." },
         { status: 400 }
       );
     }

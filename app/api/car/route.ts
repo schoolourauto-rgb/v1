@@ -25,6 +25,7 @@ export async function POST(req: Request) {
 
   // Parse form
   const formData = await req.formData();
+  console.log("FORM DATA RECEIVED:", Array.from(formData.entries()));
   const token = formData.get("token");
   if (!token) {
     return NextResponse.json({ error: "Missing reCAPTCHA token" }, { status: 400 });

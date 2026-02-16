@@ -3,6 +3,7 @@ import { LeadsService } from "@/lib/services/leads.service"
 
 export async function POST(req: Request) {
   const body = await req.json();
+  console.log("BODY RECEIVED:", body);
   const { car_id, name, email, phone, message } = body;
 
   // Basic validation

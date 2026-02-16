@@ -7,7 +7,9 @@ type CarInsert = Database["public"]["Tables"]["cars"]["Insert"];
 
 export async function POST(req: NextRequest) {
 
-  const { message, token } = await req.json();
+  const body = await req.json();
+  console.log("BODY RECEIVED:", body);
+  const { message, token } = body;
 
 
   if (!token) {
