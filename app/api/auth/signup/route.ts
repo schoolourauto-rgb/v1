@@ -13,15 +13,23 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
   if (rl) return rl;
   const validation = await validateJsonRequest(req, SignupSchema);
   if (validation.error) return validation.response;
-  const { businessName, ownerName, phone, email, password, referralCode, location } = validation.data;
+  const {
+    business_name,
+    contact_person,
+    phone,
+    email,
+    password,
+    location,
+    referral_code,
+  } = validation.data;
   const supabase = await createClient();
   // 1. Handle referral code (if provided)
   let referredBy: string | null = null;
-  if (referralCode && typeof referralCode === 'string') {
+  if (referral_code && typeof referral_code === 'string') {
     const { data: refDealer, error: refError } = await supabase
       .from('dealers')
       .select('id')
-      .eq('referral_code', referralCode.trim().toUpperCase())
+      .eq('referral_code', referral_code.trim().toUpperCase())
       .maybeSingle();
     if (refDealer && !refError) {
       referredBy = refDealer.id;
@@ -39,8 +47,8 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     .from('dealers')
     .insert([
       {
-        name: businessName.trim(),
-        owner_name: ownerName.trim(),
+        name: business_name.trim(),
+        owner_name: contact_person.trim(),
         city: location?.trim() || '',
         phone: phone.trim(),
         email: email.trim(),
