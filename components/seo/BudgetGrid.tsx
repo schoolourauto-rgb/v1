@@ -29,7 +29,7 @@ export default function BudgetGrid({ brand, city }: BudgetGridProps) {
                 ? `/cars/city/${encodeURIComponent(city.toLowerCase())}/budget/under-${b.value / 100000}-lakh`
                 : `/cars/budget/under-${b.value / 100000}-lakh`
             }
-            className="px-3 py-1 bg-gray-100 rounded hover:bg-yellow-100"
+            className="px-3 py-1 bg-yellow-100 rounded hover:bg-yellow-500 text-black transition"
           >
             {b.label}
           </Link>

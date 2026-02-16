@@ -15,6 +15,9 @@ interface Car {
   is_active?: boolean | null
   created_at?: string | null
   car_images?: Array<{ image_url?: string }>
+  dealer_id?: string;
+  dealer_name?: string;
+  activeDealer?: boolean;
 }
 
 export default async function MarketplacePage({ searchParams }: { searchParams?: Promise<any> }) {
@@ -125,6 +128,7 @@ export default async function MarketplacePage({ searchParams }: { searchParams?:
                   year={car.year}
                   price={formatPrice(car.price)}
                   location={car.city || ""}
+                  dealer={car.dealer_id ? { id: car.dealer_id, name: car.dealer_name || 'Dealer', activeDealer: car.activeDealer } : undefined}
                 />
               ))}
             </div>

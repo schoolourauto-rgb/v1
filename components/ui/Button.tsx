@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "outline";
+  variant?: "primary" | "secondary";
 };
 
 export function Button({
@@ -10,15 +10,13 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
+    "inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 hover:brightness-110 active:scale-95";
 
   const variants = {
     primary:
-      "bg-foreground text-background hover:opacity-90",
+      "bg-yellow-500 text-black hover:scale-105",
     secondary:
-      "bg-muted text-foreground hover:bg-muted/80",
-    outline:
-      "border border-foreground text-foreground hover:bg-foreground hover:text-background",
+      "border border-yellow-500 text-black dark:text-white hover:bg-yellow-500 hover:text-black",
   };
 
   return (

@@ -17,7 +17,7 @@ export function ListingCard({
 }: ListingCardProps) {
   return (
     <Card>
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-muted">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900">
         <Image
           src={imageUrl}
           alt={title}
@@ -28,21 +28,21 @@ export function ListingCard({
         />
       </div>
 
-      <div className="mt-4">
-        <h3 className="line-clamp-1 text-lg font-semibold">
+      <div className="mt-6">
+        <h3 className="line-clamp-1 text-xl font-semibold text-black dark:text-white">
           {title}
         </h3>
 
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-2 text-base text-black/60 dark:text-gray-300">
           {mileage}
         </p>
 
-        <p className="mt-2 text-xl font-bold">
+        <p className="mt-3 text-2xl font-bold text-black dark:text-white">
           {price}
         </p>
 
-        <div className="mt-4">
-          <Button className="w-full">
+        <div className="mt-6">
+          <Button className="w-full" variant="secondary">
             View Details
           </Button>
         </div>

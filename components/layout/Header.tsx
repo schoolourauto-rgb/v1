@@ -1,69 +1,40 @@
 
 "use client"
 
+
+"use client"
+
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Menu, X, Sun, Moon } from "lucide-react"
 import { useTheme } from "next-themes"
 
+
 export default function Header() {
-  const [open, setOpen] = useState(false)
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-
-        <div className="text-2xl font-extrabold tracking-wide text-black">FREE MARKETPLACE</div>
-        <div className="flex items-center gap-6">
+    <header className="border-b border-yellow-500 bg-white dark:bg-black sticky top-0 z-30 transition-colors duration-200">
+      <div className="max-w-6xl mx-auto flex items-center justify-between h-16 px-4">
+        <span className="font-semibold tracking-wide text-base select-none text-black dark:text-white">FREE MARKETPLACE</span>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-xl p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
           <Link
-            href="/login"
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:opacity-90 transition"
+            href="/auth/login"
+            className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-lg"
           >
             Dealer Login
           </Link>
         </div>
-
-        {/* Mobile Controls */}
-        <div className="md:hidden flex items-center gap-3">
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg hover:bg-muted transition"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-          <Link
-            href="/login"
-            className="bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-sm"
-          >
-            Login
-          </Link>
-          <button onClick={() => setOpen(!open)}>
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
       </div>
-
-      {/* Mobile Dropdown */}
-      {open && (
-        <div className="md:hidden bg-card border-t border-border px-4 py-4 space-y-4">
-          <Link
-            href="/about"
-            onClick={() => setOpen(false)}
-            className="block"
-          >
-            About
-          </Link>
-        </div>
-      )}
     </header>
-  )
+  );
 }

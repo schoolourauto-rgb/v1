@@ -23,7 +23,7 @@ export default function RelatedSearchBlock({ brand, city, fuel, transmission, pr
       <h3 className="text-lg font-semibold mb-2">Related Searches</h3>
       <div className="flex flex-wrap gap-2">
         {links.map((link) => (
-          <Link key={link!.href} href={link!.href} className="px-3 py-1 bg-gray-100 rounded hover:bg-yellow-100">
+          <Link key={link!.href} href={link!.href} className="px-3 py-1 bg-yellow-100 rounded hover:bg-yellow-500 text-black transition">
             {link!.label}
           </Link>
         ))}

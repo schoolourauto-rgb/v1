@@ -16,13 +16,13 @@ export default function Logo() {
              L390 70 
              Q360 55 300 50 
              Q200 45 120 70 Z"
-          fill="#EAB308"
+          fill="#FFD600"
         />
 
         {/* Speed line accent */}
         <path
           d="M90 78 Q160 60 250 65"
-          stroke="#EAB308"
+          stroke="#FFD600"
           strokeWidth="4"
           fill="none"
         />

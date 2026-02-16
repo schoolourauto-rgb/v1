@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+
 export default function AddCarPage() {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -15,11 +16,13 @@ export default function AddCarPage() {
     fuel_type: "",
     transmission: "",
     description: "",
+    listingTier: "simple", // Simulate tier selection
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -58,6 +61,21 @@ export default function AddCarPage() {
     <div className="p-6 max-w-xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Add Car</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* --- 3-TIER LISTING TYPE --- */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Listing Type:</label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-1 text-xs">
+              <input type="radio" name="listingTier" value="simple" checked={form.listingTier === "simple"} onChange={handleChange} /> Simple
+            </label>
+            <label className="flex items-center gap-1 text-xs">
+              <input type="radio" name="listingTier" value="featured" checked={form.listingTier === "featured"} onChange={handleChange} /> Featured
+            </label>
+            <label className="flex items-center gap-1 text-xs">
+              <input type="radio" name="listingTier" value="hot" checked={form.listingTier === "hot"} onChange={handleChange} /> Hot Deal
+            </label>
+          </div>
+        </div>
         <input name="title" value={form.title} onChange={handleChange} placeholder="Title*" className="w-full p-2 border rounded" required />
         <input name="brand" value={form.brand} onChange={handleChange} placeholder="Brand*" className="w-full p-2 border rounded" required />
         <input name="model" value={form.model} onChange={handleChange} placeholder="Model*" className="w-full p-2 border rounded" required />

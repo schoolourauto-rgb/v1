@@ -16,7 +16,7 @@ export default function CityGrid({ brand, cities }: CityGridProps) {
           <Link
             key={city}
             href={brand ? `/cars/${encodeURIComponent(brand.toLowerCase())}/city/${encodeURIComponent(city.toLowerCase())}` : `/cars/city/${encodeURIComponent(city.toLowerCase())}`}
-            className="px-3 py-1 bg-gray-100 rounded hover:bg-yellow-100"
+            className="px-3 py-1 bg-yellow-100 rounded hover:bg-yellow-500 text-black transition"
           >
             {capitalize(city)}
           </Link>

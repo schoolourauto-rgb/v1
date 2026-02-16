@@ -32,7 +32,7 @@ export default async function DealerProfilePage({ params }: { params: { id: stri
     // Fetch dealer profile (minimal columns)
     const { data: dealer, error: dealerError } = await supabase
       .from('dealers')
-      .select('id, business_name, city, mobile')
+      .select('id, business_name, city, mobile, created_at, activeDealer')
       .eq('id', params.id)
       .maybeSingle();
 
@@ -45,11 +45,13 @@ export default async function DealerProfilePage({ params }: { params: { id: stri
       notFound();
     }
 
-    // Fetch dealer's cars (minimal columns)
+    // Fetch dealer's active cars, sorted by priorityScore DESC
     const { data: carsData, error: carsError } = await supabase
       .from('cars')
-      .select('id, title, brand, model, year, price, fuel_type, city, transmission, car_images(image_url)')
-      .eq('dealer_id', dealer.id);
+      .select('id, title, brand, model, year, price, fuel_type, city, transmission, car_images(image_url), priorityScore, status')
+      .eq('dealer_id', dealer.id)
+      .eq('status', 'active')
+      .order('priorityScore', { ascending: false });
     if (carsError) {
       console.error('Fetch cars error', carsError.message);
     }
@@ -69,6 +71,11 @@ export default async function DealerProfilePage({ params }: { params: { id: stri
         image: row.car_images?.[0]?.image_url ?? '/logo.png',
         location: row.city ?? dealer?.city ?? 'N/A',
       })) ?? [];
+
+    // Count of active listings
+    const totalActiveListings = cars.length;
+    // Format joined date
+    const joinedDate = dealer.created_at ? new Date(dealer.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' }) : '-';
 
     // Structured data for SEO
     const schemaDealer = {
@@ -91,38 +98,40 @@ export default async function DealerProfilePage({ params }: { params: { id: stri
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaDealer) }}
         />
-        <div className="min-h-screen bg-background text-foreground py-12 max-w-5xl mx-auto">
-          <div className="mb-10 text-center">
-            <h1 className="text-3xl font-bold mb-2">{dealer.business_name}</h1>
-            <p className="text-lg text-muted-foreground mb-2">City: {dealer.city || 'N/A'}</p>
-            <p className="text-lg text-muted-foreground mb-2">Phone: {dealer.mobile || 'N/A'}</p>
-          </div>
-          {/* Internal links for topic clusters */}
-          <div className="flex flex-wrap gap-4 justify-center mb-8">
-            <a href={`/cars-in-${dealer.city?.toLowerCase() || ''}`} className="text-sm bg-neutral-900 text-yellow-500 px-4 py-2 rounded hover:bg-yellow-500 hover:text-black transition">
-              Cars in {dealer.city}
-            </a>
-            <a href={`/dealers-in-${dealer.city?.toLowerCase() || ''}`} className="text-sm bg-neutral-900 text-yellow-500 px-4 py-2 rounded hover:bg-yellow-500 hover:text-black transition">
-              Other dealers in {dealer.city}
-            </a>
+        <div className="max-w-3xl mx-auto py-8">
+          <div className="mb-6 border-b pb-4">
+            <div className="flex items-center gap-3 mb-1">
+              <span className="text-xl font-semibold">{dealer.business_name}</span>
+              {dealer.activeDealer && (
+                <span className="px-2 py-[2px] border border-border rounded text-xs text-muted-foreground bg-background/80 backdrop-blur-sm select-none" style={{fontWeight: 500, letterSpacing: 0.1}}>Active Dealer</span>
+              )}
+            </div>
+            <div className="text-sm text-muted-foreground flex flex-wrap gap-4">
+              <span>City: {dealer.city || '-'}</span>
+              <span>Joined: {joinedDate}</span>
+              <span>Active Listings: {totalActiveListings}</span>
+            </div>
           </div>
           <div>
-            <h2 className="text-2xl font-semibold mb-6">Cars Listed by {dealer.business_name}</h2>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {cars.length > 0 ? (
-                cars.map((car) => (
-                  <CarCard
-                    key={car.id}
-                    id={car.id}
-                    image={car.image}
-                    title={car.title}
-                    year={car.year}
-                    price={car.price?.toLocaleString?.('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }) ?? ''}
-                    location={car.location}
-                  />
-                ))
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {cars.length === 0 ? (
+                <div className="col-span-full text-center text-muted-foreground py-12">
+                  No active inventory for this dealer.
+                </div>
               ) : (
-                <p className="text-muted-foreground col-span-full">No cars listed yet.</p>
+                cars.map((car) => (
+                  <div key={car.id} className="relative">
+                    <CarCard
+                      id={car.id}
+                      image={car.image}
+                      title={car.title}
+                      year={car.year}
+                      price={typeof car.price === 'number' ? '₹' + car.price.toLocaleString('en-IN') : car.price}
+                      location={car.location}
+                      dealer={{ id: dealer.id, name: dealer.business_name, activeDealer: dealer.activeDealer }}
+                    />
+                  </div>
+                ))
               )}
             </div>
           </div>
