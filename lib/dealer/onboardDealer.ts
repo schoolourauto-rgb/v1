@@ -21,17 +21,6 @@ export async function onboardDealer(user_id: string): Promise<Dealer | null> {
     if (dealer) return dealer as Dealer;
     // Insert new dealer
     const { data: inserted, error: insertError } = await supabase
-      .insert([
-        {
-          user_id,
-          verified: false,
-          dealership_name: "",
-          phone: "",
-          location: "",
-        },
-      ])
-      .select("id, user_id, verified, dealership_name, phone, location, created_at")
-      .maybeSingle();
       .from("dealers")
       .insert([
         {
@@ -47,8 +36,8 @@ export async function onboardDealer(user_id: string): Promise<Dealer | null> {
           referral_rewarded: false
         },
       ])
-      .select("id, user_id, name, city, phone, referral_code, verified, featured_ads_credit, hot_deal_credit, total_listings, referral_rewarded, created_at")
-      .maybeSingle();
+      .select()
+      .single();
     if (insertError) {
       console.error("onboardDealer insert error", insertError);
       return null;

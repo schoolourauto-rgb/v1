@@ -112,19 +112,11 @@ export default function SignupPage() {
       return;
     }
     const dealerInsertPayload = {
-      dealership_name: businessName,
-      phone,
-      location,
-      referral_code: newReferralCode,
-      referred_by: referredBy,
-      verified: false,
-    };
       user_id: userId,
       name: businessName.trim(),
       city: location.trim(),
       phone: phone.trim(),
       referral_code: newReferralCode,
-      verified: false,
       featured_ads_credit: 0,
       hot_deal_credit: 0,
       total_listings: 0,
@@ -137,8 +129,8 @@ export default function SignupPage() {
       .insert([
         dealerInsertPayload,
       ])
-      .select('id')
-      .maybeSingle();
+      .select()
+      .single();
     // Console log: after dealer insert
     console.log("[Signup] After dealer insert", { dealer, dealerError });
     if (dealerError || !dealer) {
