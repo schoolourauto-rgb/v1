@@ -24,6 +24,17 @@ export default function LoginPage() {
             Login
           </button>
         </form>
+          <div className="text-center mt-6">
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              Don’t have an account?
+            </p>
+            <a
+              href="/auth/signup"
+              className="text-yellow-500 font-semibold hover:underline"
+            >
+              Create Dealer Account
+            </a>
+          </div>
       </div>
     </div>
   )

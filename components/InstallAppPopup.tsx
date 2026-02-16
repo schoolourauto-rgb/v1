@@ -19,10 +19,20 @@ export default function InstallAppPopup({ onComplete }: InstallAppPopupProps) {
   const [show, setShow] = useState(false);
   const [installReady, setInstallReady] = useState(false);
 
+  // Detect if device is mobile
+  function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  // Check if app is already installed
+  function isAppInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
   // Only show if not already shown in this session
   useEffect(() => {
     if (localStorage.getItem("installPromptShown") === "true") return;
     let promptEvent: BeforeInstallPromptEvent | null = null;
+    if (!isMobile() || isAppInstalled()) return;
     const handler = (e: Event) => {
       e.preventDefault();
       promptEvent = e as BeforeInstallPromptEvent;
@@ -39,6 +49,7 @@ export default function InstallAppPopup({ onComplete }: InstallAppPopupProps) {
   useEffect(() => {
     if (!installReady) return;
     if (localStorage.getItem("installPromptShown") === "true") return;
+    if (!isMobile() || isAppInstalled()) return;
     let shown = false;
     const showPopup = () => {
       if (!shown) {
@@ -76,7 +87,7 @@ export default function InstallAppPopup({ onComplete }: InstallAppPopupProps) {
 
   // If not ready or already shown, render nothing
   if (!show || localStorage.getItem("installPromptShown") === "true") return null;
-
+  if (!show || localStorage.getItem("installPromptShown") === "true" || !isMobile() || isAppInstalled()) return null;
   return (
     <div className="fixed bottom-4 left-4 right-4 bg-card border border-border rounded-xl p-4 shadow-lg z-50">
       <h3 className="font-semibold mb-2">Install OurAuto App</h3>

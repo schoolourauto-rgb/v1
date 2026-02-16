@@ -86,7 +86,7 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
 
       {/* HEADER: SAFE, PREMIUM */}
       <header className="w-full border-b border-neutral-200 dark:border-neutral-800 backdrop-blur-sm bg-white/80 dark:bg-black/80 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto flex items-center justify-between h-16 px-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between py-3 sm:py-4 px-4 sm:px-6">
           <span className="font-semibold tracking-tight text-lg md:text-xl select-none">FREE MARKETPLACE</span>
           <div className="flex items-center gap-4">
             {/* Theme Toggle (do not remove) */}
@@ -98,26 +98,12 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
       </header>
 
       {/* SEARCH: PREMIUM */}
-      <section className="flex justify-center py-20 px-4">
+      <section className="flex justify-center py-16 sm:py-20 px-4 sm:px-6">
         <form className="w-full">
           <input
             type="text"
             placeholder="Search by Brand, Model or City"
-            className="
-              w-full
-              max-w-2xl
-              mx-auto
-              rounded-full
-              px-6 py-4
-              bg-white dark:bg-neutral-900
-              text-black dark:text-white
-              placeholder:text-neutral-400 dark:placeholder:text-neutral-500
-              border border-yellow-500/40
-              focus:outline-none
-              focus:ring-2 focus:ring-yellow-500
-              transition-all duration-200
-              shadow-sm
-            "
+            className="w-full rounded-full px-4 sm:px-6 py-4 bg-white dark:bg-neutral-900 text-black dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 border border-yellow-500/40 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all duration-200 shadow-sm"
             disabled
             style={{ boxShadow: '0 2px 16px 0 rgba(255, 221, 51, 0.08)' }}
           />
@@ -125,7 +111,7 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
       </section>
 
       {/* TRUST STRIP: PREMIUM */}
-      <section className="w-full py-20">
+      <section className="w-full py-16 sm:py-20">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-8 text-base md:text-lg font-semibold tracking-tight text-black dark:text-white text-center pb-3">
           <span className="flex items-center gap-2"><svg width="18" height="18" fill="none" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="#FACC15"/><path d="M6.5 10.5l2 2 5-5" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>Verified Dealers</span>
           <span className="flex items-center gap-2"><svg width="18" height="18" fill="none" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="#FACC15"/><path d="M6.5 10.5l2 2 5-5" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>Direct Contact</span>
@@ -135,8 +121,13 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
       </section>
 
       {/* INVENTORY SECTION: STRUCTURED */}
-      <section className="max-w-6xl mx-auto px-4 py-20 flex-1 w-full">
-        {/* ...existing code for listing grid and pagination... */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20 flex-1 w-full">
+        {/* Listing grid example: */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Render CarCard with p-4 sm:p-5, ensure buttons w-full sm:w-auto */}
+          {/* ...existing code for mapping listings... */}
+        </div>
+        {/* ...existing code for pagination, ensure buttons w-full sm:w-auto ... */}
       </section>
 
       {/* FOOTER placeholder (if needed, can be replaced with actual Footer component) */}
