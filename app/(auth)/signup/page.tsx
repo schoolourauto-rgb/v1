@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+import { generateReferralCode } from '@/lib/utils/generateReferralCode';
 
 export default function SignupPage() {
   // create supabase client instance
@@ -33,29 +34,94 @@ export default function SignupPage() {
 
     const supabase = createClient();
     if (!supabase) {
-      setError('Supabase client not configured. Check environment variables.')
-      setLoading(false)
-      return
+      setError('Supabase client not configured. Check environment variables.');
+      setLoading(false);
+      return;
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    // 1. Sign up user
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
     });
 
-    if (error) {
-      if (error.message.includes("User already registered")) {
-        setError("Account already exists. Please login.");
+    if (authError) {
+      if (authError.message.includes('User already registered')) {
+        setError('Account already exists. Please login.');
       } else {
-        setError(error.message);
+        setError(authError.message);
       }
       setLoading(false);
       return;
     }
 
+    // 2. Prepare dealer insert
+    let referredBy: string | null = null;
+    const referralCodeInput = form.referral_code.trim().toUpperCase();
+    if (referralCodeInput) {
+      // Check if referral code exists
+      const { data: refDealer, error: refError } = await supabase
+        .from('dealers')
+        .select('id')
+        .eq('referral_code', referralCodeInput)
+        .maybeSingle();
+      if (refDealer && !refError) {
+        referredBy = refDealer.id;
+      }
+    }
+
+    // 3. Generate unique referral code for this dealer
+    let newReferralCode = '';
+    try {
+      newReferralCode = await generateReferralCode();
+    } catch (e) {
+      // fallback: random code (should not happen)
+      newReferralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+    }
+
+    // 4. Insert dealer row
+    const userId = authData?.user?.id;
+    if (!userId) {
+      setError('Signup failed: No user ID returned.');
+      setLoading(false);
+      return;
+    }
+    const { data: dealer, error: dealerError } = await supabase
+      .from('dealers')
+      .insert([
+        {
+          user_id: userId,
+          dealership_name: form.business_name,
+          phone: form.mobile,
+          referral_code: newReferralCode,
+          referred_by: referredBy,
+          verified: false,
+        },
+      ])
+      .select('id')
+      .maybeSingle();
+    if (dealerError || !dealer) {
+      setError('Signup failed: Could not create dealer profile.');
+      setLoading(false);
+      return;
+    }
+
+    // 5. Call reward_referrer RPC if referredBy exists
+    if (referredBy) {
+      try {
+        await supabase.rpc('reward_referrer', { new_dealer: dealer.id });
+      } catch (e) {
+        // Do not block signup, do not log in production
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('Referral reward RPC failed', e);
+        }
+      }
+    }
+
     setLoading(false);
-    router.push("/dealer/dashboard");
-  }
+    router.push('/dealer/dashboard');
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">

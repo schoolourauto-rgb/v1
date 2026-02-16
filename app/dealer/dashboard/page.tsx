@@ -3,8 +3,14 @@ export const dynamic = "force-dynamic"
 
 import { createClient } from "@/lib/supabase/server";
 import { getServerUser } from "@/lib/supabase/getServerUser";
+
 import { Button } from "@/components/ui/Button";
+import { ReferralShare } from "@/components/dealer/ReferralShare";
 import Link from "next/link";
+
+import { MomentumLayer } from "@/components/dealer/MomentumLayer";
+
+import SmartSuggestion from "@/components/dealer/SmartSuggestion";
 
 interface Car {
   id: string;
@@ -22,12 +28,27 @@ export default async function DealerDashboard() {
   // Fetch dealer
   const { data: dealer } = await supabase
     .from("dealers")
-    .select("id, dealership_name, phone, verified")
+    .select("id, dealership_name, phone, verified, referral_code")
     .eq("user_id", user.id)
     .maybeSingle();
   if (!dealer) {
     return <div className="p-8">Dealer profile not found.</div>;
   }
+
+  // Fetch featured ads credit
+  const { data: wallet } = await supabase
+    .from("dealer_wallet")
+    .select("featured_credits")
+    .eq("dealer_id", dealer.id)
+    .maybeSingle();
+
+  // Fetch dealer stats: total_listings, hot_deals_used
+  const { data: dealerStats } = await supabase
+    .from("dealers")
+    .select("total_listings, hot_deals_used")
+    .eq("id", dealer.id)
+    .maybeSingle();
+
   // Fetch cars
   const { data: cars } = await supabase
     .from("cars")
@@ -36,9 +57,29 @@ export default async function DealerDashboard() {
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
+  // Gamification calculations
+  const totalListings = dealerStats?.total_listings ?? 0;
+  const hotDealsUsed = dealerStats?.hot_deals_used ?? 0;
+  const availableHotDeals = Math.floor(totalListings / 10) - hotDealsUsed;
+  let nextUnlock = 10 - (totalListings % 10);
+  if (nextUnlock === 10) nextUnlock = 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+        {/* Momentum Layer: Motivation, Progress, Credits */}
+        <div className="w-full mb-8">
+          <MomentumLayer
+            totalListings={totalListings}
+            hotDealsUsed={hotDealsUsed}
+            featuredCredits={wallet?.featured_credits ?? 0}
+          />
+          <SmartSuggestion
+            totalListings={totalListings}
+            featuredCredits={wallet?.featured_credits ?? 0}
+            hotDealsAvailable={availableHotDeals}
+          />
+        </div>
         <div className="flex flex-col gap-4 mb-2">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Dealer Dashboard</h1>
@@ -142,6 +183,13 @@ export default async function DealerDashboard() {
               <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-100 text-green-700 rounded px-2 py-0.5 mb-2">{dealer.verified ? "✔ Verified Dealer" : "Unverified"}</span>
               <span className="text-muted-foreground text-sm mb-3">{dealer.phone || "dealer@email.com"}</span>
               <Button variant="secondary">Edit Profile</Button>
+              {/* Referral Sharing Upgrade */}
+              <div className="w-full mt-6">
+                <ReferralShare referralCode={dealer.referral_code} />
+                <div className="mt-2 text-sm font-medium text-yellow-900 dark:text-yellow-200 text-center">
+                  Featured Ads Credit: <span className="font-bold">{wallet?.featured_credits ?? 0}</span>
+                </div>
+              </div>
             </div>
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm transition-all duration-200">
               <h3 className="font-semibold mb-3">Guidelines</h3>

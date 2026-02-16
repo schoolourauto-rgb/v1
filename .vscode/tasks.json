@@ -18,6 +18,16 @@
 			"problemMatcher": [
 				"$tsc"
 			]
+		},
+		{
+			"label": "Next.js build (referral integration)",
+			"type": "shell",
+			"command": "npm run build",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
 		}
 	]
 }

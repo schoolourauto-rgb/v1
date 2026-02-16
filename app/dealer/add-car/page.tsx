@@ -1,6 +1,10 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getDealerListingEligibility } from "@/lib/marketplace/getDealerListingEligibility";
+import { createClient } from "@/lib/supabase/client";
+
 
 
 export default function AddCarPage() {
@@ -16,11 +20,38 @@ export default function AddCarPage() {
     fuel_type: "",
     transmission: "",
     description: "",
-    listingTier: "simple", // Simulate tier selection
+    listingTier: "simple",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [eligibility, setEligibility] = useState<{
+    featuredEligible: boolean;
+    featuredCredits: number;
+    hotDealEligible: boolean;
+    hotDealAvailable: number;
+    totalListings: number;
+    nextHotDealUnlock: number;
+  } | null>(null);
+  const [dealerId, setDealerId] = useState<string | null>(null);
 
+  // Fetch dealerId and eligibility on mount
+  useEffect(() => {
+    async function fetchEligibility() {
+      const supabase = createClient();
+      const { data: user } = await supabase.auth.getUser();
+      if (!user?.user?.id) return;
+      const { data: dealer } = await supabase
+        .from("dealers")
+        .select("id")
+        .eq("user_id", user.user.id)
+        .maybeSingle();
+      if (!dealer?.id) return;
+      setDealerId(dealer.id);
+      const result = await getDealerListingEligibility(dealer.id);
+      setEligibility(result);
+    }
+    fetchEligibility();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -33,6 +64,17 @@ export default function AddCarPage() {
     // Validate required fields
     if (!form.title || !form.brand || !form.model || !form.year || !form.price) {
       setError("Please fill all required fields.");
+      setLoading(false);
+      return;
+    }
+    // Smart Lock: Prevent submission exploit
+    if (form.listingTier === "featured" && eligibility && !eligibility.featuredEligible) {
+      setForm(f => ({ ...f, listingTier: "simple" }));
+      setLoading(false);
+      return;
+    }
+    if (form.listingTier === "hot" && eligibility && !eligibility.hotDealEligible) {
+      setForm(f => ({ ...f, listingTier: "simple" }));
       setLoading(false);
       return;
     }
@@ -65,14 +107,57 @@ export default function AddCarPage() {
         <div>
           <label className="block text-sm font-medium mb-1">Listing Type:</label>
           <div className="flex gap-4">
-            <label className="flex items-center gap-1 text-xs">
-              <input type="radio" name="listingTier" value="simple" checked={form.listingTier === "simple"} onChange={handleChange} /> Simple
+            {/* Simple */}
+            <label className="flex flex-col items-center gap-1 text-xs">
+              <input
+                type="radio"
+                name="listingTier"
+                value="simple"
+                checked={form.listingTier === "simple"}
+                onChange={handleChange}
+                className="accent-yellow-500"
+              />
+              <span className="font-medium">Simple</span>
             </label>
-            <label className="flex items-center gap-1 text-xs">
-              <input type="radio" name="listingTier" value="featured" checked={form.listingTier === "featured"} onChange={handleChange} /> Featured
+            {/* Featured */}
+            <label
+              className={`flex flex-col items-center gap-1 text-xs transition-opacity ${eligibility && !eligibility.featuredEligible ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <input
+                type="radio"
+                name="listingTier"
+                value="featured"
+                checked={form.listingTier === "featured"}
+                onChange={handleChange}
+                disabled={eligibility ? !eligibility.featuredEligible : true}
+                className="accent-yellow-500"
+              />
+              <span className="font-medium">Featured</span>
+              {eligibility && !eligibility.featuredEligible && (
+                <span className="text-xs mt-1 text-neutral-500 dark:text-neutral-400">
+                  Invite dealers to earn 5 Featured credits.
+                </span>
+              )}
             </label>
-            <label className="flex items-center gap-1 text-xs">
-              <input type="radio" name="listingTier" value="hot" checked={form.listingTier === "hot"} onChange={handleChange} /> Hot Deal
+            {/* Hot Deal */}
+            <label
+              className={`flex flex-col items-center gap-1 text-xs transition-opacity ${eligibility && !eligibility.hotDealEligible ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <input
+                type="radio"
+                name="listingTier"
+                value="hot"
+                checked={form.listingTier === "hot"}
+                onChange={handleChange}
+                disabled={eligibility ? !eligibility.hotDealEligible : true}
+                className="accent-yellow-500"
+              />
+              <span className="font-medium">Hot Deal</span>
+              {eligibility && !eligibility.hotDealEligible && (
+                <span className="text-xs mt-1 text-neutral-500 dark:text-neutral-400">
+                  Post {eligibility.nextHotDealUnlock} more listings to unlock.
+                </span>
+              )}
             </label>
           </div>
         </div>
