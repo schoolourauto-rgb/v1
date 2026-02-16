@@ -4,6 +4,11 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 module.exports = withBundleAnalyzer({
   images: {
-    domains: ["your-project-id.supabase.co"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'your-project-id.supabase.co',
+      },
+    ],
   },
 });
