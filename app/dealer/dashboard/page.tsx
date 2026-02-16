@@ -28,7 +28,7 @@ export default async function DealerDashboard() {
   // Fetch dealer
   const { data: dealer } = await supabase
     .from("dealers")
-    .select("id, dealership_name, phone, verified, referral_code")
+    .select("id, dealership_name, phone, verified, referral_code, city")
     .eq("user_id", user.id)
     .maybeSingle();
   if (!dealer) {
@@ -182,14 +182,22 @@ export default async function DealerDashboard() {
               <span className="font-semibold text-lg mb-1">{dealer.dealership_name || "Demo Dealer"}</span>
               <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-100 text-green-700 rounded px-2 py-0.5 mb-2">{dealer.verified ? "✔ Verified Dealer" : "Unverified"}</span>
               <span className="text-muted-foreground text-sm mb-3">{dealer.phone || "dealer@email.com"}</span>
+              {dealer.city && (
+                <span className="text-muted-foreground text-sm mb-1">Location: {dealer.city}</span>
+              )}
+              {dealer.referral_code && (
+                <span className="text-muted-foreground text-sm mb-1">Referral Code: {dealer.referral_code}</span>
+              )}
               <Button variant="secondary">Edit Profile</Button>
               {/* Referral Sharing Upgrade */}
-              <div className="w-full mt-6">
-                <ReferralShare referralCode={dealer.referral_code} />
-                <div className="mt-2 text-sm font-medium text-yellow-900 dark:text-yellow-200 text-center">
-                  Featured Ads Credit: <span className="font-bold">{wallet?.featured_credits ?? 0}</span>
+              {dealer.referral_code && (
+                <div className="w-full mt-6">
+                  <ReferralShare referralCode={dealer.referral_code} />
+                  <div className="mt-2 text-sm font-medium text-yellow-900 dark:text-yellow-200 text-center">
+                    Featured Ads Credit: <span className="font-bold">{wallet?.featured_credits ?? 0}</span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm transition-all duration-200">
               <h3 className="font-semibold mb-3">Guidelines</h3>

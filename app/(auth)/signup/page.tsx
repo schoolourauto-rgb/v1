@@ -36,38 +36,34 @@ export default function SignupPage() {
     console.log("[Signup] Before validation", form);
 
     // Validation
-    const businessName = form.business_name.trim();
-    const ownerName = form.owner_name.trim();
-    const phone = form.mobile.trim();
-    const email = form.email.trim();
-    const password = form.password.trim();
-    const location = form.location.trim();
-    const referralCodeInput = form.referral_code.trim().toUpperCase();
+    const businessName = form.business_name;
+    const ownerName = form.owner_name;
+    const phone = form.mobile;
+    const email = form.email;
+    const password = form.password;
+    const location = form.location;
+    const referralCodeInput = form.referral_code;
 
-    // Console log: after validation values
-    console.log("[Signup] After validation values", { businessName, ownerName, phone, email, password, location });
+    // Cleaned values for insert
+    const cleanedBusinessName = businessName.trim();
+    const cleanedOwnerName = ownerName.trim();
+    const cleanedPhone = phone.trim();
+    const cleanedEmail = email.trim();
+    const cleanedPassword = password.trim();
+    const cleanedLocation = location?.trim();
+    const cleanedReferralCode = referralCodeInput?.trim().toUpperCase();
 
-    // Log each variable individually
-    console.log("[Signup] businessName:", businessName);
-    console.log("[Signup] ownerName:", ownerName);
-    console.log("[Signup] phone:", phone);
-    console.log("[Signup] email:", email);
-    console.log("[Signup] password:", password);
-    console.log("[Signup] location:", location);
-
-    // Nuclear safe validation
+    // Required fields validation
     const isInvalid = [
-      businessName,
-      ownerName,
-      phone,
-      email,
-      password,
-      location
+      cleanedBusinessName,
+      cleanedOwnerName,
+      cleanedPhone,
+      cleanedEmail,
+      cleanedPassword
     ].some((field) => !field || field.trim() === '');
 
     if (isInvalid) {
-      console.log("[Signup] Validation failed: missing required fields", { businessName, ownerName, phone, email, password, location });
-      setError('Missing required fields');
+      setError("Business Name, Name, Mobile, Email and Password are required.");
       setLoading(false);
       return;
     }
@@ -131,10 +127,10 @@ export default function SignupPage() {
     }
     const dealerInsertPayload = {
       user_id: userId,
-      name: businessName.trim(),
-      city: location.trim(),
-      phone: phone.trim(),
-      referral_code: newReferralCode,
+      name: cleanedBusinessName,
+      city: cleanedLocation || null,
+      phone: cleanedPhone,
+      referral_code: cleanedReferralCode || null,
       featured_ads_credit: 0,
       hot_deal_credit: 0,
       total_listings: 0,
