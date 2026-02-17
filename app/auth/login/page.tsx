@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,40 +41,48 @@ export default function LoginPage() {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded-xl shadow-md w-96"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Dealer Login
-        </h2>
-
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full mb-4 p-3 border rounded-lg"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full mb-6 p-3 border rounded-lg"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-yellow-500 text-black py-3 rounded-lg font-semibold"
+      <div>
+        <form
+          onSubmit={handleLogin}
+          className="bg-white p-8 rounded-xl shadow-md w-96"
         >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+          <h2 className="text-2xl font-bold mb-6 text-center">
+            Dealer Login
+          </h2>
+
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full mb-4 p-3 border rounded-lg"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full mb-6 p-3 border rounded-lg"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-yellow-500 text-black py-3 rounded-lg font-semibold"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+        <div className="mt-4 text-center text-sm">
+          Don’t have an account?{" "}
+          <Link href="/auth/signup" className="text-yellow-500 hover:underline">
+            Create Dealer Account
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
