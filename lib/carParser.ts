@@ -219,19 +219,6 @@ export function parseCarText(text: string): ParseCarTextResult {
   return {
     structuredFields,
     detectedFeatures,
-    rawText: text,
-
-  model = model ? model.trim().replace(/\s+/g, " ") : "";
-  // Version parsing
-  // RegNo parsing
-
-  // Mileage
-  // Price (strict extraction)
-  // Error validation
-  // No color field in DB, skip color parsing
-  // Use structuredFields directly for make, model, version, regNo
-  // Remove undefined get() usage
-    images: imageUrls,
-    errors,
+    rawText: text
   };
 }
