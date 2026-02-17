@@ -18,45 +18,73 @@ interface Car {
   is_active?: boolean | null;
 }
 
-export default async function DealerDashboard() {
-  const user = await getServerUser();
-  if (!user) {
-    return <div className="p-8">User not found.</div>;
+"use client";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+export default function DealerDashboard() {
+  const [loading, setLoading] = useState(true);
+  const [dealer, setDealer] = useState<any>(null);
+  const [wallet, setWallet] = useState<any>(null);
+  const [dealerStats, setDealerStats] = useState<any>(null);
+  const [cars, setCars] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchDealer = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const { data: dealer } = await supabase
+        .from("dealers")
+        .select("id, dealership_name, phone, verified, referral_code, city")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!dealer) {
+        setLoading(false);
+        return;
+      }
+      setDealer(dealer);
+
+      const { data: wallet } = await supabase
+        .from("dealer_wallet")
+        .select("featured_credits")
+        .eq("dealer_id", dealer.id)
+        .maybeSingle();
+      setWallet(wallet);
+
+      const { data: dealerStats } = await supabase
+        .from("dealers")
+        .select("total_listings, hot_deals_used")
+        .eq("id", dealer.id)
+        .maybeSingle();
+      setDealerStats(dealerStats);
+
+      const { data: cars } = await supabase
+        .from("cars")
+        .select("id, title, price, is_active")
+        .eq("dealer_id", dealer.id)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      setCars(cars || []);
+
+      setLoading(false);
+    };
+    fetchDealer();
+  }, []);
+
+  if (loading) {
+    return <div className="text-gray-400 p-8">Loading dashboard...</div>;
   }
-  const supabase = await createClient();
-  // Fetch dealer
-  const { data: dealer } = await supabase
-    .from("dealers")
-    .select("id, dealership_name, phone, verified, referral_code, city")
-    .eq("user_id", user.id)
-    .maybeSingle();
   if (!dealer) {
-    return <div className="p-8">Dealer profile not found.</div>;
+    return <div className="p-8">User not found or dealer profile not found.</div>;
   }
 
-  // Fetch featured ads credit
-  const { data: wallet } = await supabase
-    .from("dealer_wallet")
-    .select("featured_credits")
-    .eq("dealer_id", dealer.id)
-    .maybeSingle();
-
-  // Fetch dealer stats: total_listings, hot_deals_used
-  const { data: dealerStats } = await supabase
-    .from("dealers")
-    .select("total_listings, hot_deals_used")
-    .eq("id", dealer.id)
-    .maybeSingle();
-
-  // Fetch cars
-  const { data: cars } = await supabase
-    .from("cars")
-    .select("id, title, price, is_active")
-    .eq("dealer_id", dealer.id)
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
-
-  // Gamification calculations
   const totalListings = dealerStats?.total_listings ?? 0;
   const hotDealsUsed = dealerStats?.hot_deals_used ?? 0;
   const availableHotDeals = Math.floor(totalListings / 10) - hotDealsUsed;

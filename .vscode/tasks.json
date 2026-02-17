@@ -42,6 +42,13 @@
 			"command": "npm run build",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "Next.js build (referral integration)",
+			"type": "shell",
+			"command": "npm run build",
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }

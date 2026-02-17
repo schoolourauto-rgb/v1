@@ -171,6 +171,27 @@ export default function AddCarPage() {
         <input name="fuel_type" value={form.fuel_type} onChange={handleChange} placeholder="Fuel Type" className="w-full p-2 border rounded" />
         <input name="transmission" value={form.transmission} onChange={handleChange} placeholder="Transmission" className="w-full p-2 border rounded" />
         <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" className="w-full p-2 border rounded" />
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => {
+              const formatted = `\n💳 *Reg.No.* :- ${form.title}\n🗓 *Year*  :- ${form.year}\n🏭 *Make*  :- ${form.brand}\n🚘 *Model* :- ${form.model}\n🚘 *Version*:- ${form.transmission}\n⛽ *Fuel* :- ${form.fuel_type}\n🎨 *Colour*:- ${form.city}\n👤 *Owner* :- \n📃 *Insurance* :- \n🎰 *K/m.* :- ${form.km_driven}\n💵 *Price* :- ${form.price}/-\n`;
+              setForm(f => ({ ...f, description: formatted }));
+            }}
+            className="bg-yellow-500 text-black px-4 py-2 rounded-lg mt-3"
+          >
+            Generate WhatsApp Format
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard.writeText(form.description);
+            }}
+            className="ml-3 bg-gray-800 text-white px-4 py-2 rounded-lg mt-3"
+          >
+            Copy
+          </button>
+        </div>
         {error && <div className="text-red-600 text-sm">{error}</div>}
         <button type="submit" className="w-full bg-yellow-500 text-black font-semibold py-2 rounded" disabled={loading}>
           {loading ? "Adding..." : "Add Car"}
