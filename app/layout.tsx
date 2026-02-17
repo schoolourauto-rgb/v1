@@ -6,7 +6,6 @@ export const metadata = {
 
 import Header from "@/components/layout/Header";
 import PopupQueueController from "@/components/PopupQueueController";
-import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 export default function RootLayout({
@@ -19,12 +18,10 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#C9A227" />
       </head>
-      <body className="min-h-screen bg-background text-foreground antialiased transition-colors duration-300">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <Header />
-          <PopupQueueController />
-          {children}
-        </ThemeProvider>
+      <body className="min-h-screen bg-black text-white antialiased">
+        <Header />
+        <PopupQueueController />
+        {children}
       </body>
     </html>
   );
