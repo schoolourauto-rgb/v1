@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { parseCarMessage } from "@/lib/carParser";
+import { parseCarText } from "@/lib/carParser";
 import { Button } from "@/components/ui/Button";
 
 import type { Car } from '@/types/car';
@@ -14,12 +14,16 @@ export default function ChatInput({ onParse }: ChatInputProps) {
   const [images, setImages] = useState<File[]>([]);
 
   const handlePaste = () => {
-    const parsed = parseCarMessage(input);
-    if (parsed && parsed.regNo) {
+    const parsed = parseCarText(input);
+    if (parsed && parsed.structuredFields.regNo) {
       onParse({
-        ...parsed,
-        year: parsed.year ?? undefined,
-        price: parsed.price ?? undefined,
+        ...parsed.structuredFields,
+        year: parsed.structuredFields.year
+          ? Number(parsed.structuredFields.year)
+          : undefined,
+        price: parsed.structuredFields.price
+          ? Number(parsed.structuredFields.price.replace(/,/g, ""))
+          : undefined,
       });
     }
   };

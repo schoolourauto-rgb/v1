@@ -15,6 +15,7 @@ export default function AddCarPage() {
     title: "",
     brand: "",
     model: "",
+    version: "",
     year: "",
     price: "",
     km_driven: "",

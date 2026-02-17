@@ -63,13 +63,12 @@ export function normalizeStructuredData(
   // Always default to Manual if not detected
 
   // 6. FUEL FALLBACK
-  let fuel_type: string | null = structuredFields.fuel || null;
-  if (!fuel_type) {
-    if (/diesel/i.test(rawText)) fuel_type = "Diesel";
-    else if (/petrol/i.test(rawText)) fuel_type = "Petrol";
-    else if (/cng/i.test(rawText)) fuel_type = "CNG";
-    else if (/electric/i.test(rawText)) fuel_type = "Electric";
-    else fuel_type = null;
+  let fuel: string | null = structuredFields.fuel || null;
+  if (!fuel) {
+    if (/diesel/i.test(rawText)) fuel = "Diesel";
+    else if (/petrol/i.test(rawText)) fuel = "Petrol";
+    else if (/cng/i.test(rawText)) fuel = "CNG";
+    else if (/(ev|electric)/i.test(rawText)) fuel = "EV";
   }
 
   // 7. AUTO TITLE GENERATION
@@ -219,10 +218,7 @@ export function parseCarText(text: string): ParseCarTextResult {
     detectedFeatures,
     rawText: text,
   };
-}
-  else if (/petrol/i.test(text)) fuel = "Petrol";
-  else if (/cng/i.test(text)) fuel = "CNG";
-  else if (/ev|electric/i.test(text)) fuel = "EV";
+
 
   // No color field in DB, skip color parsing
 

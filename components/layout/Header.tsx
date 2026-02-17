@@ -8,7 +8,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 
 type Session = {
   user: {
@@ -26,7 +26,7 @@ export default function Header() {
 
   useEffect(() => {
     setMounted(true);
-    const supabase = createClientComponentClient();
+    const supabase = createClient();
     let authListener: any;
 
     async function getSessionAndDealer() {
@@ -95,7 +95,7 @@ export default function Header() {
               <button
                 className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-lg border"
                 onClick={async () => {
-                  const supabase = createClientComponentClient();
+                  const supabase = createClient();
                   await supabase.auth.signOut();
                 }}
               >
