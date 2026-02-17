@@ -2,6 +2,7 @@
 
 
 import Link from "next/link";
+import Header from "@/components/layout/Header";
 
 const navLinks = [
   { href: "/dealer", label: "Dashboard" },

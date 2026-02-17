@@ -1,6 +1,7 @@
 
 import DealerDashboardClient from "./DealerDashboardClient";
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function DealerDashboardPage() {
   // Server-side: get user and dealer info

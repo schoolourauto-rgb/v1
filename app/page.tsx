@@ -43,7 +43,7 @@ export const revalidate = 60;
 export default async function HomePage() {
   const supabase = await createClient();
   // RLS policy required: Ensure only active cars are fetched and user cannot access others
-  let brands = [], cities = [], cars = [], error = null;
+  let brands: any[] = [], cities: any[] = [], cars: any[] = [], error: any = null;
   try {
     const results = await Promise.all([
       supabase

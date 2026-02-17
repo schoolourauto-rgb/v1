@@ -1,8 +1,8 @@
 
 "use client";
 
-import CarPasteGenerate from "@/app/dealer/add-car/CarPasteGenerate";
+import AddCarPage from "@/app/dealer/add/page";
 
 export default function SellPage() {
-  return <CarPasteGenerate />;
+  return <AddCarPage />;
 }

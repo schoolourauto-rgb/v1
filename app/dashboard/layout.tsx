@@ -1,6 +1,7 @@
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import Header from "@/components/layout/Header";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -25,8 +26,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (profile.role !== "dealer" && profile.role !== "admin") {
     redirect("/");
   }
-
-  import Header from "@/components/layout/Header";
 
   return (
     <>
