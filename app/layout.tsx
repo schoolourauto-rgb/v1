@@ -4,9 +4,11 @@ export const metadata = {
 };
 
 
+
 import Header from "@/components/layout/Header";
 import PopupQueueController from "@/components/PopupQueueController";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function RootLayout({
   children,
@@ -18,10 +20,12 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#C9A227" />
       </head>
-      <body className="min-h-screen bg-black text-white antialiased">
-        <Header />
-        <PopupQueueController />
-        {children}
+      <body className="bg-white dark:bg-black text-black dark:text-white min-h-screen antialiased">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <Header />
+          <PopupQueueController />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

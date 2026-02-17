@@ -1,26 +1,51 @@
 
 
+
 import Link from "next/link";
+
+const navLinks = [
+  { href: "/dealer", label: "Dashboard" },
+  { href: "/dealer/add", label: "Add New Car" },
+  { href: "/dealer/listings", label: "Listings" },
+  { href: "/dealer/chat", label: "Leads / Chat" },
+  { href: "/dealer/profile", label: "Profile" },
+  { href: "/dealer/refer", label: "Refer & Earn" },
+  { href: "/dealer/help", label: "Help & Support" },
+];
 
 export default function DealerLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-black text-white flex">
-      <aside className="w-64 bg-zinc-950 border-r border-zinc-800 p-6">
-        <h2 className="text-xl font-bold mb-8 text-yellow-400">
-          Dealer Panel
-        </h2>
-        <nav className="space-y-4 text-sm">
-          <Link href="/dealer">Dashboard</Link>
-          <Link href="/dealer/add">Add New Car</Link>
-          <Link href="/dealer/chat">Leads / Chat</Link>
-          <Link href="/dealer/profile">Profile</Link>
-          <Link href="/dealer/refer">Refer & Earn</Link>
-          <Link href="/dealer/help">Help & Support</Link>
+    <div className="min-h-screen bg-zinc-950 text-white flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-black border-r border-zinc-800 p-6 flex flex-col">
+        <h2 className="text-2xl font-extrabold mb-10 text-yellow-400 tracking-tight">Dealer Panel</h2>
+        <nav className="flex-1">
+          <ul className="space-y-3">
+            {navLinks.map(link => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="block px-4 py-2 rounded-lg hover:bg-zinc-800 transition"
+                  // TODO: Add active className logic in client component
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </nav>
       </aside>
-      <main className="flex-1 p-8 bg-zinc-950">
-        {children}
-      </main>
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Top bar */}
+        <header className="w-full h-16 flex items-center justify-between px-8 border-b border-zinc-800 bg-black/80 backdrop-blur sticky top-0 z-10">
+          <span className="font-semibold text-lg tracking-wide">Welcome, Dealer</span>
+          {/* Theme toggle and other actions can go here */}
+        </header>
+        <main className="flex-1 p-6 md:p-10">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
