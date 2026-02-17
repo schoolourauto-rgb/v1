@@ -7,7 +7,7 @@ export default async function DealerDashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    return <div className="p-8">User not found or dealer profile not found.</div>;
+    return redirect("/dealer/onboarding");
   }
   const { data: dealer } = await supabase
     .from("dealers")
@@ -15,7 +15,7 @@ export default async function DealerDashboardPage() {
     .eq("user_id", user.id)
     .maybeSingle();
   if (!dealer) {
-    return <div className="p-8">User not found or dealer profile not found.</div>;
+    return redirect("/dealer/onboarding");
   }
   const { data: wallet } = await supabase
     .from("dealer_wallet")

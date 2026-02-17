@@ -37,11 +37,7 @@ export default function DealerLayout({ children }: { children: React.ReactNode }
       </aside>
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top bar */}
-        <header className="w-full h-16 flex items-center justify-between px-8 border-b border-zinc-800 bg-black/80 backdrop-blur sticky top-0 z-10">
-          <span className="font-semibold text-lg tracking-wide">Welcome, Dealer</span>
-          {/* Theme toggle and other actions can go here */}
-        </header>
+        <Header />
         <main className="flex-1 p-6 md:p-10">
           {children}
         </main>

@@ -26,5 +26,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect("/");
   }
 
-  return <>{children}</>;
+  import Header from "@/components/layout/Header";
+
+  return (
+    <>
+      <Header />
+      {children}
+    </>
+  );
 }

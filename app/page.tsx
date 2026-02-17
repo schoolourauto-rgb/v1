@@ -42,42 +42,65 @@ export const revalidate = 60;
 
 export default async function HomePage() {
   const supabase = await createClient();
+  // RLS policy required: Ensure only active cars are fetched and user cannot access others
+  let brands = [], cities = [], cars = [], error = null;
+  try {
+    const results = await Promise.all([
+      supabase
+        .from("seo_brand_counts")
+        .select("brand, listing_count")
+        .order("listing_count", { ascending: false })
+        .limit(12),
+      supabase
+        .from("seo_city_counts")
+        .select("city, listing_count")
+        .order("listing_count", { ascending: false })
+        .limit(10),
+      supabase
+        .from("cars")
+        .select(`
+          id,
+          title,
+          brand,
+          model,
+          year,
+          price,
+          fuel_type,
+          transmission,
+          city,
+          car_images(image_url)
+        `)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false }),
+    ]);
+    brands = results[0].data || [];
+    cities = results[1].data || [];
+    cars = results[2].data || [];
+    error = results[2].error || null;
+  } catch (err) {
+    error = err;
+  }
 
-  // Fetch mesh data from materialized views
-  const [
-    { data: brands },
-    { data: cities },
-    { data: cars, error },
-  ] = await Promise.all([
-    supabase
-      .from("seo_brand_counts")
-      .select("brand, listing_count")
-      .order("listing_count", { ascending: false })
-      .limit(12),
-    supabase
-      .from("seo_city_counts")
-      .select("city, listing_count")
-      .order("listing_count", { ascending: false })
-      .limit(10),
-    supabase
-      .from("cars")
-      .select(`
-        id,
-        title,
-        brand,
-        model,
-        year,
-        price,
-        fuel_type,
-        transmission,
-        city,
-        car_images(image_url)
-      `)
-      .eq("is_active", true)
-      .order("created_at", { ascending: false }),
-  ]);
+  let listings: Car[] = Array.isArray(cars) ? cars : [];
 
-  let listings: Car[] = [];
+  // Empty state UI
+  if (error) {
+    return (
+      <div className="max-w-2xl mx-auto mt-10 p-8 rounded-xl bg-zinc-900 text-white text-center">
+        <h2 className="text-2xl font-bold mb-4">Failed to load cars</h2>
+        <p className="text-sm text-zinc-300 mb-6">There was a problem fetching car listings. Please try again later.</p>
+        <p className="text-xs text-zinc-400">If you are an admin, check Supabase RLS policies and deployment sync.</p>
+      </div>
+    );
+  }
+  if (!listings.length) {
+    return (
+      <div className="max-w-2xl mx-auto mt-10 p-8 rounded-xl bg-zinc-900 text-white text-center">
+        <h2 className="text-2xl font-bold mb-4">No cars found</h2>
+        <p className="text-sm text-zinc-300 mb-6">There are currently no cars available. Please check back soon.</p>
+      </div>
+    );
+  }
   let errorMsg = "";
   if (error) {
     errorMsg = "Failed to load cars.";
