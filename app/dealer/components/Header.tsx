@@ -14,7 +14,7 @@ export default function Header() {
     <header className="bg-background border-b p-4 flex justify-between items-center">
       <div>
         <h2 className="text-lg font-semibold">
-          Welcome back, Demo Dealer 👋
+          Welcome back
         </h2>
         <p className="text-sm text-muted-foreground">
           Kaludi Auto World • Verified Dealer

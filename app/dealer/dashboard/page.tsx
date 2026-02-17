@@ -174,7 +174,7 @@ export default async function DealerDashboard() {
               <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4 border-2 border-primary">
                 <span className="text-3xl font-bold text-muted-foreground">D</span>
               </div>
-              <span className="font-semibold text-lg mb-1">{dealer.dealership_name || "Demo Dealer"}</span>
+              <span className="font-semibold text-lg mb-1">{dealer.dealership_name || ""}</span>
               <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-100 text-green-700 rounded px-2 py-0.5 mb-2">{dealer.verified ? "✔ Verified Dealer" : "Unverified"}</span>
               <span className="text-muted-foreground text-sm mb-3">{dealer.phone || "dealer@email.com"}</span>
               {dealer.city && (

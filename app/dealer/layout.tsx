@@ -1,57 +1,55 @@
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export const dynamic = "force-dynamic"
 
 
-import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
+
 import { onboardDealer } from "@/lib/dealer/onboardDealer";
 import { getServerUser } from "@/lib/supabase/getServerUser";
 import { redirect } from "next/navigation";
 
-export default async function DealerLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  let user = null;
-  try {
-    user = await getServerUser();
-    if (!user) {
-      return (
-        <div className="flex items-center justify-center min-h-screen bg-[#0f0f0f] text-white">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-4">Authentication Error</h2>
-            <p>Could not authenticate. Please <a href="/login" className="underline">login</a> again.</p>
-          </div>
-        </div>
-      );
-    }
-    try {
-      await onboardDealer(user.id);
-    } catch (err) {
-      console.error("Dealer onboarding failed", err);
-      // Optionally show fallback UI or continue
-    }
-  } catch (err) {
-    console.error("Dealer layout auth error", err);
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0f0f0f] text-white">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Authentication Error</h2>
-          <p>Could not authenticate. Please <a href="/login" className="underline">login</a> again.</p>
-        </div>
-      </div>
-    );
-  }
+import React from "react";
+
+const navLinks = [
+  { href: "/dealer", label: "Dashboard" },
+  { href: "/dealer/add", label: "Add Car" },
+  { href: "/dealer/chat", label: "Chat" },
+  { href: "/dealer/profile", label: "Profile" },
+  { href: "/dealer/refer", label: "Refer" },
+  { href: "/dealer/help", label: "Help" },
+];
+
+function SidebarNav() {
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
   return (
-    <body className="bg-black text-white">
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="flex-1 flex flex-col">
-          <Header />
-          <main className="p-6">{children}</main>
-        </div>
-      </div>
-    </body>
+    <nav className="flex flex-col gap-2 p-6">
+      {navLinks.map((link) => {
+        const isActive = pathname === link.href;
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={`block px-4 py-2 rounded-lg font-medium transition-colors ${
+              isActive ? "bg-zinc-800 text-white" : "text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            }`}
+          >
+            {link.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export default function DealerLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-black text-white flex">
+      <aside className="w-64 bg-zinc-900 border-r border-zinc-800">
+        <div className="text-2xl font-bold px-6 py-8 mb-4">Dealer Panel</div>
+        <SidebarNav />
+      </aside>
+      <main className="flex-1 p-8 bg-black">{children}</main>
+    </div>
   );
 }
