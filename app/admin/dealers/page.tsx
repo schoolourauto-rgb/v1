@@ -1,44 +1,13 @@
 
-import { createClient } from "@/lib/supabase/server";
-import { Dealer } from "@/types";
+import { requireAdmin } from "@/lib/auth/requireAdmin";
 
-
-export default async function AdminDealersPage() {
-  const supabase = await createClient();
-  let dealers: Dealer[] = [];
-  const { data } = await supabase
-    .from("dealers")
-    .select("id, user_id, dealership_name, phone, location, verified, created_at, referral_code, referred_by")
-    .order("created_at", { ascending: false });
-  dealers = data ?? [];
-
+export default async function DealersPage() {
+  await requireAdmin();
+  // TODO: List all dealers with pagination and controls
   return (
-    <div className="p-6">
-      <h2 className="text-xl font-semibold mb-4">All Dealers</h2>
-      <table className="w-full text-sm">
-        <thead>
-          <tr>
-            <th>Dealership</th>
-            <th>Phone</th>
-            <th>Location</th>
-            <th>Verified</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dealers.map((dealer: Dealer) => (
-            <tr key={dealer.id}>
-              <td>{dealer.dealership_name}</td>
-              <td>{dealer.phone}</td>
-              <td>{dealer.location || '-'}</td>
-              <td>{dealer.verified ? 'Yes' : 'No'}</td>
-              <td>
-                {/* Approve/Reject toggle will be implemented here */}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <h1 className="text-xl font-bold mb-4">Dealers</h1>
+      <div>Dealer list and controls go here.</div>
     </div>
   );
 }

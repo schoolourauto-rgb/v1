@@ -1,5 +1,7 @@
+
 "use client";
 import { useState, useRef } from "react";
+import imageCompression from "browser-image-compression";
 
 const initialForm = {
   brand: "",
@@ -42,12 +44,35 @@ export default function AddCarPage() {
   };
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
 
-  // Handle form submit (placeholder for Supabase upload)
+
+  // Compress image before upload
+  async function compressImage(file: File) {
+    const options = {
+      maxSizeMB: 0.4,           // 400 KB target
+      maxWidthOrHeight: 1600,
+      useWebWorker: true,
+      fileType: "image/webp",
+    };
+    return await imageCompression(file, options);
+  }
+
+  // Handle form submit (with compression)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setSuccess(false);
-    // TODO: Upload images to Supabase Storage and save car data
+
+    // Compress all images before upload
+    let compressedFiles: File[] = [];
+    try {
+      compressedFiles = await Promise.all(images.map(file => compressImage(file)));
+    } catch (err) {
+      setLoading(false);
+      alert("Image compression failed. Please try again.");
+      return;
+    }
+
+    // TODO: Upload compressedFiles to Supabase Storage and save car data
     setTimeout(() => {
       setLoading(false);
       setSuccess(true);

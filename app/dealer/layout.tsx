@@ -2,7 +2,6 @@
 
 
 import Link from "next/link";
-import Header from "@/components/layout/Header";
 
 const navLinks = [
   { href: "/dealer", label: "Dashboard" },
@@ -38,7 +37,6 @@ export default function DealerLayout({ children }: { children: React.ReactNode }
       </aside>
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-h-screen">
-        <Header />
         <main className="flex-1 p-6 md:p-10">
           {children}
         </main>

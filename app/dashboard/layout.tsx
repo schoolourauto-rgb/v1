@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import Header from "@/components/layout/Header";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -29,7 +28,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <>
-      <Header />
       {children}
     </>
   );

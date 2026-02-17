@@ -1,23 +1,21 @@
 
+
 import DealerDashboardClient from "./DealerDashboardClient";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { requireActiveDealer } from "@/lib/auth/requireActiveDealer";
 
 export default async function DealerDashboardPage() {
-  // Server-side: get user and dealer info
+  let user, dealer;
+  try {
+    ({ user, dealer } = await requireActiveDealer());
+  } catch (e: any) {
+    if (e.message === "DEALER_SUSPENDED") {
+      return redirect("/suspended");
+    }
+    return redirect("/login");
+  }
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return redirect("/dealer/onboarding");
-  }
-  const { data: dealer } = await supabase
-    .from("dealers")
-    .select("id, dealership_name, phone, verified, referral_code, city")
-    .eq("user_id", user.id)
-    .maybeSingle();
-  if (!dealer) {
-    return redirect("/dealer/onboarding");
-  }
   const { data: wallet } = await supabase
     .from("dealer_wallet")
     .select("featured_credits")

@@ -46,7 +46,7 @@ export default function OnboardingPage() {
 
           <div className="space-y-4">
             <Link
-              href="/dealer/add-car"
+              href="/dealer/add"
               className="block bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-4 rounded-2xl shadow-lg backdrop-blur-sm border border-border transition text-lg hover:scale-[1.02] active:scale-95 duration-200"
             >
               Add Your First Car
