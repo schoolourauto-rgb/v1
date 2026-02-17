@@ -1,103 +1,51 @@
 
-export const dynamic = "force-dynamic"
-
-import { createClient } from "@/lib/supabase/server";
-import { getServerUser } from "@/lib/supabase/getServerUser";
-
-import { Button } from "@/components/ui/Button";
-import { ReferralShare } from "@/components/dealer/ReferralShare";
-import Link from "next/link";
-
-
 import DealerDashboardClient from "./DealerDashboardClient";
+import { createClient } from "@/lib/supabase/server";
 
-interface Car {
-  id: string;
-  title: string;
-  price: number;
-  is_active?: boolean | null;
-}
-
-"use client";
-
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-
-export default function DealerDashboard() {
-  const [loading, setLoading] = useState(true);
-  const [dealer, setDealer] = useState<any>(null);
-  const [wallet, setWallet] = useState<any>(null);
-  const [dealerStats, setDealerStats] = useState<any>(null);
-  const [cars, setCars] = useState<any[]>([]);
-
-  useEffect(() => {
-    const fetchDealer = async () => {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      const { data: dealer } = await supabase
-        .from("dealers")
-        .select("id, dealership_name, phone, verified, referral_code, city")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (!dealer) {
-        setLoading(false);
-        return;
-      }
-      setDealer(dealer);
-
-      const { data: wallet } = await supabase
-        .from("dealer_wallet")
-        .select("featured_credits")
-        .eq("dealer_id", dealer.id)
-        .maybeSingle();
-      setWallet(wallet);
-
-      const { data: dealerStats } = await supabase
-        .from("dealers")
-        .select("total_listings, hot_deals_used")
-        .eq("id", dealer.id)
-        .maybeSingle();
-      setDealerStats(dealerStats);
-
-      const { data: cars } = await supabase
-        .from("cars")
-        .select("id, title, price, is_active")
-        .eq("dealer_id", dealer.id)
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
-      setCars(cars || []);
-
-      setLoading(false);
-    };
-    fetchDealer();
-  }, []);
-
-  if (loading) {
-    return <div className="text-gray-400 p-8">Loading dashboard...</div>;
+export default async function DealerDashboardPage() {
+  // Server-side: get user and dealer info
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return <div className="p-8">User not found or dealer profile not found.</div>;
   }
+  const { data: dealer } = await supabase
+    .from("dealers")
+    .select("id, dealership_name, phone, verified, referral_code, city")
+    .eq("user_id", user.id)
+    .maybeSingle();
   if (!dealer) {
     return <div className="p-8">User not found or dealer profile not found.</div>;
   }
+  const { data: wallet } = await supabase
+    .from("dealer_wallet")
+    .select("featured_credits")
+    .eq("dealer_id", dealer.id)
+    .maybeSingle();
+  const { data: dealerStats } = await supabase
+    .from("dealers")
+    .select("total_listings, hot_deals_used")
+    .eq("id", dealer.id)
+    .maybeSingle();
 
   const totalListings = dealerStats?.total_listings ?? 0;
   const hotDealsUsed = dealerStats?.hot_deals_used ?? 0;
-  const availableHotDeals = Math.floor(totalListings / 10) - hotDealsUsed;
-  let nextUnlock = 10 - (totalListings % 10);
-  if (nextUnlock === 10) nextUnlock = 0;
+  const featuredCredits = wallet?.featured_credits ?? 0;
+  const hotDealsAvailable = Math.floor(totalListings / 10) - hotDealsUsed;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-        {/* Momentum Layer: Motivation, Progress, Credits */}
-        <div className="w-full mb-8">
-          <DealerDashboardClient
-            totalListings={totalListings}
+        <DealerDashboardClient
+          totalListings={totalListings}
+          hotDealsUsed={hotDealsUsed}
+          featuredCredits={featuredCredits}
+          hotDealsAvailable={hotDealsAvailable}
+        />
+      </div>
+    </div>
+  );
+}
             hotDealsUsed={hotDealsUsed}
             featuredCredits={wallet?.featured_credits ?? 0}
             hotDealsAvailable={availableHotDeals}

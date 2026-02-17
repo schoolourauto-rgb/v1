@@ -49,6 +49,11 @@
 			"command": "npm run build",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "Clean Next.js build",
+			"type": "shell",
+			"command": "rimraf .next && npm run build"
 		}
 	]
 }
