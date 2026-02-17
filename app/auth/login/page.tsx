@@ -1,41 +1,80 @@
-export default function LoginPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
-      <div className="w-full max-w-md p-8 rounded-2xl shadow-lg bg-white dark:bg-neutral-900">
-        <h1 className="text-2xl font-bold mb-6 text-black dark:text-white">
-          Dealer Login
-        </h1>
+"use client";
 
-        <form className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full px-4 py-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full px-4 py-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
-          />
-          <button
-            type="submit"
-            className="w-full py-3 rounded-lg bg-yellow-500 hover:bg-yellow-600 transition font-semibold text-black"
-          >
-            Login
-          </button>
-        </form>
-          <div className="text-center mt-6">
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              Don’t have an account?
-            </p>
-            <a
-              href="/auth/signup"
-              className="text-yellow-500 font-semibold hover:underline"
-            >
-              Create Dealer Account
-            </a>
-          </div>
-      </div>
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function LoginPage() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault(); // 🔥 stop refresh
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/dealer/dashboard");
+    } catch (err) {
+      alert("Something went wrong");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      <form
+        onSubmit={handleLogin}
+        className="bg-white p-8 rounded-xl shadow-md w-96"
+      >
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Dealer Login
+        </h2>
+
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full mb-4 p-3 border rounded-lg"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full mb-6 p-3 border rounded-lg"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-yellow-500 text-black py-3 rounded-lg font-semibold"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
     </div>
-  )
+  );
+}
 }
