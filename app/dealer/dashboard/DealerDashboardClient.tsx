@@ -5,11 +5,15 @@ import React from "react";
 const MomentumLayer = dynamic(() => import("@/components/dealer/MomentumLayer").then(m => m.MomentumLayer));
 const SmartSuggestion = dynamic(() => import("@/components/dealer/SmartSuggestion"));
 
+
 interface Props {
   totalListings: number;
   hotDealsUsed: number;
   featuredCredits: number;
   hotDealsAvailable: number;
+  cars: any[];
+  dealer: any;
+  wallet: any;
 }
 
 export default function DealerDashboardClient({
@@ -17,6 +21,9 @@ export default function DealerDashboardClient({
   hotDealsUsed,
   featuredCredits,
   hotDealsAvailable,
+  cars,
+  dealer,
+  wallet,
 }: Props) {
   return (
     <>
@@ -30,6 +37,7 @@ export default function DealerDashboardClient({
         featuredCredits={featuredCredits}
         hotDealsAvailable={hotDealsAvailable}
       />
+      {/* Render listings and dealer info here as needed */}
     </>
   );
 }
