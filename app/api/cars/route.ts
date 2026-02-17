@@ -1,3 +1,18 @@
+export async function GET() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("cars")
+    .select("*")
+    .eq("status", "active")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  }
+
+  return new Response(JSON.stringify(data), { status: 200 });
+}
 
 
 import { NextRequest, NextResponse } from "next/server";
@@ -22,5 +37,12 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
 
   let supabase = null;
   supabase = await createClient();
+
+  // PATCH 2: Debug logs before returning response
+  console.log("🔥 CARS API HIT");
+  const { data, error } = await supabase.from("cars").select("*");
+  console.log("Cars Data:", data);
+  console.log("Cars Error:", error);
+
   // (Re-add the rest of your logic here as needed)
 });
