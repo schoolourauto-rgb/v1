@@ -12,6 +12,10 @@ export const CarInsertSchema = z.object({
   make: z.string().min(1),
   model: z.string().min(1),
   price: z.number().positive(),
+  plate_number: z.string().min(1),
+  plate_verified: z.boolean().optional().default(false),
+  plate_confidence: z.number().optional(),
+  image_ocr_text: z.string().optional(),
   // ...add other fields as needed
 });
 

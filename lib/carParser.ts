@@ -71,6 +71,9 @@ export function normalizeStructuredData(
     else if (/(ev|electric)/i.test(rawText)) fuel = "EV";
   }
 
+  // Ensure fuel_type is properly declared before use
+  const fuel_type = fuel;
+
   // 7. AUTO TITLE GENERATION
   const titleParts = [year, structuredFields.make, structuredFields.model, structuredFields.version, fuel_type]
     .filter(Boolean)

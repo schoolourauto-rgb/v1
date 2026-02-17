@@ -5,10 +5,15 @@ alter table public.cars alter column dealer_id set not null;
 create index if not exists idx_cars_dealer_id on public.cars(dealer_id);
 create index if not exists idx_cars_updated_at on public.cars(updated_at);
 
--- Example: Add updated_at column if not exists
 alter table public.cars add column if not exists updated_at timestamptz default now();
 
--- RLS and policies (add your actual policies here)
+-- Add plate fields and unique constraint
+alter table public.cars add column if not exists plate_number text;
+alter table public.cars add column if not exists plate_verified boolean default false;
+alter table public.cars add column if not exists plate_confidence float;
+alter table public.cars add column if not exists image_ocr_text text;
+alter table public.cars add constraint if not exists unique_plate unique (plate_number);
+
 -- enable row level security
 alter table public.cars enable row level security;
 
