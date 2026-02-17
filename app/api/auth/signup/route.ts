@@ -59,6 +59,33 @@ export async function POST(req: Request) {
 
     console.log("User ID:", authData.user?.id);
 
+    // --- INSERT DEALER PROFILE AFTER AUTH SIGNUP ---
+    const userId = authData.user?.id;
+
+    if (!userId) {
+      return new Response(
+        JSON.stringify({ error: "User creation failed" }),
+        { status: 400 }
+      );
+    }
+
+    // 🔥 INSERT INTO DEALERS TABLE
+      if (authData.user) {
+        const { error: dealerError } = await supabase
+          .from("dealers")
+          .insert([
+            {
+              user_id: authData.user.id,
+              name: parsed.data.business_name,
+              phone: parsed.data.phone,
+            },
+          ]);
+
+        if (dealerError) {
+          console.error("Dealer Insert Error:", dealerError);
+        }
+      }
+
     return new Response(JSON.stringify({ success: true }), { status: 200 });
 
   } catch (err) {
