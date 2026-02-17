@@ -8,6 +8,8 @@ interface DealerInfo {
 }
 
 
+import { StructuredFields } from "@/lib/carParser";
+
 interface CarCardProps {
   id: string;
   image: string;
@@ -17,6 +19,9 @@ interface CarCardProps {
   location: string;
   dealer?: DealerInfo;
   listingTier?: "hot" | "featured" | "simple";
+  structuredFields?: StructuredFields;
+  detectedFeatures?: Record<string, boolean>;
+  rawDescription?: string;
 }
 
 export default function CarCard({
@@ -28,6 +33,9 @@ export default function CarCard({
   location,
   dealer,
   listingTier = "simple",
+  structuredFields,
+  detectedFeatures,
+  rawDescription,
 }: CarCardProps) {
   return (
     <Link
@@ -64,6 +72,40 @@ export default function CarCard({
           <span className="text-xs px-2 py-1 rounded bg-transparent text-black dark:text-white font-medium ml-2">{year}</span>
           <span className="text-xs text-black dark:text-white ml-2">{location}</span>
         </div>
+
+        {/* Structured fields */}
+        {structuredFields && (
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-black dark:text-white mt-2">
+            <div><b>Reg.No:</b> {structuredFields.regNo}</div>
+            <div><b>Make:</b> {structuredFields.make}</div>
+            <div><b>Model:</b> {structuredFields.model}</div>
+            <div><b>Version:</b> {structuredFields.version}</div>
+            <div><b>Fuel:</b> {structuredFields.fuel}</div>
+            <div><b>Colour:</b> {structuredFields.colour}</div>
+            <div><b>Owner:</b> {structuredFields.owner}</div>
+            <div><b>Insurance:</b> {structuredFields.insurance}</div>
+            <div><b>KM:</b> {structuredFields.km}</div>
+            <div><b>Price:</b> {structuredFields.price}</div>
+          </div>
+        )}
+
+        {/* Feature badges */}
+        {detectedFeatures && Object.keys(detectedFeatures).length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {Object.entries(detectedFeatures).filter(([_, v]) => v).map(([k]) => (
+              <span key={k} className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold border border-green-300">
+                {k.charAt(0).toUpperCase() + k.slice(1)}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Raw description */}
+        {rawDescription && (
+          <div className="mt-3 text-xs text-neutral-700 dark:text-neutral-300 whitespace-pre-line border-t pt-2">
+            {rawDescription}
+          </div>
+        )}
         {/* Dealer info */}
         {dealer && (
           <div className="flex items-center gap-2 mt-2">

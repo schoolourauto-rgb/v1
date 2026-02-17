@@ -4,15 +4,70 @@
 
 "use client"
 
-import Link from "next/link"
-import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
 
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+type Session = {
+  user: {
+    id: string;
+    email?: string;
+    [key: string]: any;
+  } | null;
+};
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const [session, setSession] = useState<Session | null>(null);
+  const [dealerName, setDealerName] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    const supabase = createClientComponentClient();
+    let authListener: any;
+
+    async function getSessionAndDealer() {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      if (session?.user?.id) {
+        // Fetch dealer name if logged in
+        const { data } = await supabase
+          .from("dealers")
+          .select("name")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
+        setDealerName(data?.name || null);
+      } else {
+        setDealerName(null);
+      }
+    }
+
+    getSessionAndDealer();
+
+    authListener = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user?.id) {
+        supabase
+          .from("dealers")
+          .select("name")
+          .eq("user_id", session.user.id)
+          .maybeSingle()
+          .then(({ data }) => setDealerName(data?.name || null));
+      } else {
+        setDealerName(null);
+      }
+    });
+
+    return () => {
+      if (authListener && typeof authListener.subscription?.unsubscribe === "function") {
+        authListener.subscription.unsubscribe();
+      }
+    };
+  }, []);
+
   if (!mounted) return null;
 
   return (
@@ -32,12 +87,29 @@ export default function Header() {
           >
             {theme === "dark" ? "☀️" : "🌙"}
           </button>
-          <Link
-            href="/auth/login"
-            className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-lg"
-          >
-            Dealer Login
-          </Link>
+          {session && session.user ? (
+            <>
+              <span className="text-black dark:text-white text-sm font-medium px-3 py-1 rounded-lg">
+                {dealerName ? dealerName : "My Account"}
+              </span>
+              <button
+                className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-lg border"
+                onClick={async () => {
+                  const supabase = createClientComponentClient();
+                  await supabase.auth.signOut();
+                }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-lg"
+            >
+              Dealer Login
+            </Link>
+          )}
         </div>
       </div>
     </header>

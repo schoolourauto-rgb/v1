@@ -1,9 +1,11 @@
 "use client";
 
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getDealerListingEligibility } from "@/lib/marketplace/getDealerListingEligibility";
 import { createClient } from "@/lib/supabase/client";
+import { parseCarText, StructuredFields } from "@/lib/carParser";
 
 
 
@@ -21,7 +23,10 @@ export default function AddCarPage() {
     transmission: "",
     description: "",
     listingTier: "simple",
+    raw_description: "",
+    formatted_description: "",
   });
+  const [detectedFeatures, setDetectedFeatures] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [eligibility, setEligibility] = useState<{
@@ -56,6 +61,48 @@ export default function AddCarPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  // WhatsApp smart parser on paste
+  const handleDescriptionPaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const pasted = e.clipboardData.getData("text");
+    if (!pasted) return;
+    const { structuredFields, detectedFeatures, rawText } = parseCarText(pasted);
+    // Transmission business rule
+    const transmissionValue =
+      detectedFeatures.automatic
+        ? "Automatic"
+        : detectedFeatures.manual
+        ? "Manual"
+        : "Manual";
+    setForm(prev => ({
+      ...prev,
+      // Headings auto-fill
+      brand: structuredFields.make || prev.brand,
+      model: structuredFields.model || prev.model,
+      year: structuredFields.year || prev.year,
+      fuel_type: structuredFields.fuel || prev.fuel_type,
+      version: structuredFields.version || prev.version,
+      transmission: transmissionValue,
+      // Other fields
+      title: structuredFields.regNo || prev.title,
+      price: structuredFields.price || prev.price,
+      km_driven: structuredFields.km || prev.km_driven,
+      description: pasted,
+      raw_description: rawText,
+      formatted_description: formatDescription(structuredFields, detectedFeatures, pasted),
+    }));
+    setDetectedFeatures(detectedFeatures);
+    // Do NOT preventDefault, allow paste
+  };
+
+  function formatDescription(fields: StructuredFields, features: Record<string, boolean>, raw: string) {
+    // Example: return a formatted string for display/DB
+    let out = `Reg.No: ${fields.regNo}\nYear: ${fields.year}\nMake: ${fields.make}\nModel: ${fields.model}\nVersion: ${fields.version}\nFuel: ${fields.fuel}\nColour: ${fields.colour}\nOwner: ${fields.owner}\nInsurance: ${fields.insurance}\nKM: ${fields.km}\nPrice: ${fields.price}`;
+    const featureList = Object.entries(features).filter(([k, v]) => v).map(([k]) => k).join(", ");
+    if (featureList) out += `\nFeatures: ${featureList}`;
+    out += `\n\n${raw}`;
+    return out;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,7 +217,24 @@ export default function AddCarPage() {
         <input name="city" value={form.city} onChange={handleChange} placeholder="City" className="w-full p-2 border rounded" />
         <input name="fuel_type" value={form.fuel_type} onChange={handleChange} placeholder="Fuel Type" className="w-full p-2 border rounded" />
         <input name="transmission" value={form.transmission} onChange={handleChange} placeholder="Transmission" className="w-full p-2 border rounded" />
-        <textarea name="description" value={form.description} onChange={handleChange} placeholder="Description" className="w-full p-2 border rounded" />
+        <textarea
+          name="description"
+          value={form.description || ""}
+          onChange={handleChange}
+          onPaste={handleDescriptionPaste}
+          placeholder="Description"
+          className="w-full p-2 border rounded"
+        />
+        {/* Feature badges */}
+        {Object.keys(detectedFeatures).length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {Object.entries(detectedFeatures).filter(([_, v]) => v).map(([k]) => (
+              <span key={k} className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold border border-green-300">
+                {k.charAt(0).toUpperCase() + k.slice(1)}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="flex items-center">
           <button
             type="button"
