@@ -220,53 +220,17 @@ export function parseCarText(text: string): ParseCarTextResult {
     structuredFields,
     detectedFeatures,
     rawText: text,
-  };
 
-
-  // No color field in DB, skip color parsing
-
-  // Make + Model parsing
-  let make = get("Make");
-  let model = get("Model");
-  make = make ? make.trim().replace(/\s+/g, " ") : "";
   model = model ? model.trim().replace(/\s+/g, " ") : "";
-  make = make.charAt(0).toUpperCase() + make.slice(1);
-  model = model.charAt(0).toUpperCase() + model.slice(1);
-
   // Version parsing
-  let version = get("Version");
-  version = version ? version.trim() : "";
-
   // RegNo parsing
-  let regNo = get("Reg.No");
-  regNo = regNo ? regNo.trim() : "";
-
-  // Images
-  const imageUrls = text.match(/https?:\/\/[^\s]+\.(jpg|jpeg|png|webp)/gi) || [];
 
   // Mileage
-  const kmRaw = get("K/m");
-  const km = cleanKM(kmRaw);
-
   // Price (strict extraction)
-  const priceStr = extractPrice(text);
-  const price = priceStr ? Number(priceStr) : null;
-
   // Error validation
-  const errors: string[] = [];
-  if (year && year < 2000) errors.push("Year must be 2000 or newer");
-
-  return {
-    regNo,
-    year,
-    make,
-    model,
-    version,
-    fuel,
-    owner,
-    insurance,
-    km,
-    price,
+  // No color field in DB, skip color parsing
+  // Use structuredFields directly for make, model, version, regNo
+  // Remove undefined get() usage
     images: imageUrls,
     errors,
   };
