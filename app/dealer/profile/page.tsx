@@ -94,10 +94,10 @@ export default function DealerProfilePage() {
             className="hidden"
             onChange={handleAvatarChange}
           />
-        </div>
       </div>
+        </div> {/* Closing div for Avatar section */}
       {/* Dealer Info */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-b-2xl p-8 pt-20 -mt-12 shadow-sm text-center">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-b-2xl p-4 sm:p-6 pt-20 -mt-12 shadow-sm text-center">
         <h2 className="text-2xl font-bold text-zinc-100 mb-2">{profile.name || "Business Name"}</h2>
         <div className="text-zinc-400 mb-2">{profile.bio || "Your bio goes here."}</div>
         <div className="flex justify-center gap-4 mb-2">
@@ -134,7 +134,7 @@ export default function DealerProfilePage() {
       {editOpen && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <form
-            className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 w-full max-w-md shadow-lg space-y-4"
+            className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6 w-full max-w-md shadow-lg space-y-4"
             onSubmit={handleEdit}
           >
             <h3 className="text-xl font-bold mb-2 text-zinc-100">Edit Profile</h3>

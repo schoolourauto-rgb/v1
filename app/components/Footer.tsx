@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border bg-background mt-20">
       <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 sm:gap-8 mb-8">
           {/* Brand */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-foreground">OurAuto</h3>

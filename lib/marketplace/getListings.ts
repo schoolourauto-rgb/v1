@@ -13,6 +13,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { Car } from "@/types/car";
+import { calculateCarScore } from "@/lib/marketplace/ranking";
 
 interface GetListingsParams {
   filters?: Record<string, any>;
@@ -83,35 +84,23 @@ export async function getListings({ filters = {}, from, to }: GetListingsParams)
 
     // Compute priorityScore, qualityScore, activeDealer, finalScore, and placeholders
     let listings: MarketplaceListing[] = (data ?? []).map((row: any) => {
-      // --- PART 1: Listing quality score ---
+      // ...existing logic...
       let qualityScore = 0;
       if ((row.car_images as { image_url: string }[] | undefined)?.[0]?.image_url) qualityScore += 1;
       if (row.price) qualityScore += 1;
       if (row.city) qualityScore += 1;
       if (row.transmission) qualityScore += 1;
       if (row.fuel_type) qualityScore += 1;
-
-      // --- PART 2: Dealer activity signal ---
       const dealerId = row.dealer_id ?? '';
       const activeDealer = dealerId && dealerListingCounts[dealerId] >= 5;
-
-      // --- PART 1: 3-tier system (internal only) ---
-      // Default: all simple
       let listingTier: "hot" | "featured" | "simple" = "simple";
       let isFeatured = false;
       let isHotDeal = false;
       let tierWeight = 0;
-
-      // --- DEV MODE: Simulate tier assignment ---
-      if (process.env.NODE_ENV === "development") {
-        // Will assign after mapping
-      }
-
-      // --- PART 2: Priority score update ---
       const priorityScore = row.updated_at ? new Date(row.updated_at).getTime() : 0;
-      // tierWeight will be set after
       let finalScore = priorityScore;
-
+      // Add smart ranking score
+      const score = calculateCarScore(row);
       return {
         id: row.id,
         title: row.title,
@@ -128,19 +117,22 @@ export async function getListings({ filters = {}, from, to }: GetListingsParams)
         location: row.city ?? "Unknown",
         updated_at: row.updated_at,
         created_at: row.created_at,
-        // Monetization-ready fields
         priorityScore,
         isFeatured,
         isHotDeal,
         boostLevel: 0,
-        // 3-tier system
         listingTier,
-        // Quality system
         qualityScore,
         activeDealer,
         finalScore,
+        score,
       };
     });
+
+    // Sort by score descending
+    listings.sort((a, b) => b.score - a.score);
+
+    return { listings, count: typeof count === "number" ? count : 0, error: false };
 
     // --- DEV MODE: Simulate tier assignment and ordering ---
     if (process.env.NODE_ENV === "development") {

@@ -54,6 +54,11 @@
 			"label": "Clean Next.js build",
 			"type": "shell",
 			"command": "rimraf .next && npm run build"
+		},
+		{
+			"label": "Start Next.js dev server",
+			"type": "shell",
+			"command": "npm run dev"
 		}
 	]
 }

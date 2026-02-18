@@ -36,7 +36,7 @@ export default function LocationPopup({ onComplete, forceCenter }: LocationPopup
         <p className="text-muted-foreground text-sm mb-4">Show cars near your area for better results.</p>
         <button
           onClick={enableLocation}
-          className="w-full bg-primary text-primary-foreground py-2 rounded-lg"
+          className="w-full bg-primary text-primary-foreground py-2 rounded-lg active:scale-95 transition-transform duration-150"
           disabled={loading}
         >
           {loading ? "Enabling..." : "Allow Location"}

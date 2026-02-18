@@ -66,5 +66,17 @@ export async function analyzeDealerBehavior({ dealerId, event, carId, leadId, ip
       await deductTrustScore(dealerId, 5, "car_deleted_quickly", { carId });
     }
   }
-  // TODO: Implement other rules (price changes, suspension flags, duplicate IP leads, rapid posting)
+
+  // Rapid posting: 5+ cars in 10 min
+  if (event === "car_create") {
+    const { count } = await adminSupabase
+      .from("cars")
+      .select("*", { count: "exact", head: true })
+      .eq("dealer_id", dealerId)
+      .gte("created_at", new Date(Date.now() - 10 * 60 * 1000).toISOString());
+    if (count && count >= 5) {
+      await deductTrustScore(dealerId, 10, "rapid_posting");
+    }
+  }
+  // TODO: Implement other rules (price changes, suspension flags, duplicate IP leads)
 }

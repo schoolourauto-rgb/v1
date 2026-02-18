@@ -17,11 +17,17 @@ export async function generateMetadata({
       url: `https://ourauto.in/car/${id}`,
       siteName: "OurAuto",
       type: "website",
+      images: [
+        `https://ourauto.in/api/share-image/${id}`
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [
+        `https://ourauto.in/api/share-image/${id}`
+      ],
     },
   }
 }
@@ -66,6 +72,13 @@ export default async function CarDetailsPage({
       <h1 className="text-2xl font-bold">
         Car ID: {id}
       </h1>
+      <a
+        href={`https://wa.me/?text=Check this car 🚗 ${process.env.NEXT_PUBLIC_SITE_URL}/car/${id}`}
+        target="_blank"
+        className="bg-green-500 text-white px-4 py-2 rounded-lg mt-4 inline-block"
+      >
+        Share on WhatsApp
+      </a>
     </div>
   )
 }

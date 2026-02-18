@@ -17,7 +17,7 @@ export default function DealerDashboard() {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+              className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
             >
               <div className="text-lg font-semibold mb-2 text-zinc-400">{stat.label}</div>
               <div className="text-4xl font-extrabold text-yellow-500">{stat.value}</div>
@@ -28,7 +28,7 @@ export default function DealerDashboard() {
 
       {/* Quick Actions */}
       <section>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-sm">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6 shadow-sm">
           <div className="text-lg font-semibold mb-4 text-zinc-100">Quick Actions</div>
           <div className="flex flex-wrap gap-4">
             <Link

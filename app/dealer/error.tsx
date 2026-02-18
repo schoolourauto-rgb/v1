@@ -8,7 +8,7 @@ export default function DealerError({
   reset: () => void;
 }) {
   return (
-    <div className="p-8 text-center">
+    <div className="p-4 sm:p-6 text-center">
       <h2 className="text-xl font-semibold">
         Something went wrong.
       </h2>

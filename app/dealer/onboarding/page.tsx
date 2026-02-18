@@ -12,7 +12,7 @@ export default function OnboardingPage() {
             <p className="text-muted-foreground text-lg">Get your dealership up and running in minutes</p>
           </div>
 
-          <div className="bg-primary/10 border border-primary/40 rounded-2xl p-8 shadow-lg backdrop-blur-sm space-y-4">
+          <div className="bg-primary/10 border border-primary/40 rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-sm space-y-4">
             <h2 className="text-2xl font-semibold text-primary">Next Step: Add Your First Car</h2>
             <p className="text-muted-foreground">
               To unlock the marketplace and start selling, you need to list a minimum of <strong>6 cars</strong> on your

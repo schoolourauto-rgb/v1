@@ -57,21 +57,47 @@ export async function POST(req: Request) {
     }
 
     // 🔥 INSERT INTO DEALERS TABLE
-      if (authData.user) {
-        const { error: dealerError } = await supabase
-          .from("dealers")
-          .insert([
-            {
-              user_id: authData.user.id,
-              name: parsed.data.business_name,
-              phone: parsed.data.phone,
-            },
-          ]);
+    if (authData.user) {
+      // Generate referral code
+      const referralCode = crypto.randomUUID().slice(0, 8);
+      const { error: dealerError } = await supabase
+        .from("dealers")
+        .insert([
+          {
+            user_id: authData.user.id,
+            name: parsed.data.business_name,
+            phone: parsed.data.phone,
+            referral_code: referralCode,
+            trust_score: 100
+          },
+        ]);
 
-        if (dealerError) {
-          console.error("Dealer Insert Error:", dealerError);
+      if (dealerError) {
+        console.error("Dealer Insert Error:", dealerError);
+      }
+
+      // Referral trust boost (by referral code)
+      if (parsed.data.ref) {
+        // Fetch current trust_score and featured_ads_credit
+        const { data: refDealer, error: refFetchError } = await supabase
+          .from("dealers")
+          .select("trust_score, featured_ads_credit")
+          .eq("referral_code", parsed.data.ref)
+          .single();
+
+        if (!refFetchError && refDealer) {
+          const newTrustScore = (refDealer.trust_score || 0) + 5;
+          const newFeaturedAdsCredit = (refDealer.featured_ads_credit || 0) + 1;
+          await supabase
+            .from("dealers")
+            .update({
+              trust_score: newTrustScore,
+              featured_ads_credit: newFeaturedAdsCredit
+            })
+            .eq("referral_code", parsed.data.ref);
         }
       }
+    }
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
 

@@ -164,6 +164,29 @@ export default function LeadsPanel() {
       .eq("chat_id", selectedChat.id)
       .order("created_at", { ascending: true });
     setMessages(messages || []);
+
+    // Fetch dealer notification settings and send push if enabled
+    try {
+      const dealerId = selectedChat.dealer_id || user.id;
+      const res = await fetch(`/api/dealer/notification-settings?id=${dealerId}`);
+      const settingsData = await res.json();
+      if (settingsData.settings?.chat) {
+        await fetch("/api/push/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dealerId,
+            payload: {
+              title: "New Message",
+              body: "You received a new chat message",
+              url: `/dealer/chat`
+            }
+          })
+        });
+      }
+    } catch (e) {
+      // Silently ignore errors
+    }
   }
 
   return (

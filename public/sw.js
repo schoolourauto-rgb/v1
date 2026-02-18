@@ -97,4 +97,27 @@ define(['./workbox-e43f5367'], (function (workbox) { 'use strict';
     plugins: []
   }), 'GET');
 
+  // Web Push Notification Event Listeners
+
+  self.addEventListener("push", function(event) {
+    const data = event.data.json();
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      data: data.url,
+    });
+    // Play sound if enabled
+    if (data.sound) {
+      self.sound = self.sound || new Audio("/notification.mp3");
+      self.sound.play && self.sound.play();
+    }
+  });
+
+  self.addEventListener("notificationclick", function(event) {
+    event.notification.close();
+    event.waitUntil(
+      clients.openWindow(event.notification.data)
+    );
+  });
 }));

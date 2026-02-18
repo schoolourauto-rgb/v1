@@ -1,6 +1,5 @@
 
 "use client";
-
 import { useState, useEffect } from "react";
 
 export default function AddCarPage() {
@@ -57,6 +56,7 @@ export default function AddCarPage() {
     // await handleImageOCR(files[0]);
   };
 
+
   // Optional: Image OCR handler (advanced)
   // async function handleImageOCR(file: File) {
   //   const formData = new FormData();
@@ -70,106 +70,61 @@ export default function AddCarPage() {
     setImages(images.filter((_, i) => i !== index));
   };
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Add New Car</h1>
-
-      <form className="grid md:grid-cols-2 gap-6">
-
-        <textarea
-          placeholder="Paste OLX / WhatsApp car details here..."
-          value={rawText}
-          onChange={(e) => handleRawText(e.target.value)}
-          className="input col-span-2"
-        />
-
+    <div className="min-h-screen pb-24">
+      {/* Image Picker */}
+      <div className="mb-6">
         <input
-          placeholder="Brand"
-          className="input"
-          value={brand}
-          onChange={e => setBrand(e.target.value)}
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={handleImages}
+          ref={fileInputRef}
+          className="hidden"
         />
-        <input
-          placeholder="Model"
-          className="input"
-          value={model}
-          onChange={e => setModel(e.target.value)}
-        />
-        <input
-          placeholder="Year"
-          type="number"
-          className="input"
-          value={year}
-          onChange={e => setYear(e.target.value)}
-        />
-        <input
-          placeholder="Price"
-          type="number"
-          className="input"
-          value={price}
-          onChange={e => setPrice(e.target.value)}
-        />
-        <input
-          placeholder="Fuel Type"
-          className="input"
-          value={fuel}
-          onChange={e => setFuel(e.target.value)}
-        />
-        <input
-          placeholder="Transmission"
-          className="input"
-          value={transmission}
-          onChange={e => setTransmission(e.target.value)}
-        />
-
-        <input
-          placeholder="Title"
-          className="input col-span-2"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
-
-        <textarea
-          placeholder="Description"
-          className="input col-span-2"
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-        />
-
-        {/* Image Upload */}
-        <div className="col-span-2">
-          <label className="block mb-2 font-semibold">Car Images</label>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImages}
-            className="mb-4"
-          />
-
-          <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
-            {images.map((file, index) => (
-              <div key={index} className="relative">
-                <img
-                  src={URL.createObjectURL(file)}
-                  className="rounded-lg object-cover h-24 w-full"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeImage(index)}
-                  className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 rounded"
-                >
-                  X
-                </button>
-              </div>
-            ))}
-          </div>
+        <div className="grid grid-cols-3 gap-2">
+          {images.map((file, i) => (
+            <div key={i} className="relative aspect-square rounded-lg overflow-hidden">
+              <img src={URL.createObjectURL(file)} className="object-cover w-full h-full" />
+              {i === 0 && (
+                <span className="absolute top-1 left-1 bg-yellow-500 text-black text-xs px-2 py-0.5 rounded">
+                  Main
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => removeImage(i)}
+                className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 rounded"
+              >
+                X
+              </button>
+            </div>
+          ))}
+          {/* Add button */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="aspect-square border-2 border-dashed border-neutral-400 rounded-lg flex items-center justify-center text-2xl text-neutral-500"
+          >
+            +
+          </button>
         </div>
+      </div>
 
-        <button className="col-span-2 bg-yellow-500 text-black py-3 rounded-lg font-semibold">
-          Add Car
+      {/* Chat Style Inputs */}
+      <div className="space-y-4 px-4">
+        <input className="w-full p-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl" placeholder="Car Title" value={title} onChange={e => setTitle(e.target.value)} />
+        <input className="w-full p-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl" placeholder="Price" value={price} onChange={e => setPrice(e.target.value)} />
+        <textarea className="w-full p-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl" placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
+      </div>
+
+      {/* Sticky Submit */}
+      <div className="fixed bottom-16 left-0 right-0 px-4 sm:hidden">
+        <button className="w-full bg-yellow-500 text-black py-3 rounded-xl font-semibold">
+          Publish Car
         </button>
-      </form>
+      </div>
     </div>
   );
 }

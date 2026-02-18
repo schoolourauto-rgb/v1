@@ -10,6 +10,24 @@ const MIN_CONFIDENCE = 60;
 export async function GET() {
   const supabase = await createClient();
 
+  // Parse filters from query params
+  const url = new URL(globalThis.location ? globalThis.location.href : "http://localhost", globalThis.location ? undefined : "http://localhost");
+  const filters: Record<string, any> = {};
+  ["brand", "model", "city", "maxPrice", "fuel", "transmission", "year"].forEach((key) => {
+    const value = url.searchParams.get(key);
+    if (value) filters[key] = value;
+  });
+
+  // Log search intelligence
+  if (Object.keys(filters).length > 0) {
+    await supabase.from("search_logs").insert([
+      {
+        filters,
+        searched_at: new Date().toISOString(),
+      },
+    ]);
+  }
+
   const { data, error } = await supabase
     .from("cars")
     .select("*")

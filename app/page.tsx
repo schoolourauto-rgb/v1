@@ -1,9 +1,21 @@
-// JSON-LD generator for Vehicle structured data
+
+import HeroSection from "@/components/marketplace/HeroSection";
+import { createClient } from "@/lib/supabase/server";
+import { Car } from "@/types/car";
+import BrandGrid from "@/components/seo/BrandGrid";
+import CityGrid from "@/components/seo/CityGrid";
+import BudgetGrid from "@/components/seo/BudgetGrid";
+import FuelGrid from "@/components/seo/FuelGrid";
+import TransmissionGrid from "@/components/seo/TransmissionGrid";
+import { getTrendingCities } from '@/lib/marketplace/getTrendingCities';
+
+export const revalidate = 60;
+
 function generateVehicleJsonLd(cars: Car[]) {
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    itemListElement: cars.slice(0, 6).map((car, index) => ({
+    "itemListElement": cars.map((car, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
@@ -28,22 +40,10 @@ function generateVehicleJsonLd(cars: Car[]) {
   };
 }
 
-import HeroSection from "@/components/marketplace/HeroSection";
-import { createClient } from "@/lib/supabase/server";
-import { Car } from "@/types/car";
-import BrandGrid from "@/components/seo/BrandGrid";
-import CityGrid from "@/components/seo/CityGrid";
-import BudgetGrid from "@/components/seo/BudgetGrid";
-import FuelGrid from "@/components/seo/FuelGrid";
-import TransmissionGrid from "@/components/seo/TransmissionGrid";
-
-// Server Component: Fetch active cars from Supabase and pass to HeroSection
-export const revalidate = 60;
-
 export default async function HomePage() {
   const supabase = await createClient();
-  // RLS policy required: Ensure only active cars are fetched and user cannot access others
   let brands: any[] = [], cities: any[] = [], cars: any[] = [], error: any = null;
+  let trendingCities: string[] = [];
   try {
     const results = await Promise.all([
       supabase
@@ -72,10 +72,12 @@ export default async function HomePage() {
         `)
         .eq("is_active", true)
         .order("created_at", { ascending: false }),
+      getTrendingCities(),
     ]);
     brands = results[0].data || [];
     cities = results[1].data || [];
     cars = results[2].data || [];
+    trendingCities = results[3] || [];
     error = results[2].error || null;
   } catch (err) {
     error = err;
@@ -152,6 +154,18 @@ export default async function HomePage() {
         <span className="mx-4">Updated Daily</span>
       </div>
 
+      {/* Trending Cities */}
+      {trendingCities.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex flex-wrap gap-4 mb-6">
+            {trendingCities.map((city) => (
+              <span key={city} className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-semibold text-lg">
+                Trending in {city} 🔥
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Inventory Grid */}
       <div className="max-w-7xl mx-auto px-4 py-10">
         {listings.length > 0 ? (

@@ -89,7 +89,7 @@ export default function DealerProfilePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
-      <form onSubmit={handleSave} className="bg-card border border-border p-8 rounded-xl shadow-sm w-full max-w-md space-y-6">
+      <form onSubmit={handleSave} className="bg-card border border-border p-4 sm:p-6 rounded-xl shadow-sm w-full max-w-md space-y-6">
         <h1 className="text-2xl font-bold mb-2">Edit Dealership Profile</h1>
         <div className="space-y-4">
           <div>

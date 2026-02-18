@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import CarCard from '@/components/marketplace/CarCard'
-import ListingCardSkeleton from '@/components/marketplace/ListingCardSkeleton'
+import CarCardSkeleton from '@/components/skeleton/CarCardSkeleton'
 import Link from 'next/link'
 
 interface Car {
@@ -108,9 +108,9 @@ export default async function MarketplacePage({ searchParams }: { searchParams?:
 
         {/* Results */}
         {!cars ? (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 animate-fadeInUp">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <ListingCardSkeleton key={i} />
+              <CarCardSkeleton key={i} />
             ))}
           </div>
         ) : cars.length === 0 ? (
