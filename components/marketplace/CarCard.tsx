@@ -22,10 +22,6 @@ export interface CarCardProps {
   is_featured?: boolean;
 }
 
-interface DealerInfo {
-  id: string;
-  name: string;
-}
 
 export default function CarCard({
   id,
