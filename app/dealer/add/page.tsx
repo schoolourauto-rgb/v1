@@ -175,7 +175,7 @@ export default function DealerAddCarPage() {
                   aria-label="Remove image"
                 >
                   X
-                    // Ensure production and build safety: remove any invalid unicode escapes, unsafe JSON.parse usage, emojis in JSON string literals, and unsafe template literals.
+                </button>
               </div>
             ))}
             {/* Add button */}

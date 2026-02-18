@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  // swcMinify removed for Next.js 16+ compatibility
 
   images: {
     formats: ["image/avif", "image/webp"],
