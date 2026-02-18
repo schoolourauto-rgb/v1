@@ -35,7 +35,7 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 
   return NextResponse.json(data, { status: 200 });
@@ -135,7 +135,7 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
       );
     }
     return NextResponse.json(
-      { error: carError.message },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

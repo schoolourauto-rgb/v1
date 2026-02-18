@@ -1,3 +1,4 @@
+import { logger } from '@/lib/monitoring/logger';
 
 
 import { notFound } from "next/navigation"
@@ -42,7 +43,7 @@ export default async function CarDetailPage(
 
 		const { data, error } = await supabase
 			.from("cars")
-			.select("*")
+			.select("id, brand, model, price, year, km_driven, fuel_type, transmission, description, dealer_id")
 			.eq("id", params.id)
 			.single()
 
@@ -66,7 +67,7 @@ export default async function CarDetailPage(
 			</div>
 		)
 	} catch (error) {
-		console.error("Car page error:", error)
+		  logger.error('Car page error', { error });
 		notFound()
 	}
 }

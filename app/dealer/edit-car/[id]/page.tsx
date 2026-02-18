@@ -49,7 +49,7 @@ export default function EditCarPage() {
 
       const { data: carData, error: fetchError } = await supabase
         .from('cars')
-        .select('*')
+        .select('id, title, brand, model, year, price, km_driven, fuel_type, transmission, description, dealer_id')
         .eq('id', carId)
         .eq('dealer_id', user.id)
         .single<Car>()

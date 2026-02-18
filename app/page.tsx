@@ -172,7 +172,14 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {listings.slice(0, 12).map((car) => (
               <div key={car.id} className="bg-white border border-zinc-200 rounded-lg p-4">
-                <img src={car.image} alt={car.title} className="w-full h-40 object-cover rounded mb-3" />
+                <Image
+                  src={car.image || "/categories/default-car.jpg"}
+                  alt={car.title}
+                  width={320}
+                  height={160}
+                  className="w-full h-40 object-cover rounded mb-3"
+                  sizes="(max-width: 768px) 100vw, 320px"
+                />
                 <div className="font-bold text-lg text-black mb-1">{car.brand} {car.model}</div>
                 <div className="text-zinc-700 text-sm mb-1">{car.year} • {car.fuel_type} • {car.transmission}</div>
                 <div className="text-zinc-900 font-semibold">₹{car.price.toLocaleString()}</div>
@@ -198,3 +205,4 @@ export default async function HomePage() {
     </>
   );
 }
+import Image from "next/image";

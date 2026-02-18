@@ -1,6 +1,6 @@
-
 "use client";
-import { useState, useEffect } from "react";
+import Image from 'next/image';
+import React, { useState, useEffect } from "react";
 
 export default function AddCarPage() {
   const [images, setImages] = useState<File[]>([]);
@@ -86,7 +86,14 @@ export default function AddCarPage() {
         <div className="grid grid-cols-3 gap-2">
           {images.map((file, i) => (
             <div key={i} className="relative aspect-square rounded-lg overflow-hidden">
-              <img src={URL.createObjectURL(file)} className="object-cover w-full h-full" />
+              <Image
+                src={URL.createObjectURL(file)}
+                alt="preview"
+                width={320}
+                height={240}
+                className="object-cover w-full h-full"
+                sizes="(max-width: 768px) 100vw, 320px"
+              />
               {i === 0 && (
                 <span className="absolute top-1 left-1 bg-yellow-500 text-black text-xs px-2 py-0.5 rounded">
                   Main

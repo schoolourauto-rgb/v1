@@ -40,7 +40,7 @@ export default function DealerDashboardClient({
     dealer?.city ? `🔥 Your cars are trending in ${dealer.city}` : null,
     totalListings < 5 ? '📸 Add more cars to increase visibility' : null,
     status === 'Elite Dealer' ? '🏆 You are a top dealer in your city!' : null,
-  ].filter(Boolean);
+  ].filter(Boolean) as string[];
 
   return (
     <>

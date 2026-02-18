@@ -1,3 +1,4 @@
+import { logger } from '@/lib/monitoring/logger';
 // ...existing code...
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
 
   // Parse form
   const formData = await req.formData();
-  console.log("FORM DATA RECEIVED:", Array.from(formData.entries()));
+  logger.info('FORM DATA RECEIVED', { entries: Array.from(formData.entries()) });
   const token = formData.get("token");
   if (!token) {
     return NextResponse.json({ error: "Missing reCAPTCHA token" }, { status: 400 });
@@ -139,7 +140,7 @@ export async function POST(req: Request) {
     .select()
     .single();
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 400 });
   }
 
   // Insert images into car_images table

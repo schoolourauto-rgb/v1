@@ -1,4 +1,7 @@
 
+import { logger } from '@/lib/monitoring/logger';
+import { rateLimit } from '@/middleware/rateLimit';
+
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -6,6 +9,9 @@ import { generateReferralCode } from '@/lib/utils/generateReferralCode';
 import { signupSchema } from '@/lib/validation/zodSchemas';
 
 export async function POST(req: Request) {
+  // Rate limit
+  const rl = rateLimit(req);
+  if (rl) return rl;
   try {
     const contentType = req.headers.get("content-type");
 
@@ -39,7 +45,7 @@ export async function POST(req: Request) {
       });
 
     if (authError) {
-      return new Response(JSON.stringify({ error: authError.message }), {
+      return new Response(JSON.stringify({ error: "Internal Server Error" }), {
         status: 400,
       });
     }

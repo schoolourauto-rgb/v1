@@ -32,7 +32,7 @@ export default function DealerProfilePage() {
       const userId = session.user.id;
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, name, email, phone, user_id, created_at")
         .eq("user_id", userId)
         .single()
       if (error) setError(error.message)

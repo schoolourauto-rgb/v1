@@ -18,7 +18,7 @@ const options = [
 ];
 
 export default function NotificationSettings() {
-  const [settings, setSettings] = useState(defaultSettings);
+  const [settings, setSettings] = useState<{ [key: string]: boolean }>(defaultSettings);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

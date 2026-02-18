@@ -1,4 +1,5 @@
 // --- Cluster Telemetry ---
+import { logger } from '../monitoring/logger';
 export interface ClusterTelemetryEvent {
   path: string;
   clusterType: ClusterType;
@@ -17,12 +18,10 @@ function emitTelemetry(event: ClusterTelemetryEvent) {
   if (!process.env.ENABLE_CLUSTER_TELEMETRY) return;
   queueMicrotask(() => {
     try {
-      console.log(
-        JSON.stringify({
-          type: "cluster_evaluation",
-          ...event,
-        })
-      );
+      logger.info('Canonical engine', {
+        type: "cluster_evaluation",
+        ...event,
+      });
     } catch {
       // never break rendering
     }

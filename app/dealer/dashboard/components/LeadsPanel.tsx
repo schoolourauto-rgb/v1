@@ -1,3 +1,4 @@
+import { logger } from '@/lib/monitoring/logger';
 "use client"
 
 import { useEffect, useState } from "react"
@@ -34,7 +35,7 @@ export default function LeadsPanel() {
 
         const { data, error } = await supabase
           .from("leads")
-          .select("*")
+          .select("id, name, phone, message, created_at")
           .order("created_at", { ascending: false })
 
         if (error) throw error
@@ -98,7 +99,7 @@ export default function LeadsPanel() {
         .eq("dealer_id", user.id)
         .order("created_at", { ascending: false });
       if (error) {
-        console.error(error);
+        logger.error('LeadsPanel error', { error });
         setChats([]);
       } else {
         setChats(chats || []);
@@ -114,7 +115,7 @@ export default function LeadsPanel() {
       setLoadingMessages(true);
       const { data: messages, error } = await supabase
         .from("messages")
-        .select("*")
+        .select("id, chat_id, sender_id, message, created_at")
         .eq("chat_id", selectedChat.id)
         .order("created_at", { ascending: true });
       if (!error && messages) setMessages(messages);
@@ -160,7 +161,7 @@ export default function LeadsPanel() {
     // Refetch messages
     const { data: messages } = await supabase
       .from("messages")
-      .select("*")
+      .select("id, chat_id, sender_id, message, created_at")
       .eq("chat_id", selectedChat.id)
       .order("created_at", { ascending: true });
     setMessages(messages || []);

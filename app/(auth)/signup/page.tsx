@@ -1,4 +1,6 @@
-'use client'
+
+"use client";
+import { logger } from '@/lib/monitoring/logger';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -33,7 +35,7 @@ export default function SignupPage() {
     setError(null);
 
     // Console log: before validation
-    console.log("[Signup] Before validation", form);
+    logger.info('[Signup] Before validation', { form });
 
     // Validation
     const businessName = form.business_name;

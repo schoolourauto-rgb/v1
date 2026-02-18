@@ -19,7 +19,7 @@ export class LeadsService {
     // Fetch dealer to check suspension and notification settings
     const { data: dealer, error: dealerError } = await supabase
       .from("dealers")
-      .select("is_suspended, notification_settings")
+      .select("is_suspended, notification_settings, unread_count")
       .eq("id", car.dealer_id)
       .single();
     if (dealerError || !dealer) {
@@ -55,9 +55,9 @@ export class LeadsService {
     }
     return true;
   }
-}
     // Helper to reset unread_count for a dealer
     static async resetUnreadCount(dealerId: string) {
       const supabase = await createClient();
       await supabase.from("dealers").update({ unread_count: 0 }).eq("id", dealerId);
     }
+}

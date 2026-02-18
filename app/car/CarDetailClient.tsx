@@ -6,13 +6,14 @@ import LeadForm from './[id]/LeadForm'
 import { CarWithImages } from '@/types'
 import { User } from '@supabase/supabase-js'
 import { getSimilarCars } from '@/lib/marketplace/getSimilarCars'
-import { CarCard } from '@/components/CarCard'
+import CarCard from '@/components/CarCard'
 
 interface CarDetailProps {
   car: CarWithImages & { profiles?: { mobile?: string; business_name?: string } }
   user: User | null
 }
 
+export default function CarDetailClient({ car, user }: CarDetailProps) {
   const images = car.car_images || [];
   const [selected, setSelected] = useState(images[0]?.image_url);
   const dealerMobile = car.profiles?.mobile;

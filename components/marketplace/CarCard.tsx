@@ -1,5 +1,26 @@
 import Image from "next/image"
 import Link from "next/link"
+export interface CarCardProps {
+  id: string;
+  image?: string;
+  title: string;
+  year?: string | number;
+  price: string | number;
+  location?: string;
+  dealer?: {
+    id: string;
+    name: string;
+    [key: string]: any;
+  };
+  listingTier?: "simple" | "hot" | "featured";
+  structuredFields?: any;
+  detectedFeatures?: any;
+  rawDescription?: string;
+  views?: number;
+  leads?: number;
+  created_at?: string;
+  is_featured?: boolean;
+}
 
 interface DealerInfo {
   id: string;

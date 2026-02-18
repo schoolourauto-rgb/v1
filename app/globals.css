@@ -1,58 +1,25 @@
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.4s ease-out forwards;
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
-html, body {
+/* Prevent horizontal scroll */
+html,
+body {
   overflow-x: hidden;
 }
+
+/* Smooth scroll */
 html {
   scroll-behavior: smooth;
-  transition: background-color 0.2s ease, color: 0.2s ease;
 }
 
-html.light {
-  background: #ffffff;
-  color: #000000;
-}
-
+/* Dark mode background */
 html.dark {
-  background: #000000;
+  background-color: #0a0a0a;
   color: #ffffff;
 }
 
-body {
-  background: inherit;
-  color: inherit;
-}
+/* Input styling */
 .input-style {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  background-color: #f3f4f6;
-  color: #222;
-  font-size: 1rem;
-  border: 1px solid #e5e7eb;
-  outline: none;
-  transition: box-shadow 0.2s;
+  @apply w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-yellow-500 outline-none;
 }
-.dark .input-style {
-  background-color: #232323;
-  color: #fff;
-  border-color: #444;
-}
-.input-style:focus {
-  box-shadow: 0 0 0 2px #facc15;
-  border-color: #facc15;
-}
-

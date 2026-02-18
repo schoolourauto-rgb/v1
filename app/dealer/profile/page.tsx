@@ -1,4 +1,6 @@
+
 "use client";
+import Image from "next/image";
 import { useState, useRef } from "react";
 
 const initialProfile = {
@@ -53,7 +55,14 @@ export default function DealerProfilePage() {
       {/* Cover Image */}
       <div className="relative h-56 rounded-t-2xl overflow-hidden bg-zinc-800 flex items-center justify-center">
         {coverPreview || profile.cover ? (
-          <img src={coverPreview || profile.cover} alt="cover" className="object-cover w-full h-full" />
+          <Image
+            src={coverPreview || profile.cover}
+            alt="cover"
+            width={800}
+            height={200}
+            className="object-cover w-full h-full"
+            sizes="100vw"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-zinc-500">Upload cover image</div>
         )}
@@ -76,7 +85,14 @@ export default function DealerProfilePage() {
         <div className="relative">
           <div className="w-32 h-32 rounded-full border-4 border-white bg-zinc-200 overflow-hidden shadow-lg flex items-center justify-center">
             {avatarPreview || profile.avatar ? (
-              <img src={avatarPreview || profile.avatar} alt="avatar" className="object-cover w-full h-full" />
+              <Image
+                src={avatarPreview || profile.avatar}
+                alt="avatar"
+                width={128}
+                height={128}
+                className="object-cover w-full h-full"
+                sizes="128px"
+              />
             ) : (
               <span className="text-zinc-400">Upload avatar</span>
             )}

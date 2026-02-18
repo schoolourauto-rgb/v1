@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -76,7 +77,14 @@ export default async function CityCarsPage({ params }: { params: { city: string 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {cars.map((car: any) => (
           <div key={car.id} className="bg-white border border-zinc-200 rounded-lg p-4">
-            <img src={car.car_images?.[0]?.image_url || '/logo.png'} alt={car.title} className="w-full h-40 object-cover rounded mb-3" />
+            <Image
+              src={car.car_images?.[0]?.image_url || '/logo.png'}
+              alt={car.title}
+              width={320}
+              height={160}
+              className="w-full h-40 object-cover rounded mb-3"
+              sizes="(max-width: 768px) 100vw, 320px"
+            />
             <div className="font-bold text-lg text-black mb-1">{car.brand} {car.model}</div>
             <div className="text-zinc-700 text-sm mb-1">{car.year} • {car.fuel_type} • {car.transmission}</div>
             <div className="text-zinc-900 font-semibold">₹{car.price?.toLocaleString()}</div>

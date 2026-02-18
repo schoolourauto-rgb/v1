@@ -27,6 +27,6 @@ export const POST = withErrorHandler(async (req: Request) => {
     if (e.message === "Dealer unavailable") {
       return NextResponse.json({ error: "Dealer unavailable" }, { status: 403 });
     }
-    return NextResponse.json({ error: e.message || "Failed to submit lead" }, { status: 400 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 400 });
   }
 });

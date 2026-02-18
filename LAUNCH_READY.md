@@ -13,7 +13,7 @@
 ### DEALER PAGES (4) ✅
 - [x] Dashboard (`/dealer/dashboard`)
 - [x] Add Car (`/dealer/add-car`)
-- [x] Edit Car (`/dealer/edit-car/[id]`)
+- [x] Edit Car (`/dealer/edit-car/[carId]`)
 - [x] Onboarding (`/dealer/onboarding`)
 
 ### COMPONENTS (2) ✅

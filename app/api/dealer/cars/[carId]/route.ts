@@ -42,7 +42,7 @@ export async function DELETE(
     .delete()
     .eq("id", carId);
   if (deleteError) {
-    return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 
   // Delete images from storage

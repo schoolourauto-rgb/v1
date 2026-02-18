@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { Metadata } from 'next';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Top Dealers | OurAuto',
@@ -21,12 +22,12 @@ export default async function TopDealersPage() {
     .from('dealers')
     .select('id, name, avatar, trust_score, total_leads, profile_views, active_listings, fraud_flags, verified')
     .eq('suspended', false)
-    .order('trust_score', { ascending: false });
+    .order('trust_score', { ascending: false })
+    .limit(20);
 
   const sorted = (dealers ?? [])
     .map((d) => ({ ...d, score: calculateScore(d) }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 20);
+    .sort((a, b) => b.score - a.score);
 
   return (
     <main className="max-w-5xl mx-auto py-10 px-4">
@@ -35,7 +36,15 @@ export default async function TopDealersPage() {
         {sorted.map((dealer, idx) => (
           <div key={dealer.id} className="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center relative">
             <span className="absolute top-2 left-2 text-2xl font-bold">#{idx + 1}</span>
-            <img src={dealer.avatar || '/logo.png'} alt={dealer.name} className="w-20 h-20 rounded-full border-4 border-yellow-400 mb-3" />
+            <Image
+              src={dealer.avatar || '/logo.png'}
+              alt={dealer.name}
+              width={80}
+              height={80}
+              className="w-20 h-20 rounded-full border-4 border-yellow-400 mb-3"
+              sizes="(max-width: 768px) 100vw, 80px"
+              priority={idx < 3}
+            />
             <div className="font-bold text-lg mb-1">{dealer.name}</div>
             <div className="flex items-center gap-2 mb-2">
               <span className="inline-block w-8 h-8 rounded-full border-4 border-green-400 flex items-center justify-center font-bold text-green-700 bg-green-100">{dealer.trust_score}</span>

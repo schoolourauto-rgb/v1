@@ -1,3 +1,4 @@
+import { logger } from '../monitoring/logger';
 
 
 // Tier system structure:
@@ -39,6 +40,7 @@ export interface MarketplaceListing extends Car {
   qualityScore: number;
   activeDealer: boolean;
   finalScore: number;
+  score: number;
 }
 
 export async function getListings({ filters = {}, from, to }: GetListingsParams): Promise<{ listings: MarketplaceListing[]; count: number; error: any }> {
@@ -132,7 +134,7 @@ export async function getListings({ filters = {}, from, to }: GetListingsParams)
     // Sort by score descending
     listings.sort((a, b) => b.score - a.score);
 
-    return { listings, count: typeof count === "number" ? count : 0, error: false };
+    return { listings, count: count ?? 0, error: false };
 
     // --- DEV MODE: Simulate tier assignment and ordering ---
     if (process.env.NODE_ENV === "development") {
@@ -179,9 +181,9 @@ export async function getListings({ filters = {}, from, to }: GetListingsParams)
       return 0;
     });
 
-    return { listings, count: typeof count === "number" ? count : 0, error: false };
+    return { listings, count: count ?? 0, error: false };
   } catch (error) {
-    console.error("Marketplace fetch error:", error);
+    logger.error('Marketplace fetch error', { error });
     return { listings: [], count: 0, error: false };
   }
 }

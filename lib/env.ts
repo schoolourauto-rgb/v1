@@ -1,4 +1,6 @@
+
 import { z } from "zod";
+import { logger } from './monitoring/logger';
 
 const envSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
@@ -14,7 +16,7 @@ const _env = {
 const parsed = envSchema.safeParse(_env);
 if (!parsed.success) {
   // eslint-disable-next-line no-console
-  console.error("❌ Invalid environment variables:", parsed.error.flatten());
+  logger.error('Invalid environment variables', { error: parsed.error.flatten() });
   throw new Error("Invalid environment variables");
 }
 

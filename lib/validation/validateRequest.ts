@@ -1,3 +1,4 @@
+import { logger } from '../monitoring/logger';
 import { z, ZodSchema } from "zod";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -23,7 +24,7 @@ export async function validateJsonRequest<T>(req: Request | NextRequest, schema:
   const result = schema.safeParse(json);
   if (!result.success) {
     // Log the error details for debugging
-    console.log('Zod validation error:', result.error.flatten());
+    logger.error('Zod validation error', { error: result.error.flatten() });
     return {
       error: true,
       response: NextResponse.json({ error: result.error.flatten() }, { status: 422 })

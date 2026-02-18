@@ -1,11 +1,16 @@
 import webpush from "web-push";
 import { createClient } from "@supabase/supabase-js";
 
-webpush.setVapidDetails(
-  "mailto:admin@yourdomain.com",
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+if (
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY &&
+  process.env.VAPID_PRIVATE_KEY
+) {
+  webpush.setVapidDetails(
+    "mailto:admin@yourdomain.com",
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  );
+}
 
 export async function sendPush(dealerId: string, payload: { title: string; body: string; url: string }, type: 'chat' | 'leads' | 'broadcast' = 'chat') {
   const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
@@ -19,7 +24,7 @@ export async function sendPush(dealerId: string, payload: { title: string; body:
   if (type === 'leads' && dealer.notification_settings.leads === false) return;
   if (type === 'broadcast' && dealer.notification_settings.broadcast === false) return;
 
-  const { data: subs } = await supabase.from("push_subscriptions").select("*").eq("dealer_id", dealerId);
+  const { data: subs } = await supabase.from("push_subscriptions").select("id, endpoint, p256dh, auth").eq("dealer_id", dealerId);
   if (!subs || subs.length === 0) return;
 
   for (const sub of subs) {

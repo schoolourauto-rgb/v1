@@ -1,5 +1,3 @@
-
-
 import { createClient } from "@/lib/supabase/server";
 import CarCard from "@/components/marketplace/CarCard";
 import EmptyState from "@/components/marketplace/EmptyState";
@@ -20,13 +18,47 @@ dayjs.extend(relativeTime);
 
 export const revalidate = 60;
 
-import { type Metadata, type ResolvingMetadata } from 'next';
+import { type Metadata } from 'next';
+import Head from "next/head";
 
 interface CarsPageProps {
   params: { filters?: string[] };
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 
+
+export async function generateMetadata({ params }: CarsPageProps): Promise<Metadata> {
+  const rawFilters = params.filters ?? [];
+  const parsedFilters = parseFilters(rawFilters);
+  const normalizedSegments = normalizeFilters(parsedFilters);
+  const { title, description } = buildMetadata(parsedFilters);
+  const city = parsedFilters.city || "";
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://ourauto.in/cars/${normalizedSegments.join("/")}`,
+      siteName: "OurAuto",
+      type: "website",
+      images: [
+        `https://ourauto.in/api/share-image/city/${city}`
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [
+        `https://ourauto.in/api/share-image/city/${city}`
+      ],
+    },
+    alternates: {
+      canonical: `https://ourauto.in/cars/${normalizedSegments.join("/")}`,
+    },
+  };
+}
 
 export default async function CarsPage({ params, searchParams }: CarsPageProps) {
   // Filter normalization
@@ -51,8 +83,8 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
   // --- TRUST LAYER: STATS STRIP ---
   const supabase = await createClient();
   const [{ count: dealersCount }, { count: listingsCount }, latestListing] = await Promise.all([
-    supabase.from("dealers").select("*", { count: "exact", head: true }),
-    supabase.from("cars").select("*", { count: "exact", head: true }).eq("status", "active"),
+    supabase.from("dealers").select("id", { count: "exact", head: true }).limit(1),
+    supabase.from("cars").select("id", { count: "exact", head: true }).eq("status", "active").limit(1),
     supabase.from("cars").select("updated_at").eq("status", "active").order("updated_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
@@ -76,6 +108,12 @@ export default async function CarsPage({ params, searchParams }: CarsPageProps) 
 
   return (
     <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white flex flex-col min-h-screen">
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </Head>
       {/* Canonical link and robots meta handled by generateMetadata */}
       <script
         type="application/ld+json"

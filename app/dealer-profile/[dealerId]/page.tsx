@@ -1,7 +1,48 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { CarCard } from "@/components/CarCard";
+import CarCard from "@/components/CarCard";
+import { Metadata } from "next";
+import Head from "next/head";
+
+export async function generateMetadata({ params }: { params: { dealerId: string } }): Promise<Metadata> {
+  const supabase = await createClient();
+  const { data: dealer } = await supabase
+    .from("dealers")
+    .select("dealership_name, city, trust_score, profile_views")
+    .eq("id", params.dealerId)
+    .maybeSingle();
+  if (!dealer) {
+    return { title: "Dealer Not Found | OurAuto" };
+  }
+  const title = `${dealer.dealership_name} Dealer in ${dealer.city} | OurAuto`;
+  const description = `View ${dealer.dealership_name}'s profile, trust score, and active car listings in ${dealer.city}.`;
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://ourauto.in/dealer-profile/${params.dealerId}`,
+      siteName: "OurAuto",
+      type: "profile",
+      images: [
+        `https://ourauto.in/api/share-image/dealer/${params.dealerId}`
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [
+        `https://ourauto.in/api/share-image/dealer/${params.dealerId}`
+      ],
+    },
+    alternates: {
+      canonical: `https://ourauto.in/dealer-profile/${params.dealerId}`,
+    },
+  };
+}
 
 export default async function DealerProfilePage({ params }: { params: { dealerId: string } }) {
   const supabase = await createClient();

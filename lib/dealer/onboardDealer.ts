@@ -1,5 +1,7 @@
+
 import { createClient } from "@/lib/supabase/server";
 import type { Dealer } from "@/types/index";
+import { logger } from '../monitoring/logger';
 
 /**
  * Ensures a dealer row exists for the given user_id. If not, creates one with default values.
@@ -15,7 +17,7 @@ export async function onboardDealer(user_id: string): Promise<Dealer | null> {
       .eq("user_id", user_id)
       .maybeSingle();
     if (error) {
-      console.error("onboardDealer fetch error", error);
+      logger.error('onboardDealer fetch error', { error });
       return null;
     }
     if (dealer) return dealer as Dealer;
@@ -39,12 +41,12 @@ export async function onboardDealer(user_id: string): Promise<Dealer | null> {
         .select()
         .single();
     if (insertError) {
-      console.error("onboardDealer insert error", insertError);
+      logger.error('onboardDealer insert error', { error: insertError });
       return null;
     }
     return inserted as Dealer;
   } catch (err) {
-    console.error("onboardDealer exception", err);
+    logger.error('onboardDealer exception', { err });
     return null;
   }
 }

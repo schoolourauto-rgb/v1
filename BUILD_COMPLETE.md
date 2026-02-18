@@ -18,7 +18,7 @@ app/
 ├── dealer/
 │   ├── dashboard/page.tsx           ← Dealer's Car Inventory (6-car lock)
 │   ├── add-car/page.tsx             ← Add New Car (5+ photos)
-│   ├── edit-car/[id]/page.tsx       ← Edit/Delete Car
+│   ├── edit-car/[carId]/page.tsx       ← Edit/Delete Car
 │   └── onboarding/page.tsx          ← Welcome Instructions
 │
 ├── components/
