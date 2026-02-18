@@ -86,9 +86,9 @@ export default function CarCard({
           <h3 className="text-base sm:text-xl font-semibold line-clamp-2">{title}</h3>
 
           <div className="flex items-center gap-3 text-sm text-neutral-600">
-            <span className="text-xl sm:text-2xl font-bold">₹{price}</span>
-            <span>{year}</span>
-            <span>{location}</span>
+            <span className="text-xl sm:text-2xl font-bold">₹{price ?? "-"}</span>
+            {year && <span>{year}</span>}
+            {location && <span>{location}</span>}
             {daysAgo && <span>⏳ {daysAgo}</span>}
           </div>
 
