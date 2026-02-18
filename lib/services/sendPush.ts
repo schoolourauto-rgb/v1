@@ -2,6 +2,11 @@
 import webpush from "web-push";
 import { createClient } from "@supabase/supabase-js";
 
+export async function sendPush(
+  dealerId: string,
+  payload: { title: string; body: string; url: string },
+  type: 'chat' | 'leads' | 'broadcast' = 'chat'
+) {
   const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
 
