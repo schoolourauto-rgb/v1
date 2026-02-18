@@ -24,10 +24,10 @@ export async function requireActiveDealer() {
 
   if (dealer.is_suspended) {
     await logActivity({
-      user_id: user.id,
-      action_type: "SUSPENDED_ACCESS_ATTEMPT",
-      entity_type: "dealer",
-      entity_id: dealer.id,
+      userId: user.id,
+      actionType: "SUSPENDED_ACCESS_ATTEMPT",
+      entityType: "dealer",
+      entityId: dealer.id,
       metadata: {},
     });
 

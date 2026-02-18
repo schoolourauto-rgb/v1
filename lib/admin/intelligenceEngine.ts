@@ -6,13 +6,15 @@ import { logActivity } from "@/lib/logActivity";
  */
 export async function deductTrustScore(dealerId: string, amount: number, reason: string, metadata: any = {}) {
   // Get current trust score
-  const { data: dealer } = await adminSupabase
+  const { data, error } = await adminSupabase
     .from("dealers")
     .select("trust_score")
     .eq("id", dealerId)
     .maybeSingle();
-  if (!dealer) return;
-  const newScore = Math.max(0, (dealer.trust_score ?? 100) - amount);
+  if (error || !data) return;
+  const currentScore: number =
+    typeof data.trust_score === "number" ? data.trust_score : 100;
+  const newScore = Math.max(0, currentScore - amount);
   await adminSupabase
     .from("dealers")
     .update({ trust_score: newScore })
@@ -60,7 +62,7 @@ export async function analyzeDealerBehavior({ dealerId, event, carId, leadId, ip
   // Car deleted within 5 mins of posting
   if (event === "car_delete" && carId) {
     const { data: car } = await adminSupabase.from("cars").select("created_at").eq("id", carId).maybeSingle();
-    if (car && Date.now() - new Date(car.created_at).getTime() < 5*60*1000) {
+    if (car && car.created_at && Date.now() - new Date(car.created_at).getTime() < 5*60*1000) {
       await deductTrustScore(dealerId, 5, "car_deleted_quickly", { carId });
     }
   }

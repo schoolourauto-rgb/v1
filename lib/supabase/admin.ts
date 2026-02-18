@@ -1,8 +1,16 @@
-import { createClient } from "@supabase/supabase-js"
-import type { Database } from "./types"
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/lib/types/database";
 
-// Admin client for service role usage only (never in browser)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
 export const adminSupabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+  supabaseUrl,
+  serviceRoleKey,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  }
+);
