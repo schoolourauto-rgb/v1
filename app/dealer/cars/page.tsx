@@ -8,7 +8,7 @@ async function toggleStatus(formData: FormData) {
   "use server";
   const carId = formData.get("carId") as string;
   const currentStatus = formData.get("currentStatus") as string;
-  const supabase = createClient(cookies());
+  const supabase = createClient();
   const newStatus = currentStatus === "active" ? "sold" : "active";
   await supabase
     .from("cars")
@@ -19,12 +19,12 @@ async function toggleStatus(formData: FormData) {
 async function deleteCar(formData: FormData) {
   "use server";
   const carId = formData.get("carId") as string;
-  const supabase = createClient(cookies());
+  const supabase = createClient();
   await supabase.from("cars").delete().eq("id", carId);
 }
 
 export default async function DealerCarsPage() {
-  const supabase = createClient(cookies());
+  const supabase = createClient();
 
   const {
     data: { user },
