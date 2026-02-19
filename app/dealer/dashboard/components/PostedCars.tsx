@@ -1,7 +1,7 @@
 import React from "react";
 import StatCard from "./StatCard";
 import Insight from "./Insight";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Car } from "lucide-react";
 import { motion } from "framer-motion";
 

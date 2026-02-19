@@ -78,7 +78,7 @@ export default async function DealerDashboard() {
     <DashboardMain
       name={user.user_metadata?.name || "Dealer"}
       stats={stats}
-      chart={<DashboardChartClient options={chartData.options} series={chartData.series} type="line" height={140} width="100%" />}
+      // chart removed for audit cleanup
       activity={activity}
       cars={carsGrid}
     />

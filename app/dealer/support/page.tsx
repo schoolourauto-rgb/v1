@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { SupportTicketList } from "@/components/ui/support-ticket-list"
 
-const dummyTickets = [
+
+const dummyTickets: Ticket[] = [
   {
     id: "1",
     title: "Unable to upload car image",
@@ -26,28 +27,32 @@ const dummyTickets = [
   },
 ]
 
+import type { Ticket } from "@/components/ui/support-ticket-list";
+
 export default function DealerSupportPage() {
   const [loading, setLoading] = useState(false)
-  const [tickets, setTickets] = useState(dummyTickets)
+  const [tickets, setTickets] = useState<Ticket[]>(dummyTickets)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setLoading(true)
-    const form = e.currentTarget
+    e.preventDefault();
+    setLoading(true);
+    const form = e.currentTarget;
+    const getValue = (name: string) =>
+      (form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement)?.value || "";
     setTimeout(() => {
       setTickets([
         {
           id: (tickets.length + 1).toString(),
-          title: form.title.value,
-          status: "open",
-          description: form.description.value,
+          title: getValue("title"),
+          status: "pending",
+          description: getValue("description"),
           createdAt: new Date().toLocaleString(),
         },
         ...tickets,
-      ])
-      setLoading(false)
-      form.reset()
-    }, 1200)
+      ]);
+      setLoading(false);
+      form.reset();
+    }, 1200);
   }
 
   return (

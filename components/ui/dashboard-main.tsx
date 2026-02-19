@@ -15,7 +15,7 @@ export function DashboardMain({
 }: {
   name: string;
   stats: { icon: React.ReactNode; value: string | number; label: string; subtext?: string }[];
-  chart: React.ReactNode;
+  chart?: React.ReactNode;
   activity: { id: string; avatar?: string; name: string; action: string; timestamp: string }[];
   cars: { id: string; image: string; title: string; price: number; status: "active" | "sold" | "pending" }[];
 }) {
@@ -25,9 +25,11 @@ export function DashboardMain({
       <DashboardHeader title="Dashboard" />
       <DashboardStatsGroup stats={stats} />
       <div className="grid md:grid-cols-3 gap-8 mb-12">
-        <div className="md:col-span-2">
-          <DashboardChart>{chart}</DashboardChart>
-        </div>
+        {chart && (
+          <div className="md:col-span-2">
+            <DashboardChart>{chart}</DashboardChart>
+          </div>
+        )}
         <div>
           <DashboardActivity items={activity} />
         </div>

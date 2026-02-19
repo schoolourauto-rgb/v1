@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { parseCarText } from "@/lib/carParser";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 import type { Car } from '@/types/car';
 interface ChatInputProps {

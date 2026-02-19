@@ -1,7 +1,7 @@
 import { SupportTicketCard } from "./support-ticket-card";
 import React from "react";
 
-type Ticket = {
+export type Ticket = {
   id: string;
   title: string;
   status: "open" | "closed" | "pending";

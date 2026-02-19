@@ -2,7 +2,7 @@ import { logger } from '@/lib/monitoring/logger';
 "use client"
 
 import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 
 type Lead = {
