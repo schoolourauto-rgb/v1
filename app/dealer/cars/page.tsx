@@ -169,9 +169,9 @@ export default async function DealerCarsPage() {
           </form>
         </div>
       ))}
-    </div>
-  );
-}
+      {(!cars || cars.length === 0) && (
+        <div className="bg-white p-10 text-center rounded-xl shadow">
+          <p className="text-gray-500 mb-4">
             You have not added any cars yet.
           </p>
           <Link
@@ -183,5 +183,5 @@ export default async function DealerCarsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
