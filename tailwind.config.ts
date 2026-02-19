@@ -12,13 +12,16 @@ const config: Config = {
       colors: {
         background: "rgb(var(--background))",
         foreground: "rgb(var(--foreground))",
-        card: "rgba(var(--card))",
-        muted: "rgb(var(--muted))",
-        border: "rgba(var(--border))",
-        primary: "rgb(var(--primary))",
-        'primary-foreground': "rgb(var(--primary-foreground))",
-        success: "rgb(var(--success))",
-        danger: "rgb(var(--danger))",
+        card: "rgb(var(--card))",
+        border: "rgb(var(--border))",
+        accent: "rgb(var(--accent))",
+        accentFg: "rgb(var(--accent-fg))",
+        // legacy
+        yellow: {
+          400: '#FFD600',
+          500: '#FFC700',
+          600: '#C9A227',
+        },
       },
     },
   },

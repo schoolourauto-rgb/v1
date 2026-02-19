@@ -6,20 +6,58 @@
 html,
 body {
   overflow-x: hidden;
-}
-
-/* Smooth scroll */
-html {
   scroll-behavior: smooth;
 }
 
-/* Dark mode background */
+/* 60-30-10 Color Variables */
+:root {
+  --background: 255,255,255;
+  --foreground: 0,0,0;
+  --card: 30,30,30;
+  --border: 220,220,220;
+  --accent: 201,162,39;
+  --accent-fg: 0,0,0;
+}
 html.dark {
-  background-color: #0a0a0a;
-  color: #ffffff;
+  --background: 0,0,0;
+  --foreground: 255,255,255;
+  --card: 30,30,30;
+  --border: 40,40,40;
+  --accent: 201,162,39;
+  --accent-fg: 0,0,0;
 }
 
-/* Input styling */
+body {
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+}
+
+/* Soft border utility */
+.soft-border {
+  border: 1px solid rgb(var(--border));
+}
+
+/* Card utility */
+.card-bg {
+  background: rgb(var(--card));
+  color: rgb(var(--foreground));
+}
+
+/* Accent button utility */
+.btn-accent {
+  background: rgb(var(--accent));
+  color: rgb(var(--accent-fg));
+}
+.btn-accent:disabled {
+  opacity: 0.6;
+}
+
+/* Remove heavy shadows globally */
+.shadow-xl, .shadow-lg, .shadow-md, .shadow-sm {
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04) !important;
+}
+
+/* Inputs */
 .input-style {
-  @apply w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-yellow-500 outline-none;
+  @apply w-full bg-transparent border soft-border rounded-2xl p-3 text-base focus:ring-2 focus:ring-accent outline-none;
 }

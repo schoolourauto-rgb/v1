@@ -8,7 +8,9 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+
 import { createClient } from "@/lib/supabase/client";
+import Logo from '@/components/Logo';
 
 type Session = {
   user: {
@@ -71,19 +73,19 @@ export default function Header() {
   // Only render theme toggle after mount to avoid hydration mismatch
 
   return (
-    <header className="border-b border-yellow-500 bg-white dark:bg-black sticky top-0 z-30 transition-colors duration-200">
+    <header className="border-b soft-border bg-background sticky top-0 z-30 transition-colors duration-200 rounded-b-2xl">
       <div className="max-w-6xl mx-auto flex items-center justify-between h-16 px-4">
-        <Link
-          href="/"
-          className="font-bold tracking-wide text-black dark:text-white"
-        >
-          FREE MARKETPLACE
+        <Link href="/" className="flex items-center" aria-label="Home">
+          <div style={{ width: 140, height: "auto" }}>
+            {/* Logo: theme-aware */}
+            <Logo />
+          </div>
         </Link>
         <div className="flex items-center gap-4">
           {mounted && (
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-xl p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="text-foreground hover:text-accent transition-colors duration-200 text-xl p-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? "☀️" : "🌙"}
@@ -91,11 +93,11 @@ export default function Header() {
           )}
           {session && session.user ? (
             <>
-              <span className="text-black dark:text-white text-sm font-medium px-3 py-1 rounded-lg">
+              <span className="text-foreground text-sm font-medium px-3 py-1 rounded-2xl">
                 {dealerName ? dealerName : "My Account"}
               </span>
               <button
-                className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-lg border"
+                className="text-foreground hover:text-accent transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-2xl soft-border"
                 onClick={async () => {
                   const supabase = createClient();
                   await supabase.auth.signOut();
@@ -107,7 +109,7 @@ export default function Header() {
           ) : (
             <Link
               href="/auth/login"
-              className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-lg"
+              className="text-foreground hover:text-accent transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-2xl"
             >
               Dealer Login
             </Link>

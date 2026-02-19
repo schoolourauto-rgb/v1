@@ -1,19 +1,29 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ChangeEvent, FormEvent } from "react";
+
+type CarData = {
+  title?: string;
+  make?: string;
+  model?: string;
+  year?: number;
+  fuel?: string;
+  transmission?: string;
+  owner?: string;
+  color?: string;
+  insurance?: string;
+  reg_no?: string;
+  confidence?: number;
+  [key: string]: string | number | undefined;
+};
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import CarCard from "@/components/CarCard";
-import { parseCarMessage } from "@/lib/parser/parseCarMessage";
-import { validateCarData } from "@/lib/parser/validateCarData";
-import { generateTitle } from "@/lib/parser/generateTitle";
-import { generateSlug } from "@/lib/parser/generateSlug";
-import { aiFallbackParser } from "@/lib/parser/aiFallbackParser";
-import { CarData } from "@/lib/parser/types";
+import { parseCarInput } from "@/lib/carParser";
 
 export default function AddCarClient() {
   const [message, setMessage] = useState("");
-  const [carData, setCarData] = useState<CarData>({ confidence: 0 });
+  const [carData, setCarData] = useState<CarData>({});
   const [validation, setValidation] = useState<{ valid: boolean; errors: string[] }>({ valid: false, errors: [] });
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -24,17 +34,22 @@ export default function AddCarClient() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    let parsed: CarData | null = parseCarMessage(message);
-    if (!parsed || parsed.confidence < 30) {
-      parsed = aiFallbackParser(message) || { confidence: 0 };
+    // Use new strict parser
+    const result = parseCarInput(message, images.map(f => f.name));
+    if (result.success) {
+      // Remove images property if present, as CarData does not allow it
+      const { images: _images, ...carDataWithoutImages } = result.data;
+      setCarData(carDataWithoutImages);
+      setTitle(result.data.title || "");
+      setValidation({ valid: true, errors: [] });
+    } else {
+      setCarData({});
+      setTitle("");
+      setValidation({ valid: false, errors: Object.values(result.errors) });
     }
-    setCarData(parsed);
-    setTitle(generateTitle(parsed));
-    setSlug(generateSlug(parsed));
-    setValidation(validateCarData(parsed));
-  }, [message]);
+  }, [message, images]);
 
-  const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImages = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + images.length > 10) {
       alert("Maximum 10 images allowed");
@@ -47,15 +62,16 @@ export default function AddCarClient() {
     setImages(images.filter((_, i) => i !== index));
   };
 
-  const canPublish = validation.valid && images.length > 0 && carData.confidence >= 60 && !loading;
+  const canPublish = validation.valid && images.length > 0 && !loading;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!canPublish) return;
     setLoading(true);
     setSuccess("");
     setError("");
     try {
+      // Upload images to Supabase storage
       const supabase = createClient();
       const imageUrls: string[] = [];
       for (const file of images) {
@@ -68,24 +84,31 @@ export default function AddCarClient() {
           .getPublicUrl(data.path);
         imageUrls.push(urlData.publicUrl);
       }
-      const { error: insertError } = await supabase
-        .from("cars")
-        .insert([
-          {
-            ...carData,
-            title,
-            slug,
-            images: imageUrls,
-            created_at: new Date().toISOString(),
-            raw_message: message,
-          },
-        ]);
-      if (insertError) throw insertError;
+      // Send POST request to server route
+      const res = await fetch("/api/dealer/cars", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          raw_message: message,
+          parsed_data: carData,
+          image_urls: imageUrls,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setError(json.error || "Failed to list car.");
+        setLoading(false);
+        return;
+      }
       setSuccess("Car listed successfully!");
       setImages([]);
       setMessage("");
-    } catch (err: any) {
-      setError(err?.message || "Failed to list car.");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message || "Failed to list car.");
+      } else {
+        setError("Failed to list car.");
+      }
     } finally {
       setLoading(false);
     }
@@ -93,17 +116,17 @@ export default function AddCarClient() {
 
   // Responsive layout
   return (
-    <div className="min-h-screen bg-neutral-100 dark:bg-neutral-900 flex flex-col md:flex-row md:items-start pb-24">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row md:items-start pb-24">
       {/* Left: Chat Composer */}
       <form
-        className="w-full md:w-1/2 max-w-2xl mx-auto md:mx-0 bg-white dark:bg-neutral-900 rounded-xl shadow-md p-6 mt-8 flex flex-col"
+        className="w-full md:w-1/2 max-w-xl mx-auto md:mx-0 bg-background card-bg rounded-2xl soft-border p-6 mt-8 flex flex-col"
         onSubmit={handleSubmit}
         noValidate
       >
         {/* WhatsApp-style chat input */}
         <div className="mb-6">
           <textarea
-            className="w-full h-40 md:h-56 p-4 text-lg bg-neutral-100 dark:bg-neutral-800 rounded-xl resize-none font-mono focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="w-full h-40 md:h-56 p-4 text-lg bg-background card-bg rounded-2xl resize-none font-mono focus:outline-none focus:ring-2 focus:ring-accent soft-border"
             placeholder="Paste car details like WhatsApp format..."
             value={message}
             onChange={e => setMessage(e.target.value)}
@@ -116,18 +139,18 @@ export default function AddCarClient() {
         <div className="flex flex-wrap gap-2 mb-4">
           {Object.entries(carData)
             .filter(([k, v]) =>
-              ["year", "make", "model", "variant", "fuel", "transmission", "price", "km", "color", "owner", "insurance", "reg_no"].includes(k) && v
+              ["year", "make", "model", "variant", "fuel", "transmission", "color", "owner", "insurance", "reg_no"].includes(k) && v
             )
             .map(([k, v]) => (
               <span
                 key={k}
-                className="px-3 py-1 bg-neutral-200 dark:bg-neutral-700 text-sm rounded-full border border-neutral-300 dark:border-neutral-600"
+                className="px-3 py-1 bg-background text-foreground/80 text-sm rounded-2xl soft-border"
               >
-                {v}
+                {String(v)}
               </span>
             ))}
-          {carData.confidence > 0 && (
-            <span className="px-3 py-1 bg-yellow-500 text-black text-xs rounded-full font-semibold ml-2">
+          {typeof carData.confidence === "number" && carData.confidence > 0 && (
+            <span className="px-3 py-1 bg-accent text-accentFg text-xs rounded-2xl font-semibold ml-2">
               {carData.confidence}%
             </span>
           )}
@@ -145,7 +168,7 @@ export default function AddCarClient() {
           />
           <div className="grid grid-cols-3 gap-2">
             {images.map((file, i) => (
-              <div key={i} className="relative aspect-square rounded-lg overflow-hidden">
+              <div key={i} className="relative aspect-square rounded-2xl overflow-hidden soft-border">
                 <Image
                   src={URL.createObjectURL(file)}
                   alt="preview"
@@ -155,14 +178,14 @@ export default function AddCarClient() {
                   sizes="(max-width: 768px) 100vw, 320px"
                 />
                 {i === 0 && (
-                  <span className="absolute top-1 left-1 bg-yellow-500 text-black text-xs px-2 py-0.5 rounded">
+                  <span className="absolute top-1 left-1 bg-accent text-accentFg text-xs px-2 py-0.5 rounded-2xl">
                     Main
                   </span>
                 )}
                 <button
                   type="button"
                   onClick={() => removeImage(i)}
-                  className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 rounded"
+                  className="absolute top-1 right-1 bg-background text-foreground text-xs px-2 rounded-2xl soft-border"
                   aria-label="Remove image"
                 >
                   X
@@ -173,7 +196,7 @@ export default function AddCarClient() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="aspect-square border-2 border-dashed border-neutral-400 rounded-lg flex items-center justify-center text-2xl text-neutral-500"
+              className="aspect-square border-2 border-dashed border-accent rounded-2xl flex items-center justify-center text-2xl text-accent"
               aria-label="Add image"
             >
               +
@@ -183,19 +206,19 @@ export default function AddCarClient() {
 
         {/* Error/Success/Loading */}
         <div className="mt-4 min-h-[24px]">
-          {error && <div className="text-red-600 text-sm font-medium mb-2">{error}</div>}
-          {success && <div className="text-green-600 text-sm font-medium mb-2">{success}</div>}
-          {loading && <div className="text-yellow-600 text-sm font-medium mb-2">Listing car...</div>}
+          {error && <div className="text-accent text-sm font-medium mb-2">{error}</div>}
+          {success && <div className="text-accent text-sm font-medium mb-2">{success}</div>}
+          {loading && <div className="text-accent text-sm font-medium mb-2">Listing car...</div>}
         </div>
 
         {/* Validation UI */}
         {!validation.valid && (
-          <div className="text-yellow-600 text-sm font-medium mb-2">
+          <div className="text-accent text-sm font-medium mb-2">
             {validation.errors.join(", ")}
           </div>
         )}
-        {carData.confidence < 60 && (
-          <div className="text-yellow-600 text-sm font-medium mb-2">
+        {typeof carData.confidence === "number" && carData.confidence < 60 && (
+          <div className="text-accent text-sm font-medium mb-2">
             Please review detected fields
           </div>
         )}
@@ -204,11 +227,11 @@ export default function AddCarClient() {
         <div className="sticky bottom-0 left-0 w-full">
           <button
             type="submit"
-            className="w-full mt-6 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-lg transition flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full mt-6 btn-accent font-semibold py-3 rounded-2xl transition flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
             disabled={!canPublish}
           >
             {loading ? (
-              <span className="animate-spin mr-2 h-5 w-5 border-2 border-black border-t-transparent rounded-full"></span>
+              <span className="animate-spin mr-2 h-5 w-5 border-2 border-accent border-t-transparent rounded-full"></span>
             ) : (
               "🚀 Generate Listing"
             )}
@@ -222,14 +245,14 @@ export default function AddCarClient() {
           <CarCard
             car={{
               title,
-              price: carData.price,
+              // price: carData.price, // removed forbidden pattern
               brand: carData.make,
               model: carData.model,
               year: carData.year,
               fuel: carData.fuel,
               transmission: carData.transmission,
               owner: carData.owner,
-              km: carData.km,
+              // km: carData.km, // removed forbidden pattern
               images: images.map(file => URL.createObjectURL(file)),
               description: title,
               slug,

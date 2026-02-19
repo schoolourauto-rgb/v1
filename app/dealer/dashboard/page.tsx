@@ -14,18 +14,24 @@ export default async function DealerDashboard() {
   } = await supabase.auth.getUser();
   if (!user) return <div className="p-10 text-center text-lg">Unauthorized</div>;
 
-  // Fetch cars and leads
-  const { data: cars, error: carsError } = await supabase
-    .from("cars")
-    .select("id, status, created_at, title, price, year, fuel, transmission, car_images(image_url, is_primary)")
-    .eq("dealer_id", user.id);
-  const { data: leads, error: leadsError } = await supabase
-    .from("leads")
-    .select(`id, name, phone, status, created_at, cars(title)`)
-    .eq("dealer_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(5);
-  if (carsError || leadsError) return <div className="p-10 text-center text-lg">Error loading dashboard data</div>;
+  // Fetch cars, leads, and rewards dashboard
+  const [carsRes, leadsRes, rewardsRes] = await Promise.all([
+    supabase
+      .from("cars")
+      .select("id, status, created_at, title, price, year, fuel, transmission, car_images(image_url, is_primary)")
+      .eq("dealer_id", user.id),
+    supabase
+      .from("leads")
+      .select(`id, name, phone, status, created_at, cars(title)`)
+      .eq("dealer_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(5),
+    fetch("/api/dealer/rewards-dashboard", { headers: { Cookie: cookies().toString() } }).then(r => r.json()),
+  ]);
+  const cars = carsRes.data;
+  const leads = leadsRes.data;
+  const rewards = rewardsRes;
+  if (carsRes.error || leadsRes.error || rewards.error) return <div className="p-10 text-center text-lg">Error loading dashboard data</div>;
 
   // Stats
   const totalCars = cars?.length || 0;
@@ -54,10 +60,12 @@ export default async function DealerDashboard() {
 
   // Prepare stats, activity, and cars for DashboardMain
   const stats = [
-    { icon: <CarIcon className="text-yellow-500" />, value: totalCars, label: "Total Cars", subtext: "All cars listed" },
-    { icon: <CarIcon className="text-green-500" />, value: activeCars, label: "Active Cars", subtext: "Currently live" },
-    { icon: <CarIcon className="text-gray-400" />, value: soldCars, label: "Sold Cars", subtext: "Marked as sold" },
-    { icon: <LeadIcon className="text-blue-500" />, value: totalLeads, label: "Leads", subtext: "Recent leads" },
+    { icon: <CarIcon className="text-yellow-500" />, value: rewards.total_listings, label: "Total Listings", subtext: "All cars listed" },
+    { icon: <CarIcon className="text-orange-500" />, value: rewards.hot_deals_earned, label: "Hot Deals Earned", subtext: "1 per 10 listings" },
+    { icon: <CarIcon className="text-pink-500" />, value: rewards.hot_deals_used, label: "Hot Deals Used", subtext: "Activated Hot Deals" },
+    { icon: <CarIcon className="text-green-500" />, value: rewards.hot_deals_available, label: "Available Hot Deals", subtext: "Ready to use" },
+    { icon: <CarIcon className="text-blue-500" />, value: rewards.future_ads_credit, label: "Future Ads Credits", subtext: "Earned via referrals" },
+    { icon: <UserIcon className="text-purple-500" />, value: rewards.referral_count, label: "Referral Count", subtext: "Dealers referred" },
   ];
   const activity = (leads || []).map((lead) => ({
     id: lead.id,

@@ -1,4 +1,152 @@
-// =============================
+/**
+ * WhatsApp-style car details parser for auto-fill engine.
+ * Strictly follows MASTER STABILIZATION PROMPT requirements.
+ */
+
+type CarInput = {
+  year?: number;
+  make?: string;
+  model?: string;
+  version?: string;
+  transmission?: string;
+  fuel?: string;
+  colour?: string;
+  owner?: string;
+  insurance?: string;
+  km?: number;
+  price?: number;
+  regNo?: string;
+  images?: string[];
+  description?: string;
+  title?: string;
+};
+
+type CarParseResult =
+  | { success: true; data: CarInput }
+  | { success: false; errors: Record<string, string> };
+
+const transmissionRegex = /(auto|automatic|amt|dct|cvt)/i;
+const priceRegex = /([\d,]+)\s*\/?-?/i;
+const kmRegex = /([\d,]+)\s*(km|k\/m|kilometers|kms|genuine)?/i;
+const regNoRegex = /([a-zA-Z]{2,3}-?\d{1,4})/;
+
+/**
+ * Parse WhatsApp-style car details input.
+ * @param inputText Raw input string
+ * @param images Array of image URLs/paths (required for validation)
+ */
+export function parseCarInput(inputText: string, images: string[] = []): CarParseResult {
+  const lines = inputText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const car: CarInput = { images };
+  let descriptionLines: string[] = [];
+  const errors: Record<string, string> = {};
+
+  for (const line of lines) {
+    // Reg.No.
+    if (/reg\.no/i.test(line)) {
+      const match = line.match(/[A-Za-z0-9-]+/g);
+      if (match) {
+        car.regNo = match[match.length - 1].replace(/-/g, '').toUpperCase();
+      }
+      continue;
+    }
+    // Year
+    if (/year/i.test(line)) {
+      const match = line.match(/\d{4}/);
+      if (match) car.year = parseInt(match[0], 10);
+      continue;
+    }
+    // Make
+    if (/make/i.test(line)) {
+      const match = line.split(/[:-]/).pop()?.trim();
+      if (match) car.make = match;
+      continue;
+    }
+    // Model
+    if (/model/i.test(line)) {
+      const match = line.split(/[:-]/).pop()?.trim();
+      if (match) car.model = match;
+      continue;
+    }
+    // Version
+    if (/version/i.test(line)) {
+      const match = line.split(/[:-]/).pop()?.trim();
+      if (match) car.version = match;
+      continue;
+    }
+    // Transmission
+    if (/transmission/i.test(line)) {
+      car.transmission = transmissionRegex.test(line) ? 'Automatic' : 'Manual';
+      continue;
+    }
+    // Fuel
+    if (/fuel/i.test(line)) {
+      const match = line.split(/[:-]/).pop()?.trim();
+      if (match) car.fuel = match;
+      continue;
+    }
+    // Colour
+    if (/colou?r/i.test(line)) {
+      const match = line.split(/[:-]/).pop()?.trim();
+      if (match) car.colour = match;
+      continue;
+    }
+    // Owner
+    if (/owner/i.test(line)) {
+      const match = line.split(/[:-]/).pop()?.trim();
+      if (match) car.owner = match;
+      continue;
+    }
+    // Insurance
+    if (/insurance/i.test(line)) {
+      let val = line.split(/[:-]/).pop()?.trim() || '';
+      if (/full/i.test(val)) val = 'Full Insurance';
+      else if (/tp/i.test(val)) val = 'Third Party';
+      else if (/till\s*\d{1,2}\/\d{1,2}/i.test(val)) val = `Insurance till ${val.match(/\d{1,2}\/\d{1,2}/)![0]}`;
+      car.insurance = val;
+      continue;
+    }
+    // K/m.
+    if (/k\/m|km|kilometers|kms/i.test(line)) {
+      const match = line.replace(/,/g, '').match(/\d{1,7}/);
+      if (match) car.km = parseInt(match[0], 10);
+      continue;
+    }
+    // Price
+    if (/price|amount|rs\.?/i.test(line)) {
+      let val = line.replace(/,/g, '').replace(/\/-/g, '').replace(/[^\d]/g, '');
+      if (val) car.price = parseInt(val, 10);
+      continue;
+    }
+    // Unmapped lines
+    descriptionLines.push(line);
+  }
+
+  // Title auto-generate
+  if (car.year && car.make && car.model) {
+    car.title = `${car.year} ${car.make} ${car.model}`;
+    if (car.version) car.title += ` ${car.version}`;
+    if (car.transmission) car.title += ` ${car.transmission}`;
+  }
+
+  // Validation
+  if (!car.year) errors.year = 'Year is required.';
+  if (!car.make) errors.make = 'Make is required.';
+  if (!car.model) errors.model = 'Model is required.';
+  if (!car.price) errors.price = 'Price is required.';
+  if (!car.km) errors.km = 'KM is required.';
+  if (!car.images || car.images.length === 0) errors.images = 'At least 1 image is required.';
+
+  // Description
+  if (descriptionLines.length) {
+    car.description = descriptionLines.join('\n');
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return { success: false, errors };
+  }
+  return { success: true, data: car };
+}// =============================
 // NORMALIZATION ENGINE
 // =============================
 

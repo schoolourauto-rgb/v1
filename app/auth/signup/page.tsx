@@ -2,7 +2,9 @@
 import { logger } from '@/lib/monitoring/logger';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+
 import { createClient } from '@/lib/supabase/client';
+import Logo from '@/components/Logo';
 
 export default function SignupPage() {
   const router = useRouter()
@@ -132,7 +134,10 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-black dark:text-white px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-black text-black dark:text-white px-4">
+      <div className="mb-8">
+        <Logo />
+      </div>
       <div className="bg-white dark:bg-neutral-950 text-black dark:text-white border border-gray-200 dark:border-neutral-800 p-8 rounded-xl shadow-sm w-full max-w-md space-y-4 transition-colors">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">Dealer Signup</h1>

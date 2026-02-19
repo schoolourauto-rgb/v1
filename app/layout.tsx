@@ -1,8 +1,14 @@
 
 
+
 export const metadata = {
   title: "Free Marketplace",
   description: "Dealer Inventory Network Platform",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 
@@ -24,41 +30,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <style>{`
           body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(180deg, #000 0%, #18181c 60%, #23232a 100%);
             min-height: 100vh;
             transition: background 0.4s;
             scrollbar-width: thin;
-            scrollbar-color: #C9A227 #23232a;
+            scrollbar-color: rgb(var(--accent)) rgb(var(--background));
           }
           ::-webkit-scrollbar {
             width: 8px;
-            background: #23232a;
+            background: rgb(var(--background));
           }
           ::-webkit-scrollbar-thumb {
-            background: #C9A227;
+            background: rgb(var(--accent));
             border-radius: 8px;
-          }
-          .container-center {
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 1rem;
-            padding-right: 1rem;
-          }
-          .navbar-spaced {
-            padding-top: 1.5rem;
-            padding-bottom: 1.5rem;
-          }
-          .animate-fadeIn {
-            animation: fadeIn 0.7s cubic-bezier(0.4,0,0.2,1);
-          }
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
           }
         `}</style>
       </head>
-      <body className="bg-white dark:bg-black overflow-x-hidden">
+      <body className="bg-background text-foreground overflow-x-hidden">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ActivityTicker />
           <Header />

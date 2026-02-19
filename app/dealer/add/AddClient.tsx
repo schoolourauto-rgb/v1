@@ -4,16 +4,11 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import CarCard from "@/components/CarCard";
-import { parseCarMessage } from "@/lib/parser/parseCarMessage";
-import { validateCarData } from "@/lib/parser/validateCarData";
-import { generateTitle } from "@/lib/parser/generateTitle";
-import { generateSlug } from "@/lib/parser/generateSlug";
-import { aiFallbackParser } from "@/lib/parser/aiFallbackParser";
-import { CarData } from "@/lib/parser/types";
+import { parseCarInput } from "@/lib/carParser";
 
 export default function AddClient() {
   const [message, setMessage] = useState("");
-  const [carData, setCarData] = useState<CarData>({ confidence: 0 });
+  const [carData, setCarData] = useState<any>({});
   const [validation, setValidation] = useState<{ valid: boolean; errors: string[] }>({ valid: false, errors: [] });
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -24,15 +19,18 @@ export default function AddClient() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    let parsed: CarData | null = parseCarMessage(message);
-    if (!parsed || parsed.confidence < 30) {
-      parsed = aiFallbackParser(message) || { confidence: 0 };
+    // Use new strict parser
+    const result = parseCarInput(message, images.map(f => f.name));
+    if (result.success) {
+      setCarData(result.data);
+      setTitle(result.data.title || "");
+      setValidation({ valid: true, errors: [] });
+    } else {
+      setCarData({});
+      setTitle("");
+      setValidation({ valid: false, errors: Object.values(result.errors) });
     }
-    setCarData(parsed);
-    setTitle(generateTitle(parsed));
-    setSlug(generateSlug(parsed));
-    setValidation(validateCarData(parsed));
-  }, [message]);
+  }, [message, images]);
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -47,7 +45,7 @@ export default function AddClient() {
     setImages(images.filter((_, i) => i !== index));
   };
 
-  const canPublish = validation.valid && images.length > 0 && carData.confidence >= 60 && !loading;
+  const canPublish = validation.valid && images.length > 0 && !loading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,13 +66,18 @@ export default function AddClient() {
           .getPublicUrl(data.path);
         imageUrls.push(urlData.publicUrl);
       }
+      // Re-validate with images
+      const result = parseCarInput(message, imageUrls);
+      if (!result.success) {
+        setError(Object.values(result.errors).join(", "));
+        setLoading(false);
+        return;
+      }
       const { error: insertError } = await supabase
         .from("cars")
         .insert([
           {
-            ...carData,
-            title,
-            slug,
+            ...result.data,
             images: imageUrls,
             created_at: new Date().toISOString(),
             raw_message: message,
@@ -123,7 +126,7 @@ export default function AddClient() {
                 key={k}
                 className="px-3 py-1 bg-neutral-200 dark:bg-neutral-700 text-sm rounded-full border border-neutral-300 dark:border-neutral-600"
               >
-                {v}
+                {String(v)}
               </span>
             ))}
           {carData.confidence > 0 && (

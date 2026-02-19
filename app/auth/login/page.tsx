@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+
 import Link from 'next/link'
+import Logo from '@/components/Logo'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -21,24 +23,17 @@ export default function LoginPage() {
 
     try {
       const supabase = createClient();
-      if (!supabase) {
-        setError('Supabase client not configured. Check environment variables.')
-        setLoading(false)
-        return
-      }
       const { data, error: loginError } = await supabase.auth.signInWithPassword({
         email: form.email,
         password: form.password,
-      })
-
+      });
       if (loginError) {
-        setError(loginError.message)
-        setLoading(false)
-        return
+        setError(loginError.message);
+        setLoading(false);
+        return;
       }
-
-      if (data.user) {
-        router.push('/dealer/dashboard')
+      if (data && data.user) {
+        router.push('/dealer/dashboard');
       }
     } catch (err) {
       setError('Something went wrong')
@@ -47,7 +42,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-b from-background via-background to-muted dark:from-black dark:via-neutral-950 dark:to-black">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-b from-background via-background to-muted dark:from-black dark:via-neutral-950 dark:to-black">
+      <div className="mb-8">
+        <Logo />
+      </div>
       <div className="w-full max-w-md bg-card backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-6">
         <h1 className="text-4xl md:text-3xl font-bold mb-2">
           Dealer Login
