@@ -28,10 +28,10 @@ export async function DELETE(
 
   // Only allow dealer who owns the car
   const { data: dealer } = await supabase
-    .from("profiles")
+    .from("dealers")
     .select("id")
     .eq("user_id", session.user.id)
-    .single();
+    .maybeSingle();
   if (!dealer || dealer.id !== car.dealer_id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

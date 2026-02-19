@@ -1,43 +1,23 @@
-"use client";
-import { useState } from "react";
-
-const referralCode = "DEALER123";
-const referralLink = `https://ourauto.com/signup?ref=${referralCode}`;
-const referrals = [
-  { name: "Jay Patel", status: "Joined", date: "2026-02-10" },
-  { name: "Amit Shah", status: "Pending", date: "2026-02-15" },
-];
-const totalReferrals = referrals.length;
-const targetReferrals = 5;
-const credits = 100;
-const balance = 60;
-
-export default function DealerReferPage() {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(referralCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
-  };
-  const handleWhatsApp = () => {
-    window.open(`https://wa.me/?text=Join OurAuto and earn rewards! Use my code: ${referralCode} ${referralLink}`);
-  };
-
+export default function ReferPage() {
   return (
-    <div className="max-w-2xl mx-auto mt-8 space-y-8">
-      {/* Explanation */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-sm text-center">
-        <h1 className="text-2xl font-bold mb-2 text-yellow-400">Refer & Earn</h1>
-        <p className="text-zinc-200 mb-2">Invite dealers to OurAuto. Earn <span className="text-yellow-400 font-bold">5 credits</span> for every signup using your code. More referrals = more rewards!</p>
+    <div className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-md max-w-2xl">
+
+      <h1 className="text-2xl font-semibold mb-6">
+        Refer & Earn
+      </h1>
+
+      <div className="space-y-4 text-[var(--text-muted)]">
+        <p>Share your referral code with other dealers.</p>
+        <p>For every successful signup, you get 1 free hot deal credit.</p>
       </div>
 
-      {/* Referral Code Card */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-sm flex flex-col items-center gap-4">
-        <div className="text-lg text-zinc-300 mb-1">Your Referral Code</div>
-        <div className="font-mono text-2xl bg-zinc-800 px-8 py-3 rounded-xl text-yellow-400 tracking-widest select-all border border-zinc-700">{referralCode}</div>
-        <div className="flex gap-3">
-          <button onClick={handleCopy} className="bg-yellow-500 hover:bg-yellow-400 text-black rounded-xl px-5 py-2 font-semibold transition-all duration-200">
+      <div className="mt-6 p-4 bg-[var(--accent)]/20 rounded-lg">
+        <span className="font-medium">Your Code:</span> ABC123
+      </div>
+
+    </div>
+  );
+}
             {copied ? "Copied!" : "Copy"}
           </button>
           <button onClick={handleWhatsApp} className="bg-green-500 hover:bg-green-400 text-white rounded-xl px-5 py-2 font-semibold transition-all duration-200">
