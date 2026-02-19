@@ -84,8 +84,7 @@ export async function POST(req: Request) {
         .single();
 
       if (dealerError || !dealerRow) {
-        console.error("Dealer Insert Error:", dealerError);
-        return new Response(JSON.stringify({ error: "Dealer creation failed" }), { status: 500 });
+        return new Response(JSON.stringify({ success: false, error: "Dealer creation failed" }), { status: 500 });
       }
 
       // Referral system
@@ -114,10 +113,10 @@ export async function POST(req: Request) {
                 reward_given: true,
               },
             ]);
-            // Increase referrer's future_ads_credit by 5
+            // Increase referrer's future_ads_credit by 5, never negative
             await supabase
               .from("dealers")
-              .update({ future_ads_credit: (refDealer.future_ads_credit || 0) + 5 })
+              .update({ future_ads_credit: Math.max(0, (refDealer.future_ads_credit || 0) + 5) })
               .eq("id", refDealer.id);
           }
         }
