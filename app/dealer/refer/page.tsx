@@ -35,24 +35,15 @@ export default function ReferPage() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="text-zinc-400">
-                  <th className="px-4 py-2 text-left">Dealer</th>
-                  <th className="px-4 py-2 text-left">Status</th>
-                  <th className="px-4 py-2 text-left">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {referrals.map((r, i) => (
-                  <tr key={i} className="hover:bg-zinc-800 transition">
-                    <td className="px-4 py-2 font-medium text-zinc-100">{r.name}</td>
-                    <td className="px-4 py-2">
-                      <span className={
-                        r.status === "Joined"
-                          ? "bg-green-500 text-white px-3 py-1 rounded-full text-xs"
-                          : "bg-yellow-500 text-black px-3 py-1 rounded-full text-xs"
-                      }>
-                        {r.status}
-                      </span>
+                <div className="p-6 space-y-6">
+                  <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
+                    <h2 className="text-xl font-semibold">Refer & Earn</h2>
+                    <p className="text-sm text-gray-500">Share your referral code and earn featured ad credits.</p>
+                    <div className="flex gap-3">
+                      <button className="bg-blue-600 text-white px-5 py-2 rounded-xl">Copy Code</button>
+                      <button className="bg-green-500 text-white px-5 py-2 rounded-xl">Share on WhatsApp</button>
+                    </div>
+                  </div>
                     </td>
                     <td className="px-4 py-2 text-zinc-300">{r.date}</td>
                   </tr>
