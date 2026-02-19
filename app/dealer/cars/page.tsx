@@ -3,107 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 
-export default async function DealerCarsPage() {
-  const supabase = createClient(cookies());
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const boostPrice = 500;
-
-  // Get wallet balance
-  const { data: wallet } = await supabase
-    .from("dealer_wallet")
-    .select("balance")
-    .eq("dealer_id", user.id)
-    .single();
-
-  const { data: cars } = await supabase
-    .from("cars")
-    .select("*")
-    .eq("dealer_id", user.id)
-    .order("created_at", { ascending: false });
-
-  return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">My Cars</h1>
-      {cars?.map((car) => (
-        <div key={car.id} className="border p-4 mb-2">
-          <div>{car.title}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-  import { cookies } from "next/headers";
-
-  export default async function DealerCarsPage() {
-    const supabase = createClient(cookies());
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return null;
-    }
-
-    const boostPrice = 500;
-
-    const { data: wallet } = await supabase
-      .from("dealer_wallet")
-      .select("balance")
-      .eq("dealer_id", user.id)
-      .single();
-
-    // You can add boost logic here, but do not return randomly
-
-    const { data: cars } = await supabase
-      .from("cars")
-      .select("*")
-      .eq("dealer_id", user.id)
-      .order("created_at", { ascending: false });
-
-    return (
-      <div>
-        <h1 className="text-2xl font-bold mb-4">My Cars</h1>
-        {cars?.map((car) => (
-          <div key={car.id} className="border p-4 mb-2">
-            <div>{car.title}</div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-                    <Link
-                      href={`/dealer/cars/${car.id}/edit`}
-                      className="text-blue-600"
-                    >
-                      Edit
-                    </Link>
-
-
-// ===============================
-// SERVER ACTION
-// ===============================
-async function toggleStatus(formData: FormData) {
-  "use server";
-  const carId = formData.get("carId") as string;
-  const currentStatus = formData.get("currentStatus") as string;
-  const supabase = createClient(cookies());
-  const newStatus = currentStatus === "active" ? "sold" : "active";
-  await supabase
-    .from("cars")
-    .update({ status: newStatus })
-    .eq("id", carId);
-}
-
-// ===============================
 // SERVER ACTIONS
-// ===============================
 async function toggleStatus(formData: FormData) {
   "use server";
   const carId = formData.get("carId") as string;
@@ -167,6 +67,12 @@ export default async function DealerCarsPage() {
               Delete
             </button>
           </form>
+          <Link
+            href={`/dealer/cars/${car.id}/edit`}
+            className="text-blue-600"
+          >
+            Edit
+          </Link>
         </div>
       ))}
       {(!cars || cars.length === 0) && (
