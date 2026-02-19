@@ -16,110 +16,48 @@ import { cookies } from "next/headers";
   const boostPrice = 500;
 
   // Get wallet balance
-  const { data: wallet } = await supabase
-    .from("dealer_wallet")
-    .select("balance")
-    .eq("dealer_id", user.id)
-    .single();
+  import Link from "next/link";
+  import { createClient } from "@/lib/supabase/server";
+  import { cookies } from "next/headers";
 
-  if (!wallet || wallet.balance < boostPrice) {
-    return;
-  }
+  export default async function DealerCarsPage() {
+    const supabase = createClient(cookies());
 
-  // Deduct balance
-  await supabase
-    .from("dealer_wallet")
-    .update({ balance: wallet.balance - boostPrice })
-    .eq("dealer_id", user.id);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  // Mark featured for 7 days
-  await supabase
-    .from("cars")
-    .update({
-      is_featured: true,
-      featured_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    })
-    .eq("id", carId)
-    .eq("dealer_id", user.id);
-}
+    if (!user) {
+      return null;
+    }
 
-async function deleteCar(id: string) {
-  "use server"
-  const supabase = createServerClient(cookies())
-  await supabase.from("cars").delete().eq("id", id)
-}
+    const boostPrice = 500;
 
-async function toggleStatus(id: string, currentStatus: string) {
-  "use server"
-  const supabase = createServerClient(cookies())
-  await supabase
-    .from("cars")
-    .update({
-      status: currentStatus === "active" ? "sold" : "active",
-    })
-    .eq("id", id)
-}
+    const { data: wallet } = await supabase
+      .from("dealer_wallet")
+      .select("balance")
+      .eq("dealer_id", user.id)
+      .single();
 
-export default async function DealerCarsPage() {
-  const supabase = createClient(cookies());
+    // You can add boost logic here, but do not return randomly
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const { data: cars } = await supabase
+      .from("cars")
+      .select("*")
+      .eq("dealer_id", user.id)
+      .order("created_at", { ascending: false });
 
-  if (!user) return null;
-
-  const { data: cars } = await supabase
-    .from("cars")
-    .select("*")
-    .eq("dealer_id", user.id)
-    .order("created_at", { ascending: false });
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">My Cars</h1>
-        <Link
-          href="/dealer/cars/add"
-          className="bg-black text-white px-4 py-2 rounded-lg"
-        >
-          Add Car
-        </Link>
+    return (
+      <div>
+        <h1 className="text-2xl font-bold mb-4">My Cars</h1>
+        {cars?.map((car) => (
+          <div key={car.id} className="border p-4 mb-2">
+            <div>{car.title}</div>
+          </div>
+        ))}
       </div>
-
-      {cars && cars.length > 0 ? (
-        <div className="bg-white rounded-xl shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-100 text-left text-sm">
-              <tr>
-                <th className="p-4">Title</th>
-                <th className="p-4">Price</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cars.map((car) => (
-                <tr key={car.id} className="border-t">
-                  <td className="p-4">{car.title}</td>
-                  <td className="p-4">₹{car.price}</td>
-                  <td className="p-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        car.status === "active"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
-                    >
-                      {car.status}
-                    </span>
-                    <form action={async () => boostCar(car.id)}>
-                      <button className="text-purple-600 ml-3">
-                        Boost
-                      </button>
-                    </form>
-                  </td>
-                  <td className="p-4 space-x-3">
+    );
+  }
                     <Link
                       href={`/dealer/cars/${car.id}/edit`}
                       className="text-blue-600"
