@@ -1,8 +1,8 @@
 
-"use client";
+import AddCarClient from "../dealer/add/AddCarClient";
 
-import AddCarPage from "@/app/dealer/add/page";
+export const dynamic = "force-dynamic";
 
 export default function SellPage() {
-  return <AddCarPage />;
+  return <AddCarClient />;
 }

@@ -4,7 +4,7 @@ import { CarData } from "./types";
 export function normalizeCarData(data: Partial<CarData>): CarData {
   let price: number | undefined = undefined;
   if (typeof data.price === "string") {
-    let p = data.price.trim().toLowerCase();
+    let p = (data.price ?? "").trim().toLowerCase();
     if (p.includes("lakh")) {
       p = p.replace(/[^0-9]/g, "");
       price = parseInt(p) * 100000;
