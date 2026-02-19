@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { DashboardMain } from "@/components/ui/dashboard-main";
 import { CarIcon, UserIcon, LeadIcon } from "@/components/ui/icon";
-import { DashboardChartClient } from "@/components/ui/dashboard-chart-client";
+
 
 export default async function DealerDashboard() {
   const supabase = await createClient();
