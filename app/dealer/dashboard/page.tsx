@@ -4,8 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers"
 
 export default async function DealerDashboard() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore);
+  const supabase = await createClient();
 
   // 1️⃣ Get Logged In User
   const {
@@ -73,7 +72,7 @@ export default async function DealerDashboard() {
                 <div>
                   <p className="font-semibold">{lead.name}</p>
                   <p className="text-sm text-gray-500">
-                    {lead.cars?.title || "Car"}
+                    {lead.cars?.[0]?.title || "Car"}
                   </p>
                   <p className="text-sm text-gray-400">
                     {lead.phone}

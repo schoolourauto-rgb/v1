@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 
 export default async function DealerLeadsPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -48,7 +48,7 @@ export default async function DealerLeadsPage() {
                   </td>
 
                   <td className="p-4">
-                    {lead.cars?.title || "Car"}
+                    {lead.cars?.[0]?.title || "Car"}
                   </td>
 
                   <td className="p-4">
@@ -92,7 +92,7 @@ export default async function DealerLeadsPage() {
 
 async function updateStatus(id: string, status: string) {
   "use server"
-  const supabase = createClient()
+  const supabase = await createClient()
 
   await supabase
     .from("leads")

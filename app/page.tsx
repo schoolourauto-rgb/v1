@@ -10,7 +10,7 @@ export const metadata = {
 }
 
 export default async function HomePage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // 🔥 Featured Cars (only active, featured, and not expired)
   const { data: featuredCars } = await supabase
