@@ -68,7 +68,7 @@ export default function Header() {
     };
   }, []);
 
-  if (!mounted) return null;
+  // Only render theme toggle after mount to avoid hydration mismatch
 
   return (
     <header className="border-b border-yellow-500 bg-white dark:bg-black sticky top-0 z-30 transition-colors duration-200">
@@ -80,13 +80,15 @@ export default function Header() {
           FREE MARKETPLACE
         </Link>
         <div className="flex items-center gap-4">
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-xl p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? "☀️" : "🌙"}
-          </button>
+          {mounted && (
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="text-black dark:text-white hover:text-yellow-500 transition-colors duration-200 text-xl p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
+          )}
           {session && session.user ? (
             <>
               <span className="text-black dark:text-white text-sm font-medium px-3 py-1 rounded-lg">

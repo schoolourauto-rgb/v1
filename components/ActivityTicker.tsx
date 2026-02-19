@@ -10,8 +10,10 @@ const messages = [
 
 export default function ActivityTicker() {
   const [index, setIndex] = useState(0)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % messages.length)
     }, 4000)
@@ -20,7 +22,7 @@ export default function ActivityTicker() {
 
   return (
     <div className="bg-black text-white text-xs py-2 text-center tracking-wide">
-      {messages[index]}
+      {mounted ? messages[index] : messages[0]}
     </div>
   )
 }

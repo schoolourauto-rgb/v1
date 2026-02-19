@@ -141,7 +141,7 @@ export default async function HomePage() {
         </p>
 
         <Link
-          href="/signup"
+          href="/auth/signup"
           className="bg-white text-black px-8 py-3 rounded-lg font-semibold"
         >
           Join as Dealer

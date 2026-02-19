@@ -23,7 +23,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/signup" className="hover:text-yellow-500 transition">
+                <Link href="/auth/signup" className="hover:text-yellow-500 transition">
                   Become Dealer
                 </Link>
               </li>

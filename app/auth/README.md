@@ -1,0 +1,1 @@
+This folder contains the login and signup pages for /auth/login and /auth/signup. Do not use route groups for these routes.

@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function LoginPage() {
-  // create supabase client instance
   const router = useRouter()
 
   const [form, setForm] = useState({
