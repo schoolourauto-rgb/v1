@@ -4,8 +4,7 @@ import { useState } from "react";
 
 export default function ReferPage() {
   const [copied, setCopied] = useState(false);
-
-  const referralCode = "YOURCODE";
+  const referralCode = "DEMO123";
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(referralCode);
@@ -15,17 +14,18 @@ export default function ReferPage() {
 
   const handleWhatsApp = () => {
     const text = `Join OurAuto using my referral code: ${referralCode}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(text)}`,
+      "_blank"
+    );
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-8 space-y-6">
       <h1 className="text-2xl font-bold">Refer & Earn</h1>
 
       <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow">
-        <p className="text-lg font-semibold mb-4">
-          Your Referral Code:
-        </p>
+        <p className="mb-4 font-semibold">Your Referral Code</p>
 
         <div className="flex gap-4 items-center">
           <div className="px-4 py-2 bg-yellow-400 text-black rounded-xl font-bold">
@@ -34,14 +34,14 @@ export default function ReferPage() {
 
           <button
             onClick={handleCopy}
-            className="bg-black text-white dark:bg-white dark:text-black rounded-xl px-5 py-2 font-semibold"
+            className="bg-black text-white dark:bg-white dark:text-black px-5 py-2 rounded-xl"
           >
             {copied ? "Copied!" : "Copy"}
           </button>
 
           <button
             onClick={handleWhatsApp}
-            className="bg-green-500 text-white rounded-xl px-5 py-2 font-semibold"
+            className="bg-green-500 text-white px-5 py-2 rounded-xl"
           >
             WhatsApp
           </button>
