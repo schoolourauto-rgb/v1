@@ -3,7 +3,8 @@
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 
-export const metadata = {
+import type { Metadata } from "next"
+export const metadata: Metadata = {
   title: "Find Your Perfect Used Car",
   description:
     "Browse trusted dealer listings. Find verified used cars at the best price.",

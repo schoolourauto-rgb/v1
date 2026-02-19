@@ -1,117 +1,89 @@
 
 
+
 import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers"
+import { cookies } from "next/headers";
+import { DashboardMain } from "@/components/ui/dashboard-main";
+import { CarIcon, UserIcon, LeadIcon } from "@/components/ui/icon";
+import dynamic from "next/dynamic";
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 export default async function DealerDashboard() {
   const supabase = await createClient();
-
-  // 1️⃣ Get Logged In User
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
+  if (!user) return <div className="p-10 text-center text-lg">Unauthorized</div>;
 
-  if (!user) {
-    return <div>Unauthorized</div>
-  }
-
-  // 2️⃣ Fetch Dealer Cars
+  // Fetch cars and leads
   const { data: cars, error: carsError } = await supabase
     .from("cars")
-    .select("id, status, created_at")
-    .eq("dealer_id", user.id)
-
-  // 3️⃣ Fetch Dealer Leads (Join car title)
+    .select("id, status, created_at, title, price, year, fuel, transmission, car_images(image_url, is_primary)")
+    .eq("dealer_id", user.id);
   const { data: leads, error: leadsError } = await supabase
     .from("leads")
-    .select(`
-      id,
-      name,
-      phone,
-      status,
-      created_at,
-      cars(title)
-    `)
+    .select(`id, name, phone, status, created_at, cars(title)`)
     .eq("dealer_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(5)
+    .limit(5);
+  if (carsError || leadsError) return <div className="p-10 text-center text-lg">Error loading dashboard data</div>;
 
-  if (carsError || leadsError) {
-    return <div>Error loading dashboard data</div>
-  }
+  // Stats
+  const totalCars = cars?.length || 0;
+  const activeCars = cars?.filter((car) => car.status === "active").length || 0;
+  const soldCars = cars?.filter((car) => car.status === "sold").length || 0;
+  const totalLeads = leads?.length || 0;
 
-  // 4️⃣ Calculate Stats
-  const totalCars = cars?.length || 0
-  const activeCars =
-    cars?.filter((car) => car.status === "active").length || 0
-  const soldCars =
-    cars?.filter((car) => car.status === "sold").length || 0
-  const totalLeads = leads?.length || 0
+  // Chart Data (dummy for now)
+  const chartData = {
+    options: {
+      chart: { id: "cars-trend", toolbar: { show: false } },
+      xaxis: { categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] },
+      colors: ["#facc15"],
+      grid: { show: false },
+      dataLabels: { enabled: false },
+      stroke: { curve: "smooth", width: 3 },
+      tooltip: { theme: "dark" },
+    },
+    series: [
+      {
+        name: "Total Cars",
+        data: [2, 4, 6, 8, 10, totalCars],
+      },
+    ],
+  };
+
+  // Prepare stats, activity, and cars for DashboardMain
+  const stats = [
+    { icon: <CarIcon className="text-yellow-500" />, value: totalCars, label: "Total Cars", subtext: "All cars listed" },
+    { icon: <CarIcon className="text-green-500" />, value: activeCars, label: "Active Cars", subtext: "Currently live" },
+    { icon: <CarIcon className="text-gray-400" />, value: soldCars, label: "Sold Cars", subtext: "Marked as sold" },
+    { icon: <LeadIcon className="text-blue-500" />, value: totalLeads, label: "Leads", subtext: "Recent leads" },
+  ];
+  const activity = (leads || []).map((lead) => ({
+    id: lead.id,
+    avatar: undefined,
+    name: lead.name,
+    action: `enquired about ${lead.cars?.[0]?.title || "a car"}`,
+    timestamp: new Date(lead.created_at).toLocaleString(),
+  }));
+  const carsGrid = (cars || []).map((car) => ({
+    id: car.id,
+    image: car.car_images?.find((img) => img.is_primary)?.image_url || "https://via.placeholder.com/80x60",
+    title: car.title,
+    price: car.price,
+    status: car.status,
+  }));
 
   return (
-    <div className="space-y-8">
-      {/* STATS SECTION */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <StatCard title="Total Cars" value={totalCars} />
-        <StatCard title="Active Cars" value={activeCars} />
-        <StatCard title="Sold Cars" value={soldCars} />
-        <StatCard title="Recent Leads" value={totalLeads} />
-      </div>
-
-      {/* RECENT LEADS */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <h2 className="text-lg font-semibold mb-4">Recent Leads</h2>
-
-        {leads && leads.length > 0 ? (
-          <div className="space-y-4">
-            {leads.map((lead) => (
-              <div
-                key={lead.id}
-                className="border p-4 rounded-lg flex justify-between items-center"
-              >
-                <div>
-                  <p className="font-semibold">{lead.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {lead.cars?.[0]?.title || "Car"}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    {lead.phone}
-                  </p>
-                </div>
-
-                <span
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    lead.status === "new"
-                      ? "bg-blue-100 text-blue-600"
-                      : lead.status === "contacted"
-                      ? "bg-yellow-100 text-yellow-600"
-                      : "bg-green-100 text-green-600"
-                  }`}
-                >
-                  {lead.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500">No leads yet.</p>
-        )}
-      </div>
-    </div>
-  )
+    <DashboardMain
+      name={user.user_metadata?.name || "Dealer"}
+      stats={stats}
+      chart={<Chart options={chartData.options} series={chartData.series} type="line" height={140} width="100%" />}
+      activity={activity}
+      cars={carsGrid}
+    />
+  );
 }
 
-function StatCard({
-  title,
-  value,
-}: {
-  title: string
-  value: number
-}) {
-  return (
-    <div className="bg-white p-6 rounded-xl shadow">
-      <p className="text-gray-500 text-sm">{title}</p>
-      <p className="text-2xl font-bold mt-2">{value}</p>
-    </div>
-  )
-}
+
