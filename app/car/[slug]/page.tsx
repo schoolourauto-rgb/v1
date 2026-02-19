@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
+
 export async function generateMetadata({
   params,
 }: {
   params: { slug: string }
-}) {
-  const supabase = createClient()
+}): Promise<Metadata> {
+  const supabase = await createClient()
 
   const { data: car } = await supabase
     .from("cars")
@@ -48,7 +50,7 @@ export default async function CarDetailsPage({
 }: {
   params: { slug: string }
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data: car } = await supabase
     .from("cars")
