@@ -1,23 +1,43 @@
 
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
-  "use server";
+
+export default async function DealerCarsPage() {
   const supabase = createClient(cookies());
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return;
+  if (!user) return null;
 
   const boostPrice = 500;
 
   // Get wallet balance
-  import Link from "next/link";
-  import { createClient } from "@/lib/supabase/server";
+  const { data: wallet } = await supabase
+    .from("dealer_wallet")
+    .select("balance")
+    .eq("dealer_id", user.id)
+    .single();
+
+  const { data: cars } = await supabase
+    .from("cars")
+    .select("*")
+    .eq("dealer_id", user.id)
+    .order("created_at", { ascending: false });
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-4">My Cars</h1>
+      {cars?.map((car) => (
+        <div key={car.id} className="border p-4 mb-2">
+          <div>{car.title}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
   import { cookies } from "next/headers";
 
   export default async function DealerCarsPage() {
