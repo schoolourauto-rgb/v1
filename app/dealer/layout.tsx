@@ -7,19 +7,30 @@ export default function DealerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="flex min-h-screen bg-black text-white">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-neutral-800 hidden md:block">
-        <DealerSidebar />
-      </aside>
+  import { redirect } from "next/navigation"
+  import { createServerClient } from "@/lib/supabase/server"
+  import Sidebar from "@/components/dealer/Sidebar"
+  import Topbar from "@/components/dealer/Topbar"
 
-      {/* Mobile sidebar */}
-      <div className="md:hidden">
-        <DealerSidebar />
+  const supabase = createServerClient()
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session) {
+    redirect("/login")
+  }
+
+  return (
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
+      <div className="flex flex-col flex-1">
+        <Topbar />
+        <main className="p-6">{children}</main>
       </div>
 
-      {/* Main Content */}
+  )
       <main className="flex-1 p-6">
         {children}
       </main>

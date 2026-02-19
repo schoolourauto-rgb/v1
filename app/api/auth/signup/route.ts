@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       });
     }
 
-    console.log("User ID:", authData.user?.id);
+    // ...existing code...
 
     // --- INSERT DEALER PROFILE AFTER AUTH SIGNUP ---
     const userId = authData.user?.id;

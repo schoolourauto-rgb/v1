@@ -2,7 +2,7 @@
 // TODO: Replace with actual login logic and add debug logs as per instructions.
 
 export async function POST(req: Request) {
-  console.log("🔥 LOGIN HIT");
+  // ...existing code...
   let body;
   try {
     body = await req.json();
@@ -10,12 +10,12 @@ export async function POST(req: Request) {
     console.error("❌ JSON Parse Failed:", err);
     return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
   }
-  console.log("Login Body:", body);
+  // ...existing code...
 
   // Example: Replace with actual Supabase login logic
   // const { data, error } = await supabase.auth.signInWithPassword({ ... });
-  // console.log("Auth Response:", data);
-  // console.log("Auth Error:", error);
+  // ...existing code...
+  // ...existing code...
 
   return new Response(JSON.stringify({ success: true }), { status: 200 });
 }

@@ -34,7 +34,7 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
-    // Console log: before validation
+    // ...existing code...
     logger.info('[Signup] Before validation', { form });
 
     // Validation
@@ -83,11 +83,11 @@ export default function SignupPage() {
       password,
     });
 
-    // Console log: after auth
-    console.log("[Signup] After Supabase auth", { authData, authError });
+    // ...existing code...
+    // ...existing code...
 
     if (authError) {
-      console.log("Supabase auth error:", authError);
+      // ...existing code...
       if (authError.message && authError.message.includes('User already registered')) {
         setError('Account already exists. Please login.');
       } else {
@@ -138,8 +138,8 @@ export default function SignupPage() {
       total_listings: 0,
       referral_rewarded: false
     };
-    // Console log: before dealer insert
-    console.log("[Signup] Before dealer insert", dealerInsertPayload);
+    // ...existing code...
+    // ...existing code...
     const { data: dealer, error: dealerError } = await supabase
       .from('dealers')
       .insert([
@@ -147,10 +147,10 @@ export default function SignupPage() {
       ])
       .select()
       .single();
-    // Console log: after dealer insert
-    console.log("[Signup] After dealer insert", { dealer, dealerError });
+    // ...existing code...
+    // ...existing code...
     if (dealerError || !dealer) {
-      console.log("Dealer insert error:", dealerError);
+      // ...existing code...
       setError(dealerError?.message || 'Signup failed: Could not create dealer profile.');
       setLoading(false);
       return;
