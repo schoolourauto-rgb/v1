@@ -101,30 +101,77 @@ async function toggleStatus(formData: FormData) {
     .eq("id", carId);
 }
 
-// ...existing code...
+// ===============================
+// SERVER ACTIONS
+// ===============================
+async function toggleStatus(formData: FormData) {
+  "use server";
+  const carId = formData.get("carId") as string;
+  const currentStatus = formData.get("currentStatus") as string;
+  const supabase = createClient(cookies());
+  const newStatus = currentStatus === "active" ? "sold" : "active";
+  await supabase
+    .from("cars")
+    .update({ status: newStatus })
+    .eq("id", carId);
+}
 
-                    <form action={toggleStatus}>
-                      <input type="hidden" name="carId" value={car.id} />
-                      <input type="hidden" name="currentStatus" value={car.status} />
-                      <button className="text-yellow-600">
-                        {car.status === "active" ? "Mark Sold" : "Mark Active"}
-                      </button>
-                    </form>
+async function deleteCar(formData: FormData) {
+  "use server";
+  const carId = formData.get("carId") as string;
+  const supabase = createClient(cookies());
+  await supabase.from("cars").delete().eq("id", carId);
+}
 
-                    <form action={async () => deleteCar(car.id)}>
-                      <button className="text-red-600 ml-3">
-                        Delete
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+export default async function DealerCarsPage() {
+  const supabase = createClient(cookies());
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const boostPrice = 500;
+
+  const { data: wallet } = await supabase
+    .from("dealer_wallet")
+    .select("balance")
+    .eq("dealer_id", user.id)
+    .single();
+
+  const { data: cars } = await supabase
+    .from("cars")
+    .select("*")
+    .eq("dealer_id", user.id)
+    .order("created_at", { ascending: false });
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-4">My Cars</h1>
+      {cars?.map((car) => (
+        <div key={car.id} className="border p-4 mb-2">
+          <div>{car.title}</div>
+          <form action={toggleStatus}>
+            <input type="hidden" name="carId" value={car.id} />
+            <input type="hidden" name="currentStatus" value={car.status} />
+            <button className="text-yellow-600">
+              {car.status === "active" ? "Mark Sold" : "Mark Active"}
+            </button>
+          </form>
+          <form action={deleteCar}>
+            <input type="hidden" name="carId" value={car.id} />
+            <button className="text-red-600 ml-3">
+              Delete
+            </button>
+          </form>
         </div>
-      ) : (
-        <div className="bg-white p-10 text-center rounded-xl shadow">
-          <p className="text-gray-500 mb-4">
+      ))}
+    </div>
+  );
+}
             You have not added any cars yet.
           </p>
           <Link
