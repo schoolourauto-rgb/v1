@@ -1,10 +1,9 @@
 
 import { NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
-export async function POST(req: Request) {
   try {
-    const supabase = createServerClient();
+    const supabase = await createClient();
     const { referral_code } = await req.json();
 
     // Step 4: Validate session

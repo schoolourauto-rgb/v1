@@ -1,43 +1,55 @@
+"use client";
+
+import { useState } from "react";
+
 export default function ReferPage() {
+  const [copied, setCopied] = useState(false);
+
+  const referralCode = "YOURCODE";
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(referralCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleWhatsApp = () => {
+    const text = `Join OurAuto using my referral code: ${referralCode}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
   return (
-    <div className="bg-[var(--bg-card)] p-8 rounded-2xl shadow-md max-w-2xl">
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-bold">Refer & Earn</h1>
 
-      <h1 className="text-2xl font-semibold mb-6">
-        Refer & Earn
-      </h1>
+      <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow">
+        <p className="text-lg font-semibold mb-4">
+          Your Referral Code:
+        </p>
 
-      <div className="space-y-4 text-[var(--text-muted)]">
-        <p>Share your referral code with other dealers.</p>
-        <p>For every successful signup, you get 1 free hot deal credit.</p>
-      </div>
+        <div className="flex gap-4 items-center">
+          <div className="px-4 py-2 bg-yellow-400 text-black rounded-xl font-bold">
+            {referralCode}
+          </div>
 
-      <div className="mt-6 p-4 bg-[var(--accent)]/20 rounded-lg">
-        <span className="font-medium">Your Code:</span> ABC123
-      </div>
-
-    </div>
-  );
-}
+          <button
+            onClick={handleCopy}
+            className="bg-black text-white dark:bg-white dark:text-black rounded-xl px-5 py-2 font-semibold"
+          >
             {copied ? "Copied!" : "Copy"}
           </button>
-          <button onClick={handleWhatsApp} className="bg-green-500 hover:bg-green-400 text-white rounded-xl px-5 py-2 font-semibold transition-all duration-200">
+
+          <button
+            onClick={handleWhatsApp}
+            className="bg-green-500 text-white rounded-xl px-5 py-2 font-semibold"
+          >
             WhatsApp
           </button>
         </div>
-        <div className="text-xs text-zinc-400 mt-1">Share: <a href={referralLink} className="underline text-yellow-400" target="_blank" rel="noopener noreferrer">{referralLink}</a></div>
       </div>
-
-      {/* Progress Bar */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-sm">
-        <div className="flex justify-between mb-2 text-sm text-zinc-300">
-          <span>Referrals: {totalReferrals}/{targetReferrals}</span>
-          <span>Target: {targetReferrals}</span>
-        </div>
-        <div className="w-full bg-zinc-800 rounded-full h-4 overflow-hidden">
-          <div
-            className="bg-yellow-500 h-4 rounded-full transition-all duration-500"
-            style={{ width: `${(totalReferrals / targetReferrals) * 100}%` }}
-          />
+    </div>
+  );
+}
         </div>
       </div>
 
