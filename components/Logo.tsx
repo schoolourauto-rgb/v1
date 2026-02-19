@@ -1,19 +1,25 @@
 "use client"
 
-import Image from "next/image";
-import { useTheme } from "next-themes";
+import React from "react";
 
-export default function Logo() {
-  const { resolvedTheme } = useTheme();
-  const logoSrc = resolvedTheme === "dark" ? "/logo-light.png" : "/logo-dark.png";
+interface LogoProps {
+  width?: number;
+  height?: number;
+  className?: string;
+}
+
+export function Logo({ width = 140, height = 40, className = "" }: LogoProps) {
   return (
-    <Image
-      src={logoSrc}
+    <img
+      src="/logo.png"
       alt="OurAuto Logo"
-      width={140}
-      height={40}
-      style={{ height: "auto", width: 140 }}
-      priority
+      width={width}
+      height={height}
+      className={className}
+      style={{ display: "block", maxWidth: "100%", height: "auto" }}
+      draggable={false}
     />
   );
 }
+
+export default Logo;

@@ -1,77 +1,115 @@
+
 "use client";
 
-import { useState, useEffect, useRef, ChangeEvent, FormEvent } from "react";
-
-type CarData = {
-  title?: string;
-  make?: string;
-  model?: string;
-  year?: number;
-  fuel?: string;
-  transmission?: string;
-  owner?: string;
-  color?: string;
-  insurance?: string;
-  reg_no?: string;
-  confidence?: number;
-  [key: string]: string | number | undefined;
-};
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import CarCard from "@/components/CarCard";
 import { parseCarInput } from "@/lib/carParser";
 
+type CarData = {
+  year?: number;
+  make?: string;
+  model?: string;
+  version?: string;
+  transmission?: string;
+  fuel?: string;
+  price?: number;
+  km?: number;
+  colour?: string;
+  owner?: string;
+  insurance?: string;
+  regNo?: string;
+  title?: string;
+  description?: string;
+};
+
+type ChipConfidence = "high" | "low";
+
+function getChipConfidence(key: string, value: string | number | undefined): ChipConfidence {
+  // Simple confidence: if value exists and is not empty, high; else low
+  if (typeof value === "number" && value > 0) return "high";
+  if (typeof value === "string" && value.trim().length > 0) return "high";
+  return "low";
+}
+
+const REQUIRED_FIELDS: (keyof CarData)[] = ["year", "make", "model", "price", "km", "regNo", "title"];
+
 export default function AddCarClient() {
   const [message, setMessage] = useState("");
   const [carData, setCarData] = useState<CarData>({});
-  const [validation, setValidation] = useState<{ valid: boolean; errors: string[] }>({ valid: false, errors: [] });
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
+  const [chips, setChips] = useState<{ key: keyof CarData; value: string | number; confidence: ChipConfidence }[]>([]);
   const [images, setImages] = useState<File[]>([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [publishLoading, setPublishLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Responsive check
   useEffect(() => {
-    // Use new strict parser
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Parse and normalize on message/images change
+  useEffect(() => {
     const result = parseCarInput(message, images.map(f => f.name));
     if (result.success) {
-      // Remove images property if present, as CarData does not allow it
-      const { images: _images, ...carDataWithoutImages } = result.data;
-      setCarData(carDataWithoutImages);
-      setTitle(result.data.title || "");
-      setValidation({ valid: true, errors: [] });
+      const { images: _img, ...parsed } = result.data;
+      setCarData(parsed);
+      // Chips
+      const chipFields: (keyof CarData)[] = ["year", "make", "model", "version", "transmission", "fuel", "price", "km", "colour", "owner", "insurance", "regNo"];
+      setChips(
+        chipFields
+          .filter(k => parsed[k] !== undefined && parsed[k] !== "")
+          .map(k => ({ key: k, value: parsed[k]!, confidence: getChipConfidence(k, parsed[k]) }))
+      );
+      setError("");
     } else {
       setCarData({});
-      setTitle("");
-      setValidation({ valid: false, errors: Object.values(result.errors) });
+      setChips([]);
+      setError(Object.values(result.errors).join(", "));
     }
   }, [message, images]);
 
-  const handleImages = (e: ChangeEvent<HTMLInputElement>) => {
+  // Image handlers
+  const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length + images.length > 10) {
-      alert("Maximum 10 images allowed");
-      return;
-    }
+    if (files.length + images.length > 10) return;
+    setImages([...images, ...files]);
+  };
+  const removeImage = (idx: number) => setImages(images.filter((_, i) => i !== idx));
+
+  // Drag & drop
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"));
+    if (files.length + images.length > 10) return;
     setImages([...images, ...files]);
   };
 
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
+  // Validation
+  const isValid =
+    REQUIRED_FIELDS.every(f => carData[f]) &&
+    images.length > 0 &&
+    typeof carData.regNo === "string" && carData.regNo.length > 0 &&
+    typeof carData.title === "string" && carData.title.length > 0 &&
+    typeof carData.price === "number" && carData.price > 0;
 
-  const canPublish = validation.valid && images.length > 0 && !loading;
+  // Preview modal open
+  const openPreview = () => setPreviewOpen(true);
+  const closePreview = () => setPreviewOpen(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!canPublish) return;
-    setLoading(true);
-    setSuccess("");
+  // Publish
+  const handlePublish = async () => {
+    if (!isValid) return;
+    setPublishLoading(true);
     setError("");
     try {
-      // Upload images to Supabase storage
       const supabase = createClient();
       const imageUrls: string[] = [];
       for (const file of images) {
@@ -84,7 +122,6 @@ export default function AddCarClient() {
           .getPublicUrl(data.path);
         imageUrls.push(urlData.publicUrl);
       }
-      // Send POST request to server route
       const res = await fetch("/api/dealer/cars", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -97,65 +134,44 @@ export default function AddCarClient() {
       const json = await res.json();
       if (!res.ok) {
         setError(json.error || "Failed to list car.");
-        setLoading(false);
+        setPublishLoading(false);
         return;
       }
-      setSuccess("Car listed successfully!");
+      setPreviewOpen(false);
       setImages([]);
       setMessage("");
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message || "Failed to list car.");
-      } else {
-        setError("Failed to list car.");
-      }
+      setError("Failed to list car.");
     } finally {
-      setLoading(false);
+      setPublishLoading(false);
     }
   };
 
-  // Responsive layout
+  // UI
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row md:items-start pb-24">
       {/* Left: Chat Composer */}
-      <form
-        className="w-full md:w-1/2 max-w-xl mx-auto md:mx-0 bg-background card-bg rounded-2xl soft-border p-6 mt-8 flex flex-col"
-        onSubmit={handleSubmit}
-        noValidate
-      >
-        {/* WhatsApp-style chat input */}
-        <div className="mb-6">
-          <textarea
-            className="w-full h-40 md:h-56 p-4 text-lg bg-background card-bg rounded-2xl resize-none font-mono focus:outline-none focus:ring-2 focus:ring-accent soft-border"
-            placeholder="Paste car details like WhatsApp format..."
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            autoFocus
-            rows={8}
-          />
-        </div>
-
-        {/* Suggestion chips */}
+      <div className="w-full md:w-1/2 max-w-xl mx-auto md:mx-0 bg-background card-bg rounded-2xl soft-border p-6 mt-8 flex flex-col" onDrop={handleDrop} onDragOver={e => e.preventDefault()}>
+        {/* Chips */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {Object.entries(carData)
-            .filter(([k, v]) =>
-              ["year", "make", "model", "variant", "fuel", "transmission", "color", "owner", "insurance", "reg_no"].includes(k) && v
-            )
-            .map(([k, v]) => (
-              <span
-                key={k}
-                className="px-3 py-1 bg-background text-foreground/80 text-sm rounded-2xl soft-border"
-              >
-                {String(v)}
-              </span>
-            ))}
-          {typeof carData.confidence === "number" && carData.confidence > 0 && (
-            <span className="px-3 py-1 bg-accent text-accentFg text-xs rounded-2xl font-semibold ml-2">
-              {carData.confidence}%
+          {chips.map(({ key, value, confidence }) => (
+            <span
+              key={key}
+              className={`px-3 py-1 rounded-2xl text-sm font-medium border ${confidence === "high" ? "bg-green-100 text-green-800 border-green-300" : "bg-yellow-100 text-yellow-800 border-yellow-300"}`}
+            >
+              {String(value)}
             </span>
-          )}
+          ))}
         </div>
-
+        {/* Chat input */}
+        <textarea
+          className="w-full h-40 md:h-56 p-4 text-lg bg-background card-bg rounded-2xl resize-none font-mono focus:outline-none focus:ring-2 focus:ring-accent soft-border mb-4"
+          placeholder="Paste WhatsApp car details..."
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          autoFocus
+          rows={8}
+        />
         {/* Image Picker */}
         <div className="mb-6">
           <input
@@ -203,64 +219,115 @@ export default function AddCarClient() {
             </button>
           </div>
         </div>
-
-        {/* Error/Success/Loading */}
-        <div className="mt-4 min-h-[24px]">
-          {error && <div className="text-accent text-sm font-medium mb-2">{error}</div>}
-          {success && <div className="text-accent text-sm font-medium mb-2">{success}</div>}
-          {loading && <div className="text-accent text-sm font-medium mb-2">Listing car...</div>}
-        </div>
-
-        {/* Validation UI */}
-        {!validation.valid && (
-          <div className="text-accent text-sm font-medium mb-2">
-            {validation.errors.join(", ")}
-          </div>
-        )}
-        {typeof carData.confidence === "number" && carData.confidence < 60 && (
-          <div className="text-accent text-sm font-medium mb-2">
-            Please review detected fields
-          </div>
-        )}
-
-        {/* Sticky Publish Button */}
-        <div className="sticky bottom-0 left-0 w-full">
-          <button
-            type="submit"
-            className="w-full mt-6 btn-accent font-semibold py-3 rounded-2xl transition flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
-            disabled={!canPublish}
-          >
-            {loading ? (
-              <span className="animate-spin mr-2 h-5 w-5 border-2 border-accent border-t-transparent rounded-full"></span>
-            ) : (
-              "🚀 Generate Listing"
-            )}
-          </button>
-        </div>
-      </form>
-
-      {/* Right: Live Preview */}
-      <div className="w-full md:w-1/2 flex justify-center items-start mt-8 md:mt-8">
-        <div className="w-full max-w-md mx-auto">
-          <CarCard
-            car={{
-              title,
-              // price: carData.price, // removed forbidden pattern
-              brand: carData.make,
-              model: carData.model,
-              year: carData.year,
-              fuel: carData.fuel,
-              transmission: carData.transmission,
-              owner: carData.owner,
-              // km: carData.km, // removed forbidden pattern
-              images: images.map(file => URL.createObjectURL(file)),
-              description: title,
-              slug,
-              preview: true,
-            }}
-          />
+        {/* Error/Validation */}
+        {error && <div className="text-accent text-sm font-medium mb-2">{error}</div>}
+        {/* Preview/Publish Buttons */}
+        <div className="flex flex-col gap-2 mt-4">
+          {isMobile ? (
+            <>
+              <button
+                type="button"
+                className="w-full btn-accent font-semibold py-3 rounded-2xl"
+                onClick={openPreview}
+                disabled={!isValid}
+              >
+                Preview
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className="w-full btn-accent font-semibold py-3 rounded-2xl"
+              onClick={openPreview}
+              disabled={!isValid}
+            >
+              🚀 Generate Listing
+            </button>
+          )}
         </div>
       </div>
+      {/* Right: Live Preview (desktop) */}
+      {!isMobile && (
+        <div className="w-full md:w-1/2 flex justify-center items-start mt-8 md:mt-8">
+          <div className="w-full max-w-md mx-auto">
+            <CarCard
+              car={{
+                title: carData.title || "",
+                price: carData.price,
+                brand: carData.make,
+                model: carData.model,
+                year: carData.year,
+                fuel: carData.fuel,
+                transmission: carData.transmission,
+                owner: carData.owner,
+                km: carData.km,
+                images: images.map(file => URL.createObjectURL(file)),
+                description: carData.description,
+                slug: "",
+                preview: true,
+              }}
+            />
+          </div>
+        </div>
+      )}
+      {/* Preview Modal */}
+      {previewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-background rounded-2xl p-6 max-w-lg w-full relative shadow-2xl">
+            <button
+              className="absolute top-2 right-2 text-2xl text-foreground/60 hover:text-accent"
+              onClick={closePreview}
+              aria-label="Close preview"
+            >
+              ×
+            </button>
+            <div className="flex flex-col items-center">
+              {images[0] && (
+                <Image
+                  src={URL.createObjectURL(images[0])}
+                  alt="Main image"
+                  width={320}
+                  height={240}
+                  className="object-cover rounded-xl mb-4"
+                />
+              )}
+              <div className="w-full flex flex-col gap-2 mb-4">
+                <div className="text-xl font-bold">{carData.title}</div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="chip">₹ {carData.price?.toLocaleString()}</span>
+                  <span className="chip">{carData.km} KM</span>
+                  <span className="chip">{carData.fuel}</span>
+                  <span className="chip">{carData.transmission}</span>
+                  <span className="chip">{carData.owner}</span>
+                  <span className="chip">{carData.insurance}</span>
+                </div>
+                <div className="text-foreground/80 text-sm">{carData.description}</div>
+              </div>
+              <div className="flex gap-4 w-full">
+                <button
+                  className="flex-1 btn-secondary py-2 rounded-2xl"
+                  onClick={closePreview}
+                  disabled={publishLoading}
+                >
+                  Edit
+                </button>
+                <button
+                  className="flex-1 btn-accent py-2 rounded-2xl"
+                  onClick={handlePublish}
+                  disabled={!isValid || publishLoading}
+                >
+                  {publishLoading ? "Publishing..." : "Confirm & Publish"}
+                </button>
+              </div>
+              {!isValid && (
+                <div className="text-accent text-xs mt-2 font-medium">
+                  Main image must clearly show number plate and registration number must be detected.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
