@@ -19,12 +19,12 @@ async function boostCar(carId: string) {
 
   if (!wallet || wallet.balance < boostPrice) {
     return
-  }
+  import { createClient } from "@/lib/supabase/server";
 
   // Deduct balance
   await supabase
     .from("dealer_wallet")
-    .update({
+    const supabase = createClient(cookies());
       balance: wallet.balance - boostPrice,
     })
     .eq("dealer_id", user.id)
@@ -67,18 +67,18 @@ export default async function DealerCarsPage() {
   const supabase = createServerClient(cookies())
 
   const {
-    data: { user },
+  import { createClient } from "@/lib/supabase/server";
   } = await supabase.auth.getUser()
 
   if (!user) return null
 
-  const { data: cars } = await supabase
+    const supabase = createClient(cookies());
     .from("cars")
     .select("*")
     .eq("dealer_id", user.id)
     .order("created_at", { ascending: false })
 
-  return (
+    const supabase = createClient(cookies());
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">My Cars</h1>

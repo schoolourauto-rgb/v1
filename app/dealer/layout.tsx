@@ -7,12 +7,12 @@ export default function DealerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  import { redirect } from "next/navigation"
-  import { createServerClient } from "@/lib/supabase/server"
+  import { redirect } from "next/navigation";
+  import { createClient } from "@/lib/supabase/server";
   import Sidebar from "@/components/dealer/Sidebar"
   import Topbar from "@/components/dealer/Topbar"
 
-  const supabase = createServerClient()
+  const supabase = createClient();
 
   const {
     data: { session },

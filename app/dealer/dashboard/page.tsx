@@ -1,11 +1,11 @@
 
 
-import { createServerClient } from "@/lib/supabase/server"
+import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers"
 
 export default async function DealerDashboard() {
   const cookieStore = cookies()
-  const supabase = createServerClient(cookieStore)
+  const supabase = createClient(cookieStore);
 
   // 1️⃣ Get Logged In User
   const {
