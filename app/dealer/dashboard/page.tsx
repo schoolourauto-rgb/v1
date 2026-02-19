@@ -5,8 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { DashboardMain } from "@/components/ui/dashboard-main";
 import { CarIcon, UserIcon, LeadIcon } from "@/components/ui/icon";
-import dynamic from "next/dynamic";
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+import { DashboardChartClient } from "@/components/ui/dashboard-chart-client";
 
 export default async function DealerDashboard() {
   const supabase = await createClient();
@@ -79,7 +78,7 @@ export default async function DealerDashboard() {
     <DashboardMain
       name={user.user_metadata?.name || "Dealer"}
       stats={stats}
-      chart={<Chart options={chartData.options} series={chartData.series} type="line" height={140} width="100%" />}
+      chart={<DashboardChartClient options={chartData.options} series={chartData.series} type="line" height={140} width="100%" />}
       activity={activity}
       cars={carsGrid}
     />
