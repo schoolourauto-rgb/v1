@@ -2,8 +2,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import Link from "next/link";
-
-async function boostCar(carId: string) {
+import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
   "use server";
   const supabase = createClient(cookies());
 
@@ -61,21 +61,21 @@ async function toggleStatus(id: string, currentStatus: string) {
 }
 
 export default async function DealerCarsPage() {
-  const supabase = createServerClient(cookies())
+  const supabase = createClient(cookies());
 
   const {
-  import { createClient } from "@/lib/supabase/server";
-  } = await supabase.auth.getUser()
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!user) return null
+  if (!user) return null;
 
-    const supabase = createClient(cookies());
+  const { data: cars } = await supabase
     .from("cars")
     .select("*")
     .eq("dealer_id", user.id)
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending: false });
 
-    const supabase = createClient(cookies());
+  return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">My Cars</h1>
