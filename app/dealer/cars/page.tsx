@@ -85,7 +85,27 @@ export default async function DealerCarsPage() {
                       Edit
                     </Link>
 
-                    <form action={async () => toggleStatus(car.id, car.status)}>
+
+// ===============================
+// SERVER ACTION
+// ===============================
+async function toggleStatus(formData: FormData) {
+  "use server";
+  const carId = formData.get("carId") as string;
+  const currentStatus = formData.get("currentStatus") as string;
+  const supabase = createClient(cookies());
+  const newStatus = currentStatus === "active" ? "sold" : "active";
+  await supabase
+    .from("cars")
+    .update({ status: newStatus })
+    .eq("id", carId);
+}
+
+// ...existing code...
+
+                    <form action={toggleStatus}>
+                      <input type="hidden" name="carId" value={car.id} />
+                      <input type="hidden" name="currentStatus" value={car.status} />
                       <button className="text-yellow-600">
                         {car.status === "active" ? "Mark Sold" : "Mark Active"}
                       </button>
