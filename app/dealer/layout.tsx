@@ -1,25 +1,23 @@
 
 
-import DealerSidebar from "@/components/dealer/DealerSidebar";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import Sidebar from "@/components/dealer/Sidebar";
+import Topbar from "@/components/dealer/Topbar";
 
-export default function DealerLayout({
+export default async function DealerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  import { redirect } from "next/navigation";
-  import { createClient } from "@/lib/supabase/server";
-  import Sidebar from "@/components/dealer/Sidebar"
-  import Topbar from "@/components/dealer/Topbar"
-
   const supabase = createClient();
 
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+  } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect("/login")
+    redirect("/login");
   }
 
   return (
@@ -29,11 +27,6 @@ export default function DealerLayout({
         <Topbar />
         <main className="p-6">{children}</main>
       </div>
-
-  )
-      <main className="flex-1 p-6">
-        {children}
-      </main>
     </div>
   );
 }

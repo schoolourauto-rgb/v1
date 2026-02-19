@@ -1,50 +1,47 @@
+
+import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+import Link from "next/link";
+
 async function boostCar(carId: string) {
-  "use server"
-  const supabase = createServerClient(cookies())
+  "use server";
+  const supabase = createClient(cookies());
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
-  if (!user) return
+  if (!user) return;
 
-  const boostPrice = 500
+  const boostPrice = 500;
 
   // Get wallet balance
   const { data: wallet } = await supabase
     .from("dealer_wallet")
     .select("balance")
     .eq("dealer_id", user.id)
-    .single()
+    .single();
 
   if (!wallet || wallet.balance < boostPrice) {
-    return
-  import { createClient } from "@/lib/supabase/server";
+    return;
+  }
 
   // Deduct balance
   await supabase
     .from("dealer_wallet")
-    const supabase = createClient(cookies());
-      balance: wallet.balance - boostPrice,
-    })
-    .eq("dealer_id", user.id)
+    .update({ balance: wallet.balance - boostPrice })
+    .eq("dealer_id", user.id);
 
   // Mark featured for 7 days
   await supabase
     .from("cars")
     .update({
       is_featured: true,
-      featured_until: new Date(
-        Date.now() + 7 * 24 * 60 * 60 * 1000
-      ),
+      featured_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
     .eq("id", carId)
-    .eq("dealer_id", user.id)
+    .eq("dealer_id", user.id);
 }
-
-import Link from "next/link"
-import { createServerClient } from "@/lib/supabase/server"
-import { cookies } from "next/headers"
 
 async function deleteCar(id: string) {
   "use server"
