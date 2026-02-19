@@ -1,4 +1,3 @@
-"use client"
 
 "use client"
 
@@ -20,7 +19,12 @@ export default function AddCarPage() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
-  const [images, setImages] = useState<any[]>([])
+  type UploadedImage = {
+    url: string;
+    id: string;
+    isPrimary: boolean;
+  };
+  const [images, setImages] = useState<UploadedImage[]>([])
   const [loading, setLoading] = useState(false)
 
   function handleDrop(files: FileList) {
@@ -41,26 +45,32 @@ export default function AddCarPage() {
     setImages((prev) => prev.map((img) => ({ ...img, isPrimary: img.id === id })))
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setLoading(true)
-    const form = e.currentTarget
-    const { data: userData } = await supabase.auth.getUser()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    const form = e.currentTarget;
+    const { data: userData } = await supabase.auth.getUser();
+    const getValue = (name: string) =>
+      (form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)?.value || "";
+    if (!userData.user) {
+      setLoading(false);
+      return;
+    }
     await supabase.from("cars").insert({
-      dealer_id: userData.user?.id,
-      title: form.title.value,
-      price: form.price.value,
-      brand: form.brand.value,
-      model: form.model.value,
-      year: form.year.value,
-      fuel: form.fuel.value,
-      transmission: form.transmission.value,
-      km_driven: form.km.value,
-      description: form.description.value,
-    })
-    setLoading(false)
-    router.push("/dealer/cars")
-  }
+      dealer_id: userData.user.id,
+      title: getValue("title"),
+      price: getValue("price"),
+      brand: getValue("brand"),
+      model: getValue("model"),
+      year: getValue("year"),
+      fuel: getValue("fuel"),
+      transmission: getValue("transmission"),
+      km_driven: getValue("km"),
+      description: getValue("description"),
+    });
+    setLoading(false);
+    router.push("/dealer/cars");
+  };
 
   return (
     <DashboardLayout>
