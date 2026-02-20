@@ -1,7 +1,9 @@
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+
+
+import { motion, HTMLMotionProps } from "framer-motion";
+type ButtonProps = HTMLMotionProps<"button"> & {
   variant?: "primary" | "secondary";
 };
 
