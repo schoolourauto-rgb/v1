@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import * as React from "react";
 import * as RadixTabs from "@radix-ui/react-tabs";
 
