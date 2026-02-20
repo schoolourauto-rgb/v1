@@ -44,7 +44,7 @@ export function ListingCard({
           <span style={{fontSize:'14px'}}>{mileage}</span>
         </div>
         <div className="mt-4">
-          <Button className="w-full sm:w-auto" variant="secondary">
+          <Button className="w-full sm:w-auto" variant="outline">
             View Details
           </Button>
         </div>
