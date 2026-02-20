@@ -3,5 +3,8 @@
   "ignorePatterns": [
     "lib/supabase/types.ts",
     "lib/types/database.ts"
-  ]
+  ],
+  "rules": {
+    "react/display-name": "warn"
+  }
 }
