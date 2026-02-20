@@ -4,8 +4,9 @@ import * as RadixAccordion from "@radix-ui/react-accordion";
 const Accordion = React.forwardRef<
   React.ElementRef<typeof RadixAccordion.Root>,
   React.ComponentPropsWithoutRef<typeof RadixAccordion.Root>
->((props, ref) => <RadixAccordion.Root ref={ref} {...props} />);
-Accordion.displayName = "Accordion";
+>(function Accordion(props, ref) {
+  return <RadixAccordion.Root ref={ref} {...props} />;
+});
 export { Accordion };
 export const AccordionItem = RadixAccordion.Item;
 export const AccordionTrigger = React.forwardRef<
