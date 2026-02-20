@@ -1,15 +1,15 @@
 
 
+
 import { NextResponse } from "next/server";
 import { LeadsService } from "@/lib/services/leads.service";
 import { LeadSchema } from "@/lib/validation/zodSchemas";
 import { validateJsonRequest } from "@/lib/validation/validateRequest";
 import { rateLimit } from "@/middleware/rateLimit";
-import { withErrorHandler } from "@/lib/api/withErrorHandler";
 import { apiSuccess, apiError } from "@/lib/apiResponse";
 import { logError } from "@/lib/logger";
 
-  const req = args[0] as Request;
+export async function POST(req: Request) {
   // Rate limit
   const rl = rateLimit(req);
   if (rl) return rl;
@@ -33,4 +33,4 @@ import { logError } from "@/lib/logger";
     logError("Lead creation error", e);
     return NextResponse.json(apiError(), { status: 500 });
   }
-});
+}

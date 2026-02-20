@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { apiSuccess, apiError } from "@/lib/apiResponse";
 import { logError } from "@/lib/logger";
 
-// GET /api/dealer/rewards-dashboard
+export async function GET(req: Request) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

@@ -5,7 +5,7 @@ import { apiSuccess, apiError } from "@/lib/apiResponse";
 import { rateLimit } from "@/middleware/rateLimit";
 import { logError } from "@/lib/logger";
 
-// POST /api/dealer/hot-deal
+export async function POST(req: NextRequest) {
   // Enforce rate limit
   const rl = rateLimit(req);
   if (rl) return rl;

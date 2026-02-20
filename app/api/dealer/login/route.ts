@@ -2,11 +2,13 @@
 
 
 
+import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { apiSuccess, apiError } from "@/lib/apiResponse";
 import { rateLimit } from "@/middleware/rateLimit";
 import { logError } from "@/lib/logger";
 
+export async function POST(req: Request) {
   // Enforce rate limit
   const rl = rateLimit(req);
   if (rl) return rl;
