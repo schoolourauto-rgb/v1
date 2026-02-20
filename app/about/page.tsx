@@ -1,8 +1,28 @@
+
 import { ShieldCheck, Phone, UserCheck, Ban } from "lucide-react";
 
 export const metadata = {
   title: "About OurAuto",
   description: "Learn about OurAuto's mission, values, and why we are the trusted choice for verified used cars in India.",
+  openGraph: {
+    title: "About OurAuto",
+    description: "Learn about OurAuto's mission, values, and why we are the trusted choice for verified used cars in India.",
+    url: "https://ourauto.in/about",
+    siteName: "OurAuto",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "About OurAuto",
+      },
+    ],
+    locale: "en_IN",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://ourauto.in/about",
+  },
 };
 
 export default function AboutPage() {

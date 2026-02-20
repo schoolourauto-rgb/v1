@@ -8,6 +8,15 @@ import Logo from "@/components/Logo";
 export default function MobileNav() {
   const pathname = usePathname();
 
+  const navLinks = [
+    { href: "/", label: "Home", icon: <Home size={22} /> },
+    { href: "/marketplace", label: "Marketplace", icon: <Search size={22} /> },
+    { href: "/sell", label: "Sell", icon: <PlusCircle size={26} /> },
+    { href: "/dealer-login", label: "Dealer Login", icon: <Bell size={22} /> },
+    { href: "/login", label: "Login", icon: <User size={22} /> },
+    { href: "/signup", label: "Signup", icon: <User size={22} /> },
+  ];
+
   const navItem = (href: string, icon: React.ReactNode) => (
     <Link
       href={href}
@@ -25,11 +34,7 @@ export default function MobileNav() {
         <Logo />
       </div>
       <div className="flex gap-4">
-        {navItem("/", <Home size={22} />)}
-        {navItem("/marketplace", <Search size={22} />)}
-        {navItem("/dealer/add", <PlusCircle size={26} />)}
-        {navItem("/dealer/dashboard", <Bell size={22} />)}
-        {navItem("/dealer/profile", <User size={22} />)}
+        {navLinks.map((link) => navItem(link.href, link.icon))}
       </div>
     </nav>
   );

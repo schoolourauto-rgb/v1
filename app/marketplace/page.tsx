@@ -19,6 +19,29 @@ interface Car {
   dealer_name?: string;
   activeDealer?: boolean;
 }
+export const metadata = {
+  title: "Marketplace – OurAuto",
+  description: "Browse premium cars from verified dealers across India. 100% verified inventory, no spam, no fake listings.",
+  openGraph: {
+    title: "Marketplace – OurAuto",
+    description: "Browse premium cars from verified dealers across India. 100% verified inventory, no spam, no fake listings.",
+    url: "https://ourauto.in/marketplace",
+    siteName: "OurAuto",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Marketplace – OurAuto",
+      },
+    ],
+    locale: "en_IN",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://ourauto.in/marketplace",
+  },
+};
 
 export const revalidate = 60; // 1 minute cache for public data
 

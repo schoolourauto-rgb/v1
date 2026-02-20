@@ -20,14 +20,17 @@ export default function Header() {
         </Link>
         {/* Nav Center (desktop) */}
         <nav className="hidden md:flex flex-1 justify-center gap-8">
+          <Link href="/" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">Home</Link>
           <Link href="/marketplace" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">Marketplace</Link>
-          <Link href="/about" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">About</Link>
-          <Link href="/dealer/dashboard" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">Dashboard</Link>
+          <Link href="/sell" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">Sell</Link>
+          <Link href="/dealer-login" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">Dealer Login</Link>
+          <Link href="/login" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">Login</Link>
+          <Link href="/signup" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">Signup</Link>
         </nav>
         {/* Right: Theme toggle + login */}
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link href="/dealer/login" className="btn btn-primary px-4 py-2 text-base font-semibold">Dealer Login</Link>
+          <Link href="/dealer-login" className="btn btn-primary px-4 py-2 text-base font-semibold">Dealer Login</Link>
           {/* Hamburger for mobile */}
           <button className="md:hidden ml-2 p-2 rounded-2xl hover:bg-[var(--background)]" onClick={() => setMobileOpen(!mobileOpen)}>
             <Menu size={26} />
