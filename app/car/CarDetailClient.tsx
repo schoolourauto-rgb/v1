@@ -6,7 +6,7 @@ import LeadForm from './[id]/LeadForm'
 import { CarWithImages } from '@/types'
 import { User } from '@supabase/supabase-js'
 import { getSimilarCars } from '@/lib/marketplace/getSimilarCars'
-import CarCard from '@/components/CarCard'
+import CarCard from '@/components/marketplace/CarCard'
 
 interface CarDetailProps {
   car: CarWithImages & { profiles?: { mobile?: string; business_name?: string } }
@@ -22,7 +22,9 @@ export default function CarDetailClient({ car, user }: CarDetailProps) {
 
   useEffect(() => {
     (async () => {
-      const res = await getSimilarCars(car);
+      // Ensure dealer_id is always a string for type compatibility
+      const carForSimilar = { ...car, dealer_id: car.dealer_id ?? '', created_at: car.created_at ?? undefined };
+      const res = await getSimilarCars(carForSimilar);
       setSimilar(res);
     })();
   }, [car]);
@@ -116,7 +118,7 @@ export default function CarDetailClient({ car, user }: CarDetailProps) {
         <span className="text-lg font-semibold mb-4 block">Similar Cars</span>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {similar.map((car) => (
-            <CarCard key={car.id} car={car} />
+            <CarCard key={car.id} {...car} />
           ))}
         </div>
       </div>

@@ -1,121 +1,53 @@
 
-"use client"
-
-
-"use client"
-
+"use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
+import Image from "next/image";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
-import { createClient } from "@/lib/supabase/client";
-import Logo from '@/components/Logo';
-
-type Session = {
-  user: {
-    id: string;
-    email?: string;
-    [key: string]: any;
-  } | null;
-};
+import { useState } from "react";
+import { Menu } from "lucide-react";
+import MobileNav from "./MobileNav";
 
 export default function Header() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const [session, setSession] = useState<Session | null>(null);
-  const [dealerName, setDealerName] = useState<string | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-    const supabase = createClient();
-    let authListener: any;
-
-    async function getSessionAndDealer() {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      if (session?.user?.id) {
-        // Fetch dealer name if logged in
-        const { data } = await supabase
-          .from("dealers")
-          .select("name")
-          .eq("user_id", session.user.id)
-          .maybeSingle();
-        setDealerName(data?.name || null);
-      } else {
-        setDealerName(null);
-      }
-    }
-
-    getSessionAndDealer();
-
-    authListener = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session?.user?.id) {
-        supabase
-          .from("dealers")
-          .select("name")
-          .eq("user_id", session.user.id)
-          .maybeSingle()
-          .then(({ data }) => setDealerName(data?.name || null));
-      } else {
-        setDealerName(null);
-      }
-    });
-
-    return () => {
-      if (authListener && typeof authListener.subscription?.unsubscribe === "function") {
-        authListener.subscription.unsubscribe();
-      }
-    };
-  }, []);
-
-  // Only render theme toggle after mount to avoid hydration mismatch
-
+  const [mobileOpen, setMobileOpen] = useState(false);
   return (
-    <header className="border-b soft-border bg-background sticky top-0 z-30 transition-colors duration-200 rounded-b-2xl">
-      <div className="max-w-6xl mx-auto flex items-center justify-between h-16 px-4">
-        <Link href="/" className="flex items-center" aria-label="Home">
-          <div style={{ width: 140, height: "auto" }}>
-            {/* Logo: theme-aware */}
-            <Logo />
-          </div>
+    <header className="sticky top-0 z-50 bg-[var(--card)] border-b border-[var(--border)] backdrop-blur-md">
+      <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+        {/* Logo Left */}
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/logo.png" alt="Logo" width={110} height={36} className="h-9 w-auto object-contain" />
         </Link>
-        <div className="flex items-center gap-4">
-          {mounted && (
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="text-foreground hover:text-accent transition-colors duration-200 text-xl p-2 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? "☀️" : "🌙"}
-            </button>
-          )}
-          {session && session.user ? (
-            <>
-              <span className="text-foreground text-sm font-medium px-3 py-1 rounded-2xl">
-                {dealerName ? dealerName : "My Account"}
-              </span>
-              <button
-                className="text-foreground hover:text-accent transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-2xl soft-border"
-                onClick={async () => {
-                  const supabase = createClient();
-                  await supabase.auth.signOut();
-                }}
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link
-              href="/auth/login"
-              className="text-foreground hover:text-accent transition-colors duration-200 text-sm font-medium px-3 py-1 rounded-2xl"
-            >
-              Dealer Login
-            </Link>
-          )}
+        {/* Nav Center (desktop) */}
+        <nav className="hidden md:flex flex-1 justify-center gap-8">
+          <Link href="/marketplace" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">Marketplace</Link>
+          <Link href="/about" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">About</Link>
+          <Link href="/dealer/dashboard" className="text-base font-medium text-[var(--text)] hover:text-[var(--accent)] transition">Dashboard</Link>
+        </nav>
+        {/* Right: Theme toggle + login */}
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link href="/dealer/login" className="btn btn-primary px-4 py-2 text-base font-semibold">Dealer Login</Link>
+          {/* Hamburger for mobile */}
+          <button className="md:hidden ml-2 p-2 rounded-2xl hover:bg-[var(--background)]" onClick={() => setMobileOpen(!mobileOpen)}>
+            <Menu size={26} />
+          </button>
         </div>
       </div>
+      {/* Mobile nav overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setMobileOpen(false)}>
+          <div className="absolute top-0 right-0 w-64 h-full bg-[var(--card)] shadow-modern p-6 flex flex-col gap-6">
+            <Link href="/" className="flex items-center gap-2 mb-6">
+              <Image src="/logo.png" alt="Logo" width={100} height={32} className="h-8 w-auto object-contain" />
+            </Link>
+            <Link href="/marketplace" className="text-lg font-medium text-[var(--text)] hover:text-[var(--accent)] transition" onClick={() => setMobileOpen(false)}>Marketplace</Link>
+            <Link href="/about" className="text-lg font-medium text-[var(--text)] hover:text-[var(--accent)] transition" onClick={() => setMobileOpen(false)}>About</Link>
+            <Link href="/dealer/dashboard" className="text-lg font-medium text-[var(--text)] hover:text-[var(--accent)] transition" onClick={() => setMobileOpen(false)}>Dashboard</Link>
+            <Link href="/dealer/login" className="btn btn-primary px-4 py-2 text-base font-semibold mt-4" onClick={() => setMobileOpen(false)}>Dealer Login</Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

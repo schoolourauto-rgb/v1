@@ -102,15 +102,7 @@ export default async function LocationLandingPage({ params }: LocationLandingPag
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {displayCars && displayCars.length > 0 ? (
           displayCars.map((car) => (
-            <CarCard
-              key={car.id}
-              id={car.id}
-              image={car.image}
-              title={car.title}
-              year={car.year}
-              price={car.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })}
-              location={car.location}
-            />
+            <CarCard key={car.id} {...car} />
           ))
         ) : (
           <p className="text-muted-foreground col-span-full">No cars found for this search.</p>

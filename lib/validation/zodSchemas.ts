@@ -26,5 +26,5 @@ export const signupSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6),
     location: z.string().min(2),
-    referral_code: z.string().optional().nullable(),
+    // referral_code removed
 }).passthrough();

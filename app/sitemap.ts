@@ -22,26 +22,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     // Car detail pages
-    ...(cars || []).map((car: any) => ({
+    ...(cars || []).map((car: Record<string, unknown>) => ({
       url: `${baseUrl}/car/${car.id}`,
-      lastModified: car.updated_at || new Date(),
+      lastModified: typeof car.updated_at === 'string' || car.updated_at instanceof Date ? car.updated_at : new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
     // Dealer profile pages
-    ...(dealers || []).map((dealer: any) => ({
+    ...(dealers || []).map((dealer: Record<string, unknown>) => ({
       url: `${baseUrl}/dealer-profile/${dealer.id}`,
-      lastModified: dealer.updated_at || new Date(),
+      lastModified: typeof dealer.updated_at === 'string' || dealer.updated_at instanceof Date ? dealer.updated_at : new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.7,
     })),
     // City listing pages
-    ...(cities || []).map((city: any) => ({
-      url: `${baseUrl}/cars/${encodeURIComponent(city.city)}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    })),
+    ...(cities || []).map((city: Record<string, unknown>) => {
+      const cityName = typeof city.city === 'string' ? city.city : '';
+      return {
+        url: `${baseUrl}/cars/${encodeURIComponent(cityName)}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+      };
+    }),
   ]
 
   return urls

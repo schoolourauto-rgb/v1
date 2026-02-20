@@ -4,6 +4,5 @@ export type DealerWallet = {
 
 export type Dealer = {
   id: string;
-  referral_code: string;
-  referrals?: { id: string }[];
+  // referral_code and referrals removed
 };

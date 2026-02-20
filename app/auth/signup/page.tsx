@@ -1,13 +1,14 @@
 "use client";
+import Link from "next/link";
 import { logger } from '@/lib/monitoring/logger';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { createClient } from '@/lib/supabase/client';
 import Logo from '@/components/Logo';
 
 export default function SignupPage() {
-  const router = useRouter()
+  const router = useRouter();
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -16,7 +17,17 @@ export default function SignupPage() {
     mobile: '',
     referral_code: '',
     location: '',
-  })
+  });
+
+  // Prefill referral_code from ?ref param if present and not already set
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref && !form.referral_code) {
+      setForm((prev) => ({ ...prev, referral_code: ref.toUpperCase().slice(0, 8) }));
+    }
+  }, []);
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -211,9 +222,9 @@ export default function SignupPage() {
         </button>
         <p className="text-center text-gray-600 dark:text-gray-300 text-sm">
           Already have an account?{' '}
-          <a href="/auth/login" className="text-yellow-600 dark:text-yellow-400 hover:underline">
+          <Link href="/auth/login" className="text-yellow-600 dark:text-yellow-400 hover:underline">
             Login
-          </a>
+          </Link>
         </p>
       </div>
     </div>

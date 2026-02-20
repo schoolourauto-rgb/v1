@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { motion } from "framer-motion";
 
 type CardProps = {
   children: ReactNode;
@@ -7,8 +8,13 @@ type CardProps = {
 
 export function Card({ children, className = "" }: CardProps) {
   return (
-    <div className={`rounded-2xl border-0 bg-white dark:bg-black p-8 shadow-lg ${className}`}>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className={`bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-8 shadow-lg shadow-black/10 transition duration-300 ${className}`}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }

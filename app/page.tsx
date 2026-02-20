@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const supabase = await createClient()
 
-  // 🔥 Featured Cars (only active, featured, and not expired)
+  // Featured Cars (only active, featured, and not expired)
   const { data: featuredCars } = await supabase
     .from("cars")
     .select(`
@@ -38,28 +38,28 @@ export default async function HomePage() {
     <div className="space-y-20">
 
       {/* HERO SECTION */}
-      <section className="bg-black text-white py-24 text-center px-6">
+      <section className="bg-[var(--bg-main)] text-[var(--text-main)] py-16 sm:py-24 text-center px-4 sm:px-6 rounded-2xl shadow-lg shadow-black/10 border border-[var(--border)]">
         <h1 className="text-4xl md:text-5xl font-bold mb-6">
           Find Your Perfect Used Car
         </h1>
 
-        <p className="text-lg text-gray-300 mb-8">
+        <p className="text-lg text-[var(--text-muted)] mb-8">
           Browse verified dealer listings and get the best deals today.
         </p>
 
         <Link
           href="/cars"
-          className="bg-white text-black px-8 py-3 rounded-lg font-semibold"
+          className="bg-[var(--accent)] text-black px-8 py-3 rounded-xl font-semibold w-full sm:w-auto block sm:inline-block transition hover:scale-[1.02]"
         >
           Browse Cars
         </Link>
       </section>
 
       {/* FEATURED CARS */}
-      <section className="max-w-7xl mx-auto px-6 space-y-8">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
         <h2 className="text-3xl font-bold">Featured Cars</h2>
 
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredCars?.map((car: any) => {
             const primaryImage =
               car.car_images?.find((img: any) => img.is_primary)
@@ -69,19 +69,19 @@ export default async function HomePage() {
               <Link
                 key={car.id}
                 href={`/car/${car.slug}`}
-                className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+                className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl shadow-lg shadow-black/10 hover:shadow-xl hover:scale-[1.02] transition duration-300 overflow-hidden"
               >
                 <img
                   src={
                     primaryImage ||
                     "https://via.placeholder.com/400x300"
                   }
-                  className="w-full h-52 object-cover"
+                  className="w-full h-52 object-cover rounded-t-2xl"
                   alt={car.title}
                 />
 
                 <div className="p-4 space-y-2">
-                  <h3 className="font-semibold">
+                  <h3 className="font-semibold text-[var(--text-main)]">
                     {car.title}
                   </h3>
 
@@ -89,7 +89,7 @@ export default async function HomePage() {
                     ₹{car.price}
                   </p>
 
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-[var(--text-muted)]">
                     {car.year} • {car.fuel} • {car.transmission}
                   </p>
                 </div>

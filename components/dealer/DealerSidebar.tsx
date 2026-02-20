@@ -1,3 +1,4 @@
+import Link from "next/link";
 "use client";
 
 export default function DealerSidebar() {
@@ -5,16 +6,16 @@ export default function DealerSidebar() {
     <nav className="p-6">
       <ul className="space-y-4">
         <li>
-          <a href="/dealer/dashboard" className="hover:underline">Dashboard</a>
+          <Link href="/dealer/dashboard" className="hover:underline">Dashboard</Link>
         </li>
         <li>
-          <a href="/dealer/cars" className="hover:underline">Cars</a>
+          <Link href="/dealer/cars" className="hover:underline">Cars</Link>
         </li>
         <li>
-          <a href="/dealer/leads" className="hover:underline">Leads</a>
+          <Link href="/dealer/leads" className="hover:underline">Leads</Link>
         </li>
         <li>
-          <a href="/dealer/settings" className="hover:underline">Settings</a>
+          <Link href="/dealer/settings" className="hover:underline">Settings</Link>
         </li>
       </ul>
     </nav>

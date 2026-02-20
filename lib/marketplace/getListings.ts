@@ -17,7 +17,7 @@ import { Car } from "@/types/car";
 import { calculateCarScore } from "@/lib/marketplace/ranking";
 
 interface GetListingsParams {
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   from: number;
   to: number;
 }
@@ -43,23 +43,25 @@ export interface MarketplaceListing extends Car {
   score: number;
 }
 
-export async function getListings({ filters = {}, from, to }: GetListingsParams): Promise<{ listings: MarketplaceListing[]; count: number; error: any }> {
+export async function getListings({ filters = {}, from, to }: GetListingsParams): Promise<{ listings: MarketplaceListing[]; count: number; error: boolean }> {
   try {
     const supabase = await createClient();
     let query = supabase
       .from("cars")
-      .select("id, title, brand, model, year, price, fuel_type, transmission, city, car_images(image_url), updated_at, created_at, dealer_id", { count: "exact" })
+      .select("id, title, brand, model, year, price, fuel_type, transmission, city, car_images(image_url), updated_at, created_at, dealer_id, is_hot_deal, views", { count: "exact" })
       .eq("status", "active")
-      .order("updated_at", { ascending: false })
+      .order("is_hot_deal", { ascending: false })
+      .order("views", { ascending: false })
+      .order("created_at", { ascending: false })
       .range(from, to);
 
-    if (filters.brand) query = query.ilike("brand", filters.brand);
-    if (filters.model) query = query.ilike("model", filters.model);
-    if (filters.city) query = query.ilike("city", filters.city);
-    if (filters.maxPrice) query = query.lte("price", filters.maxPrice);
-    if (filters.fuel) query = query.ilike("fuel_type", filters.fuel);
-    if (filters.transmission) query = query.ilike("transmission", filters.transmission);
-    if (filters.year) query = query.eq("year", filters.year);
+    if (filters.brand && typeof filters.brand === 'string') query = query.ilike("brand", filters.brand);
+    if (filters.model && typeof filters.model === 'string') query = query.ilike("model", filters.model);
+    if (filters.city && typeof filters.city === 'string') query = query.ilike("city", filters.city);
+    if (filters.maxPrice && typeof filters.maxPrice === 'number') query = query.lte("price", filters.maxPrice);
+    if (filters.fuel && typeof filters.fuel === 'string') query = query.ilike("fuel_type", filters.fuel);
+    if (filters.transmission && typeof filters.transmission === 'string') query = query.ilike("transmission", filters.transmission);
+    if (filters.year && typeof filters.year === 'number') query = query.eq("year", filters.year);
 
     const { data, count, error } = await query;
     if (error) {
@@ -68,7 +70,7 @@ export async function getListings({ filters = {}, from, to }: GetListingsParams)
 
     // --- PART 2: Dealer activity signal ---
     // Collect dealer_id set
-    const dealerIds = Array.from(new Set((data ?? []).map((row: any) => row.dealer_id).filter(Boolean)));
+    const dealerIds = Array.from(new Set((data ?? []).map((row: Record<string, unknown>) => row.dealer_id).filter(Boolean)));
     let dealerListingCounts: Record<string, number> = {};
     if (dealerIds.length > 0) {
       // Lightweight: count listings per dealer in one query
@@ -88,7 +90,8 @@ export async function getListings({ filters = {}, from, to }: GetListingsParams)
     let listings: MarketplaceListing[] = (data ?? []).map((row: any) => {
       // ...existing logic...
       let qualityScore = 0;
-      if ((row.car_images as { image_url: string }[] | undefined)?.[0]?.image_url) qualityScore += 1;
+      const carImages = (row.car_images as { image_url: string }[] | undefined) ?? [];
+      if (carImages[0]?.image_url) qualityScore += 1;
       if (row.price) qualityScore += 1;
       if (row.city) qualityScore += 1;
       if (row.transmission) qualityScore += 1;
@@ -102,7 +105,14 @@ export async function getListings({ filters = {}, from, to }: GetListingsParams)
       const priorityScore = row.updated_at ? new Date(row.updated_at).getTime() : 0;
       let finalScore = priorityScore;
       // Add smart ranking score
-      const score = calculateCarScore(row);
+      // Only pass required fields to calculateCarScore
+      const score = calculateCarScore({
+        views: row.views ?? 0,
+        leads: row.leads ?? 0,
+        trust: row.trust_score ?? 0,
+        ageDays: row.created_at ? Math.floor((Date.now() - new Date(row.created_at).getTime()) / (1000 * 60 * 60 * 24)) : 0,
+        isFeatured: row.isFeatured ?? false,
+      });
       return {
         id: row.id,
         title: row.title,
@@ -115,7 +125,7 @@ export async function getListings({ filters = {}, from, to }: GetListingsParams)
         price: row.price,
         transmission: row.transmission,
         city: row.city ?? '',
-        image: (row.car_images as { image_url: string }[] | undefined)?.[0]?.image_url ?? "/logo.png",
+        image: carImages[0]?.image_url ?? "/logo.png",
         location: row.city ?? "Unknown",
         updated_at: row.updated_at,
         created_at: row.created_at,

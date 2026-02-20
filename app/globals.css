@@ -9,23 +9,57 @@ body {
   scroll-behavior: smooth;
 }
 
+/* Design System Variables */
+/* Professional Design System Variables */
 :root {
-  --bg-main: #ffffff;      /* 60% */
-  --bg-card: #f8f9fa;
-  --text-main: #111111;    /* 30% */
-  --text-muted: #6b7280;
-  --accent: #facc15;       /* 10% */
-  --border: #e5e7eb;
+  --background: #FFFFFF;
+  --card: #F9F9F9;
+  --text: #000000;
+  --accent: #FFD600;
+  --border: rgba(0,0,0,0.08);
 }
 
 .dark {
-  --bg-main: #0a0a0a;
-  --bg-card: #111111;
-  --text-main: #ffffff;
-  --text-muted: #9ca3af;
-  --accent: #facc15;
-  --border: #1f2937;
+  --background: #000000;
+  --card: #111111;
+  --text: #FFFFFF;
+  --accent: #FFD600;
+  --border: rgba(255,255,255,0.08);
 }
 .input-style {
-  @apply w-full bg-transparent border rounded-2xl p-3 text-base focus:ring-2 focus:ring-accent outline-none;
+  @apply w-full bg-transparent border rounded-2xl p-4 text-base focus:ring-2 focus:ring-accent outline-none;
+}
+
+/* Spacing scale utility */
+.space-4 { margin: 4px; }
+.space-8 { margin: 8px; }
+.space-12 { margin: 12px; }
+.space-16 { margin: 16px; }
+.space-24 { margin: 24px; }
+.space-32 { margin: 32px; }
+
+/* Typography scale */
+h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
+body, p, span, div, input, button { font-size: 1rem; font-weight: 400; }
+
+@media (min-width: 640px) {
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.75rem; }
+}
+
+/* Card shadow */
+.shadow-modern {
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08), 0 1.5px 4px 0 rgba(0,0,0,0.04);
+}
+
+/* Button base styles */
+.btn {
+  @apply rounded-2xl px-6 py-3 font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+}
+.btn-primary {
+  @apply bg-accent text-black hover:scale-105 disabled:opacity-40;
+}
+.btn-secondary {
+  @apply border border-accent text-black dark:text-white bg-transparent hover:bg-accent hover:text-black disabled:opacity-40;
 }

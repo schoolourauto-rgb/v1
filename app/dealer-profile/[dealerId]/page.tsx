@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import CarCard from "@/components/CarCard";
+import CarCard from "@/components/marketplace/CarCard";
 import { Metadata } from "next";
 import Head from "next/head";
 
@@ -75,7 +75,7 @@ export default async function DealerProfilePage({ params }: { params: { dealerId
   const totalListings = cars?.length || 0;
   const totalLeads = dealer.total_leads ?? 0;
   const memberSince = dealer.created_at ? new Date(dealer.created_at).toLocaleDateString() : '-';
-  const cityRank = 1; // Placeholder, implement city rank logic if needed
+  // const cityRank = 1; // Placeholder, implement city rank logic if needed
   const profileViews = dealer.profile_views ?? 0;
 
   // WhatsApp share
@@ -99,7 +99,7 @@ export default async function DealerProfilePage({ params }: { params: { dealerId
         <span>Total Leads: {totalLeads}</span>
         <span>Profile Views: {profileViews}</span>
         <span>Member Since: {memberSince}</span>
-        <span>City Rank: {cityRank}</span>
+        {/* <span>City Rank: {cityRank}</span> */}
       </div>
       <div className="mb-4">
         <a
@@ -114,7 +114,7 @@ export default async function DealerProfilePage({ params }: { params: { dealerId
       <h2 className="text-xl font-semibold mb-2">Active Cars</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {cars?.map((car: any) => (
-          <CarCard key={car.id} car={car} />
+          <CarCard key={car.id} {...car} />
         ))}
       </div>
     </main>

@@ -164,6 +164,26 @@
 			"command": "npm run build",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "Clean and Build Next.js",
+			"type": "shell",
+			"command": "rm -rf .next; npm run build"
+		},
+		{
+			"label": "Clean and Build Next.js",
+			"type": "shell",
+			"command": "rm -rf .next; npm run build"
+		},
+		{
+			"label": "Clean and Build Next.js",
+			"type": "shell",
+			"command": "rm -rf .next; npm run build"
+		},
+		{
+			"label": "Clean and Build Next.js",
+			"type": "shell",
+			"command": "Remove-Item -Recurse -Force .next; npm run build"
 		}
 	]
 }

@@ -6,7 +6,8 @@ import { validateJsonRequest } from "@/lib/validation/validateRequest";
 import { rateLimit } from "@/middleware/rateLimit";
 import { withErrorHandler } from "@/lib/api/withErrorHandler";
 
-export const POST = withErrorHandler(async (req: Request) => {
+export const POST = withErrorHandler(async (...args: unknown[]) => {
+  const req = args[0] as Request;
   // Rate limit
   const rl = rateLimit(req);
   if (rl) return rl;
@@ -23,8 +24,8 @@ export const POST = withErrorHandler(async (req: Request) => {
       created_at: new Date().toISOString(),
     });
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    if (e.message === "Dealer unavailable") {
+  } catch (e) {
+    if (e instanceof Error && e.message === "Dealer unavailable") {
       return NextResponse.json({ error: "Dealer unavailable" }, { status: 403 });
     }
     return NextResponse.json({ error: "Internal Server Error" }, { status: 400 });

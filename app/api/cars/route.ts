@@ -12,7 +12,7 @@ export async function GET() {
 
   // Parse filters from query params
   const url = new URL(globalThis.location ? globalThis.location.href : "http://localhost", globalThis.location ? undefined : "http://localhost");
-  const filters: Record<string, any> = {};
+  const filters: Record<string, unknown> = {};
   ["brand", "model", "city", "maxPrice", "fuel", "transmission", "year"].forEach((key) => {
     const value = url.searchParams.get(key);
     if (value) filters[key] = value;
@@ -41,7 +41,8 @@ export async function GET() {
   return NextResponse.json(data, { status: 200 });
 }
 
-export const POST = withErrorHandler(async (req: NextRequest) => {
+export const POST = withErrorHandler(async function POST(...args: unknown[]) {
+  const req = args[0] as NextRequest;
   const supabase = await createClient();
 
   const formData = await req.formData();

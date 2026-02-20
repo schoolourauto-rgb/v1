@@ -1,1 +1,0 @@
-This is the /auth/signup route. Page: page.tsx

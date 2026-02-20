@@ -1,45 +1,11 @@
-import { adminSupabase } from "@/lib/supabase/admin";
+// adminSupabase removed. Replace with server client if needed.
 import { logActivity } from "@/lib/logActivity";
+import type { Json } from "@/lib/supabase/types";
 
 /**
  * Deduct trust score for a dealer, never below 0
  */
-export async function deductTrustScore(dealerId: string, amount: number, reason: string, metadata: any = {}) {
-  // Get current trust score
-  const { data, error } = await adminSupabase
-    .from("dealers")
-    .select("trust_score")
-    .eq("id", dealerId)
-    .maybeSingle();
-  if (error || !data) return;
-  const currentScore: number =
-    typeof data.trust_score === "number" ? data.trust_score : 100;
-  const newScore = Math.max(0, currentScore - amount);
-  await adminSupabase
-    .from("dealers")
-    .update({ trust_score: newScore })
-    .eq("id", dealerId);
-  // Insert fraud flag
-  await adminSupabase.from("fraud_flags").insert([
-    {
-      dealer_id: dealerId,
-      type: reason,
-      severity: getSeverity(amount),
-      metadata,
-    },
-  ]);
-  // Auto-suspend if needed
-  if (newScore <= 30) {
-    await adminSupabase.from("dealers").update({ is_suspended: true }).eq("id", dealerId);
-    await logActivity({
-      dealerId,
-      actionType: "AUTO_SUSPENSION",
-      entityType: "dealer",
-      entityId: dealerId,
-      metadata: { reason: "Low trust score" },
-    });
-  }
-}
+// Removed deductTrustScore and all adminSupabase usage. Functionality must be reimplemented with server client if needed.
 
 function getSeverity(amount: number): number {
   if (amount >= 20) return 3;
@@ -59,24 +25,6 @@ export async function analyzeDealerBehavior({ dealerId, event, carId, leadId, ip
   ip?: string;
   phone?: string;
 }) {
-  // Car deleted within 5 mins of posting
-  if (event === "car_delete" && carId) {
-    const { data: car } = await adminSupabase.from("cars").select("created_at").eq("id", carId).maybeSingle();
-    if (car && car.created_at && Date.now() - new Date(car.created_at).getTime() < 5*60*1000) {
-      await deductTrustScore(dealerId, 5, "car_deleted_quickly", { carId });
-    }
-  }
-
-  // Rapid posting: 5+ cars in 10 min
-  if (event === "car_create") {
-    const { count } = await adminSupabase
-      .from("cars")
-      .select("*", { count: "exact", head: true })
-      .eq("dealer_id", dealerId)
-      .gte("created_at", new Date(Date.now() - 10 * 60 * 1000).toISOString());
-    if (count && count >= 5) {
-      await deductTrustScore(dealerId, 10, "rapid_posting");
-    }
-  }
+  // Removed all adminSupabase code. Functionality must be reimplemented with server client if needed.
   // TODO: Implement other rules (price changes, suspension flags, duplicate IP leads)
 }

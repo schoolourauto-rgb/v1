@@ -1,7 +1,7 @@
 type LogLevel = 'info' | 'warn' | 'error';
 
 interface LogMeta {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 class Logger {
@@ -19,7 +19,7 @@ class Logger {
   info(message: string, meta?: LogMeta) {
     if (process.env.NODE_ENV !== 'production') {
       // Only log in non-prod or to external service in prod
-      // eslint-disable-next-line no-console
+       
       console.info(JSON.stringify({ level: 'info', message, ...this.redact(meta) }));
     }
     // TODO: Integrate with external log service in prod
@@ -27,7 +27,7 @@ class Logger {
 
   warn(message: string, meta?: LogMeta) {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
+       
       console.warn(JSON.stringify({ level: 'warn', message, ...this.redact(meta) }));
     }
     // TODO: Integrate with external log service in prod
@@ -35,7 +35,7 @@ class Logger {
 
   error(message: string, meta?: LogMeta) {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
+       
       console.error(JSON.stringify({ level: 'error', message, ...this.redact(meta) }));
     }
     // TODO: Integrate with external log service in prod

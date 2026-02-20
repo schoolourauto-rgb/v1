@@ -1,3 +1,4 @@
+// This file is being removed as part of the cleanup process.
 
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { createClient } from "@/lib/supabase/server";

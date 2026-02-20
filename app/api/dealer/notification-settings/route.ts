@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { adminSupabase } from "@/lib/supabase/admin";
+// adminSupabase removed. Use createClient instead.
 import { createClient } from "@/lib/supabase/server";
 
 export default async function handler(req: Request) {
@@ -10,7 +10,7 @@ export default async function handler(req: Request) {
     if (!user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
     }
-    const { data } = await adminSupabase
+    const { data } = await supabase
       .from("dealers")
       .select("notification_settings")
       .eq("user_id", user.id)
@@ -24,9 +24,9 @@ export default async function handler(req: Request) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
     }
     const body = await req.json();
-    const { error } = await adminSupabase
+    const { error } = await supabase
       .from("dealers")
-      .update({ notification_settings: body } as any)
+      .update({ notification_settings: body } as Record<string, unknown>)
       .eq("user_id", user.id);
     if (error) {
       return new Response("Update failed", { status: 500 });

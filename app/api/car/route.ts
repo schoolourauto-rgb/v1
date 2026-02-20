@@ -17,13 +17,12 @@ export async function POST(req: Request) {
   // Find dealer
   const { data: dealer } = await supabase
     .from("profiles")
-    .select("id")
+    .select("id, total_listings, hot_deal_credits")
     .eq("user_id", session.user.id)
     .single();
   if (!dealer) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
-
   // Parse form
   const formData = await req.formData();
   logger.info('FORM DATA RECEIVED', { entries: Array.from(formData.entries()) });
@@ -144,6 +143,21 @@ export async function POST(req: Request) {
   }
 
   // Insert images into car_images table
+  // Increment total_listings and add hot_deal_credit if needed
+  let newTotal = (dealer.total_listings ?? 0) + 1;
+  let hotDealCredit = dealer.hot_deal_credits ?? 0;
+  let addHotDeal = false;
+  if (newTotal % 10 === 0) {
+    hotDealCredit += 1;
+    addHotDeal = true;
+  }
+  const { error: updateProfileError } = await supabase
+    .from("profiles")
+    .update({ total_listings: newTotal, hot_deal_credits: hotDealCredit })
+    .eq("id", dealer.id);
+  if (updateProfileError) {
+    return NextResponse.json({ error: updateProfileError.message }, { status: 500 });
+  }
   if (insertedCar && imageUrls.length > 0) {
     await supabase.from("car_images").insert(
       imageUrls.map((url) => ({

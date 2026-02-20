@@ -3,7 +3,7 @@ import React from "react";
 
 export function H1({ children, className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h1 className={cn("text-4xl md:text-5xl font-bold tracking-tight", className)} {...props}>
+    <h1 className={cn("text-[2rem] sm:text-[2.25rem] font-bold tracking-tight", className)} {...props}>
       {children}
     </h1>
   );
@@ -11,7 +11,7 @@ export function H1({ children, className, ...props }: React.HTMLAttributes<HTMLH
 
 export function H2({ children, className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h2 className={cn("text-3xl md:text-4xl font-semibold tracking-tight", className)} {...props}>
+    <h2 className={cn("text-[1.5rem] sm:text-[1.75rem] font-semibold tracking-tight", className)} {...props}>
       {children}
     </h2>
   );
@@ -19,7 +19,7 @@ export function H2({ children, className, ...props }: React.HTMLAttributes<HTMLH
 
 export function H3({ children, className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3 className={cn("text-2xl md:text-3xl font-semibold tracking-tight", className)} {...props}>
+    <h3 className={cn("text-[1.25rem] sm:text-[1.5rem] font-semibold tracking-tight", className)} {...props}>
       {children}
     </h3>
   );

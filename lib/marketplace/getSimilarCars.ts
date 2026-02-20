@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
+import type { Car } from "@/types/car";
 
-export async function getSimilarCars(car: any) {
+export async function getSimilarCars(car: Car) {
   const supabase = await createClient();
   const minPrice = Math.round(car.price * 0.9);
   const maxPrice = Math.round(car.price * 1.1);

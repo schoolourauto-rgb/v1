@@ -11,8 +11,8 @@ export function rateLimit(req: NextRequest | Request) {
     ip = req.headers.get("x-forwarded-for") || "unknown";
   }
   // NextRequest has .ip, Request does not
-  if ("ip" in req && typeof (req as any).ip === "string") {
-    ip = (req as any).ip || ip;
+  if ("ip" in req && typeof (req as Record<string, unknown>).ip === "string") {
+    ip = (req as Record<string, string>).ip || ip;
   }
   const now = Date.now();
   if (!ipStore[ip] || now - ipStore[ip].last > WINDOW) {

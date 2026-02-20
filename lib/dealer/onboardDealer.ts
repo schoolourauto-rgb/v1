@@ -20,7 +20,23 @@ export async function onboardDealer(user_id: string): Promise<Dealer | null> {
       logger.error('onboardDealer fetch error', { error });
       return null;
     }
-    if (dealer) return dealer as Dealer;
+    if (dealer) {
+      // Map fetched dealer to required Dealer shape
+      return {
+        id: dealer.id,
+        user_id: dealer.user_id,
+        name: dealer.dealership_name ?? "",
+        city: dealer.location ?? "",
+        phone: dealer.phone ?? "",
+        referral_code: null,
+        verified: dealer.verified ?? false,
+        featured_ads_credit: 0,
+        hot_deal_credit: 0,
+        total_listings: 0,
+        referral_rewarded: false,
+        created_at: dealer.created_at ?? undefined,
+      } as Dealer;
+    }
     // Insert new dealer
       const { data: inserted, error: insertError } = await supabase
         .from("dealers")

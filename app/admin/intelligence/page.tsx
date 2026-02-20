@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth/requireAdmin";
-import { adminSupabase } from "@/lib/supabase/admin";
+// adminSupabase removed. Replace with server client if needed.
 
 export default async function IntelligencePage() {
   await requireAdmin();

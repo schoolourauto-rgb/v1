@@ -124,13 +124,10 @@ export default async function MarketplacePage({ searchParams }: { searchParams?:
               {cars.map((car: Car) => (
                 <CarCard
                   key={car.id}
-                  id={car.id}
-                  image={car.car_images?.[0]?.image_url || "/logo.png"}
-                  title={car.title}
-                  year={car.year}
-                  price={formatPrice(car.price)}
-                  location={car.city || ""}
-                  dealer={car.dealer_id ? { id: car.dealer_id, name: car.dealer_name || 'Dealer', activeDealer: car.activeDealer } : undefined}
+                  {...(car as any)}
+                  model={(car as any).model || "Model"}
+                  dealer_id={car.dealer_id || "unknown-dealer"}
+                  created_at={car.created_at ?? undefined}
                 />
               ))}
             </div>
