@@ -12,7 +12,7 @@ type ActivityItem = {
 
 export function ActivityPanel({ items, className }: { items: ActivityItem[]; className?: string }) {
   return (
-    <div className={cn("rounded-2xl bg-white dark:bg-neutral-900 shadow-md p-6 md:p-8", className)}>
+    <div className={cn("rounded-2xl bg-[var(--bg)] shadow-md p-6 md:p-8", className)}>
       <div className="font-semibold text-lg mb-4">Recent Activity</div>
       <ul className="space-y-4">
         {items.map((item) => (

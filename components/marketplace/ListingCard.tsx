@@ -33,7 +33,7 @@ export function ListingCard({
           priority={false}
           onLoadingComplete={img => img.setAttribute("data-loaded", "true")}
         />
-        <span className="absolute top-4 left-4 bg-[var(--accent)] text-black text-xs font-bold px-3 py-1 rounded-2xl shadow-modern z-10">🔥 Hot Deal</span>
+        <span className="absolute top-4 left-4 bg-[var(--accent)] text-[var(--text)] text-xs font-bold px-3 py-1 rounded-2xl shadow-modern z-10">🔥 Hot Deal</span>
       </div>
       <div className="flex flex-col justify-between flex-1 p-4 gap-2">
         <h3 className="text-xl font-semibold line-clamp-1 text-[var(--text)] mb-1" style={{fontSize:'16px'}}>{title}</h3>

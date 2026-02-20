@@ -156,7 +156,8 @@ export async function POST(req: Request) {
     .update({ total_listings: newTotal, hot_deal_credits: hotDealCredit })
     .eq("id", dealer.id);
   if (updateProfileError) {
-    return NextResponse.json({ error: updateProfileError.message }, { status: 500 });
+    console.error("Profile update error:", updateProfileError);
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
   if (insertedCar && imageUrls.length > 0) {
     await supabase.from("car_images").insert(

@@ -1,18 +1,24 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { apiSuccess, apiError } from "@/lib/apiResponse";
+import { rateLimit } from "@/middleware/rateLimit";
+import { logError } from "@/lib/logger";
 
 // POST /api/dealer/hot-deal
-export async function POST(req: NextRequest) {
+  // Enforce rate limit
+  const rl = rateLimit(req);
+  if (rl) return rl;
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return NextResponse.json({ success: false, error: "Session expired. Please login again." }, { status: 401 });
+      return NextResponse.json(apiError("Session expired. Please login again."), { status: 401 });
     }
 
     const { car_id } = await req.json();
     if (!car_id) {
-      return NextResponse.json({ success: false, error: "Missing car_id" }, { status: 400 });
+      return NextResponse.json(apiError("Missing car_id"), { status: 400 });
     }
 
     // Get dealer row
@@ -30,7 +36,7 @@ export async function POST(req: NextRequest) {
     const hotDealsUsed = Math.max(0, dealer.hot_deals_used || 0);
     const available = Math.max(0, Math.floor(totalListings / 10) - hotDealsUsed);
     if (available < 1) {
-      return NextResponse.json({ success: false, error: "No Hot Deal credits available" }, { status: 403 });
+      return NextResponse.json(apiError("No Hot Deal credits available"), { status: 403 });
     }
 
     // Set car as featured for 3 days

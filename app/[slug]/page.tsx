@@ -16,22 +16,8 @@ function parseSlug(slug?: string) {
       category = parts[0];
       city = parts[1];
     } else {
-      if (!slug) return { city: "", category: "" }
-  
-      if (slug.startsWith("cars-in-")) {
-        city = slug.replace("cars-in-", "");
-      } else if (slug.includes("-in-")) {
-        const parts = slug.split("-in-");
-        if (['suv', 'sedan', 'hatchback', 'luxury'].includes(parts[0].toLowerCase())) {
-          category = parts[0];
-          city = parts[1];
-        } else {
-          brand = parts[0];
-          city = parts[1];
-        }
-      }
-  
-      return { brand, city, category };
+      brand = parts[0];
+      city = parts[1];
     }
   }
   return { brand, city, category };
@@ -64,7 +50,8 @@ export default async function LocationLandingPage({ params }: LocationLandingPag
         car_images (
           image_url
         )
-      `);
+      `)
+      .limit(50);
     if (brand) query = query.eq('brand', brand);
     if (city) query = query.eq('city', city);
     if (category) query = query.eq('category', category);

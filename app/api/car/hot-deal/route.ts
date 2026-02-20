@@ -10,6 +10,6 @@ export async function POST(req: NextRequest) {
   const userId = session.user.id;
   // Only allow if user owns the car (optional: add check)
   const { error } = await supabase.rpc('use_hot_deal_credit', { user_id: userId, car_id });
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error) return NextResponse.json({ error: "Could not apply hot deal credit" }, { status: 400 });
   return NextResponse.json({ success: true });
 }

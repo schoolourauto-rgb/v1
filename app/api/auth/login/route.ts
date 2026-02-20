@@ -1,21 +1,19 @@
-// PATCH: Surgical Debug Patch Pack - Login Route Debug
-// TODO: Replace with actual login logic and add debug logs as per instructions.
+import { NextResponse } from "next/server";
+import { apiSuccess, apiError } from "@/lib/apiResponse";
+
+export async function GET() {
+  return NextResponse.json(apiSuccess("OK"), { status: 200 });
+}
 
 export async function POST(req: Request) {
-  // ...existing code...
   let body;
+
   try {
     body = await req.json();
   } catch (err) {
-    console.error("❌ JSON Parse Failed:", err);
-    return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400 });
+    console.error("JSON Parse Failed:", err);
+    return NextResponse.json(apiError("Invalid JSON"), { status: 400 });
   }
-  // ...existing code...
 
-  // Example: Replace with actual Supabase login logic
-  // const { data, error } = await supabase.auth.signInWithPassword({ ... });
-  // ...existing code...
-  // ...existing code...
-
-  return new Response(JSON.stringify({ success: true }), { status: 200 });
+  return NextResponse.json(apiSuccess(true), { status: 200 });
 }

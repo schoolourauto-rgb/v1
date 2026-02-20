@@ -10,6 +10,6 @@ export async function POST(req: NextRequest) {
   const userId = session.user.id;
   // Only allow if user owns the ad (optional: add check)
   const { error } = await supabase.rpc('use_future_ad_credit', { user_id: userId, ad_id });
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error) return NextResponse.json({ error: "Could not apply future ad credit" }, { status: 400 });
   return NextResponse.json({ success: true });
 }

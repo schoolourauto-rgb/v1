@@ -8,7 +8,7 @@ type BadgeProps = {
 const variantClasses: Record<string, string> = {
   success: "bg-green-500 text-white",
   danger: "bg-red-500 text-white",
-  warning: "bg-yellow-400 text-black",
+  warning: "bg-[var(--accent)] text-[var(--text)]",
   default: "bg-black text-white",
 };
 

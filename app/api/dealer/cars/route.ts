@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         },
       ]);
       if (insertError)
-        return NextResponse.json({ success: false, error: insertError.message }, { status: 500 });
+        return NextResponse.json({ success: false, error: "Failed to create car" }, { status: 500 });
       const { error: updateError } = await supabase
         .from("dealers")
         .update({ total_listings: Math.max(0, (dealer.total_listings ?? 0) + 1) })

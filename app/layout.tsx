@@ -1,23 +1,22 @@
-import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/layout/Header";
+import { ReactNode } from "react";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Free Marketplace",
-  description: "Dealer Inventory Network Platform",
+  description: "Dealer Network Platform",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <Header />
-        {children}
-      </body>
+    <html lang="en" className="dark">
+      <body>{children}</body>
     </html>
   );
 }

@@ -1,12 +1,14 @@
 
+
 import { NextResponse } from "next/server";
 import { LeadsService } from "@/lib/services/leads.service";
 import { LeadSchema } from "@/lib/validation/zodSchemas";
 import { validateJsonRequest } from "@/lib/validation/validateRequest";
 import { rateLimit } from "@/middleware/rateLimit";
 import { withErrorHandler } from "@/lib/api/withErrorHandler";
+import { apiSuccess, apiError } from "@/lib/apiResponse";
+import { logError } from "@/lib/logger";
 
-export const POST = withErrorHandler(async (...args: unknown[]) => {
   const req = args[0] as Request;
   // Rate limit
   const rl = rateLimit(req);
@@ -23,11 +25,12 @@ export const POST = withErrorHandler(async (...args: unknown[]) => {
       message: message ?? null,
       created_at: new Date().toISOString(),
     });
-    return NextResponse.json({ success: true });
+    return NextResponse.json(apiSuccess(true), { status: 200 });
   } catch (e) {
     if (e instanceof Error && e.message === "Dealer unavailable") {
-      return NextResponse.json({ error: "Dealer unavailable" }, { status: 403 });
+      return NextResponse.json(apiError("Dealer unavailable"), { status: 403 });
     }
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 400 });
+    logError("Lead creation error", e);
+    return NextResponse.json(apiError(), { status: 500 });
   }
 });

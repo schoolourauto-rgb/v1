@@ -1,13 +1,15 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { apiSuccess, apiError } from "@/lib/apiResponse";
+import { logError } from "@/lib/logger";
 
 // GET /api/dealer/rewards-dashboard
-export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      return NextResponse.json({ success: false, error: "Session expired. Please login again." }, { status: 401 });
+      return NextResponse.json(apiError("Session expired. Please login again."), { status: 401 });
     }
 
     // Get dealer row
@@ -33,18 +35,16 @@ export async function GET(req: NextRequest) {
       .select("id", { count: "exact", head: true })
       .eq("referrer_id", dealer.id);
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        total_listings: totalListings,
-        hot_deals_earned: hotDealsEarned,
-        hot_deals_used: hotDealsUsed,
-        hot_deals_available: hotDealsAvailable,
-        future_ads_credit: Math.max(0, dealer.future_ads_credit || 0),
-        referral_count: referralCount || 0,
-      },
-    });
+    return NextResponse.json(apiSuccess({
+      total_listings: totalListings,
+      hot_deals_earned: hotDealsEarned,
+      hot_deals_used: hotDealsUsed,
+      hot_deals_available: hotDealsAvailable,
+      future_ads_credit: Math.max(0, dealer.future_ads_credit || 0),
+      referral_count: referralCount || 0,
+    }), { status: 200 });
   } catch (err) {
-    return NextResponse.json({ success: false, error: "Server error. Please try again later." }, { status: 500 });
+    logError("Dealer rewards-dashboard error", err);
+    return NextResponse.json(apiError(), { status: 500 });
   }
 }
